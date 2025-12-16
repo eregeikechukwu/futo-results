@@ -1,0 +1,385 @@
+@import "../functions/toRem.scss";
+
+.button-primary {
+  font-size: toRem(18);
+  font-weight: 600;
+  line-height: toRem(28);
+  border-radius: toRem(16);
+  padding: toRem(16) toRem(32);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.center-child {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.justify-between-center {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dashboard-main-container {
+  display: flex;
+  flex-direction: column;
+  gap: toRem(32);
+}
+
+.dashboard-container {
+  border-radius: toRem(16);
+  padding: toRem(24);
+  background-color: var(--color-white);
+  border-width: toRem(1);
+  border-style: solid;
+  border-color: var(--color-background-mild);
+  box-shadow: 0 toRem(1) toRem(2) 0 rgba(0, 0, 0, 0.05);
+}
+
+@keyframes fallout {
+  0% {
+    transform: translateY(toRem(-20));
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+// Auth form field styles
+.label {
+  font-size: toRem(14);
+  font-weight: 600;
+  line-height: toRem(20);
+  color: var(--color-text-dark);
+  display: flex;
+  justify-items: flex-start;
+  align-items: center;
+
+  & span {
+    & svg {
+      width: toRem(14);
+      height: toRem(14);
+      margin-right: 0.5rem;
+    }
+  }
+}
+
+.field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: toRem(8);
+  width: 100%;
+
+  & label {
+    @extend .label;
+  }
+
+  & div.input {
+    position: relative;
+    border-radius: toRem(12);
+    background-color: var(--color-white);
+    border: 1px solid var(--color-border-light);
+    transition: all 0.4s;
+    & input,
+    textarea {
+      border-radius: toRem(12);
+      font-size: toRem(14);
+      width: 100%;
+      padding: toRem(12) toRem(16);
+      line-height: toRem(20);
+
+      &:focus {
+        outline: none;
+        border: 2px solid var(--color-primary);
+      }
+    }
+
+    & p.error {
+      position: absolute;
+      bottom: toRem(-20);
+      left: 0;
+      animation: fallout 0.4s ease-in-out;
+      color: var(--color-red);
+      font-size: toRem(11);
+    }
+
+    &#password {
+      & input,
+      textarea {
+        padding-right: toRem(48);
+      }
+
+      & button {
+        color: var(--color-text-link);
+        width: toRem(19);
+        position: absolute;
+        top: 50%;
+        right: toRem(16);
+        transform: translateY(-50%);
+
+        & svg {
+          color: var(--color-text-passive);
+
+          &:hover,
+          &:focus {
+            color: var(--color-text-link);
+          }
+        }
+      }
+    }
+  }
+}
+
+// Progress bar styles and animation
+@keyframes progressAnimation {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: var(--progress);
+  }
+}
+
+.progress-bar {
+  width: 100%;
+  background-color: var(--color-border-light);
+  height: toRem(8);
+  border-radius: 4rem;
+  margin-right: toRem(16);
+  overflow: hidden;
+
+  &-fill {
+    height: 100%;
+    background-color: var(--progress-color);
+    width: var(--progress);
+    border-radius: 4rem;
+    transition: width 1s ease-in-out;
+    animation: progressAnimation 1s cubic-bezier(0.19, 0.32, 0.16, 0.8) forwards;
+  }
+}
+
+.border-light {
+  border: 1px solid var(--color-border-light);
+}
+
+.input {
+  @extend .border-light;
+  border-radius: toRem(12);
+  outline: none;
+
+  &:focus {
+    border: 1px solid var(--color-primary);
+    outline: 2px solid var(--color-primary);
+  }
+}
+
+//button primary
+.button-primary {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: var(--color-primary);
+  border-radius: toRem(12);
+  font-weight: 500;
+  padding: toRem(12) toRem(24);
+  text-align: center;
+  color: var(--color-white);
+  transition: all 0.4s;
+
+  &:hover {
+    background-color: var(--color-primary-hover);
+  }
+}
+
+// Grid cards
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: toRem(24);
+}
+
+// MOdal styles
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+
+  &-content {
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    gap: toRem(16);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 105;
+
+    &-styled {
+      width: toRem(512);
+      box-shadow: 0 toRem(1) toRem(2) 0 rgba(0, 0, 0, 0.05);
+      background-color: var(--color-white);
+      border-radius: toRem(16);
+      padding: toRem(24);
+    }
+  }
+}
+
+.input-height {
+  height: toRem(46);
+}
+
+.modal-field {
+  position: relative;
+  & input,
+  & select,
+  textarea {
+    @extend .input-height;
+    @extend .input;
+    width: 98%;
+    margin-left: 2px;
+    padding: toRem(12) toRem(16);
+  }
+
+  & p.error {
+    position: absolute;
+    bottom: toRem(-20);
+    left: 0;
+    animation: fallout 0.4s ease-in-out;
+    color: var(--color-red);
+    font-size: toRem(11);
+  }
+}
+
+.modal-input {
+  @extend .input-height;
+  @extend .input;
+  width: 100%;
+  padding: toRem(12) toRem(16);
+}
+
+.cancel-btn {
+  border-color: #d1d5db;
+  border-radius: toRem(8);
+  border-style: solid;
+  border-width: 1px;
+  color: var(--color-text-link);
+  line-height: toRem(24);
+  padding: toRem(8) toRem(16);
+}
+
+.center-absolutely {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.rotate {
+  animation: rotate 1.5s linear infinite;
+}
+
+//Lodaer rotate
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+//Scrollbar styles
+.scrollbar {
+  transition: 0.5s all;
+  &::-webkit-scrollbar {
+    width: toRem(8);
+    transition: 0.5s all;
+  }
+  &::-webkit-scrollbar-track {
+    background-color: var(--color-white);
+  }
+  &::-webkit-scrollbar-thumb {
+    transition: 0.5s all;
+    background-color: #939792;
+    width: 60%;
+    border-radius: 200px;
+  }
+  &::-webkit-scrollbar-thumb:hover,
+  &::-webkit-scrollbar-thumb:active {
+    background-color: #7f837e;
+    width: 100%;
+  }
+}
+
+//fade in animations
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}
+
+.animateFadeIn {
+  animation: fadeIn 500ms cubic-bezier(0.08, 0.99, 1, 1.04);
+}
+
+// /Table styles
+.table {
+  width: 100%;
+  border-collapse: collapse;
+
+  /* adds a border-top to each child except the first */
+  > * + * {
+    border-top: 1px solid #e5e7eb;
+  }
+
+  & thead {
+    background-color: var(--color-black-background-light);
+
+    & th {
+       font-size: toRem(12);
+  line-height: toRem(16);
+      text-transform: uppercase;
+      text-align: left;
+      padding-inline: toRem(24); // px-24 = 24 * 0.25rem
+      padding-block: toRem(16); // py-16 = 16 * 0.25rem
+      font-weight: 500; // font-medium
+      color: var(--color-text-passive);
+      letter-spacing: 0.6px;
+    }
+  }
+
+  & tbody {
+    & tr {
+      border-bottom-width: 1px;
+      border-bottom-color: var(--color-border-light);
+      background-color: var(--color-white);
+      font-size: toRem(14);
+      line-height: toRem(20);
+
+      &:hover {
+        background-color: var(--color-black-background-light);
+      }
+
+      & td {
+        padding: toRem(16) toRem(24);
+      }
+    }
+  }
+}

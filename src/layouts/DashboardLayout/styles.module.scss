@@ -1,0 +1,60 @@
+@import "../../app/styles/sass/functions/toRem.scss";
+
+.navList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: 100%;
+  //   min-height: 100vh;
+
+  & li:last-child {
+    position: relative;
+    margin-top: auto;
+
+    a {
+      color: #dc2626 !important;
+
+      &:hover {
+        background-color: var(--color-red-background) !important;
+      }
+    }
+    &::after {
+      content: "";
+      display: block;
+      height: 1px;
+      width: 100%;
+      background-color: var(--color-border-light);
+      position: absolute;
+      top: -1rem;
+      left: 0;
+      right: 0;
+    }
+  }
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: toRem(12);
+  padding: toRem(16) toRem(16);
+  font-size: toRem(14);
+  font-weight: 500;
+  line-height: toRem(20);
+  border-radius: toRem(12);
+  transition: all 0.4s;
+}
+
+.linkActive {
+  background-color: var(--color-blue-background-light);
+  color: var(--color-blue-light);
+  border-right: 2px solid var(--color-blue-light);
+}
+
+.linkInactive {
+  color: var(--color-text-link);
+
+  &:hover {
+    background-color: var(--color-black-background-light);
+    color: black;
+  }
+}

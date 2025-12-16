@@ -1,0 +1,15 @@
+@mixin heading {
+  color: red;
+  font-size: 2rem;
+}
+
+@mixin center-child {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin secondary-heading {
+  font-size: toRem(14);
+  line-height: toRem(20);
+}

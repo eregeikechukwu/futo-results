@@ -1,0 +1,117 @@
+@import "tailwindcss";
+@import "../styles/sass/main.scss";
+
+@import "sass/abstracts/variables.scss";
+@import "sass/abstracts/mixins.scss";
+
+@import "sass/functions/toRem.scss";
+
+@import "sass/utilities/typography.scss";
+@import "sass/utilities/spacing.scss";
+@import "sass/utilities/sizes";
+@import "sass/utilities/reusables";
+
+:root {
+  --background: #ffffff;
+  --foreground: #000000;
+  --font-inter: var(--font-inter);
+  --font-mono: var(--font-mono);
+  --color-white: #ffffff;
+  --color-text: #111827;
+  --color-text-link: #4b5563;
+  --color-text-passive: #6b7280; /*ask chatgpt for the inverse later */
+  --color-text-dark: #374151; /*ask chatgpt for the inverse later */
+  --color-background-mild: #f3f4f6; /* light gray for cards */ /*ask chatgpt for the inverse later */
+  --color-border-light: #e5e7eb;
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-blue-light: #1d4ed8;
+  --color-yellow: #f59e0b;
+  --color-green: #22c55e;
+  --color-brown: #d97706;
+  --color-purple: #9333ea;
+  --color-red: #dc2626;
+  --color-text-green: #16a34a;
+  --color-text-green-dark: #166534;
+  --color-text-brown: #92400e;
+  --color-text-blue: #1e40af;
+  --color-text-red: #b91c1c;
+  --color-blue-background-light: #eff6ff;
+  --color-blue-background: #dbeafe;
+  --color-green-background: #dcfce7;
+  --color-red-background: #fef2f2;
+  --color-brown-background: #fef3c7;
+  --color-purple-background: #f3e8ff;
+  --color-black-background-light: #f9fafb;
+  --color-brown-border: #fde68a;
+  --color-background-secondary: #f9fafb;
+  --color-ring-offset-shadow: 0 0 #0000;
+  --color-ring-shadow: 0 0 #0000;
+  --color-shadow: 0 0 #0000;
+  --color-shadow-colored: 0 0 #0000;
+  --base-font-size: 16px;
+  --container-width: 1300px;
+  --nav-height: 64px;
+  --sidebar-width: 256px;
+}
+
+.dark {
+  --background: #0f172a; /* deep slate navy (Tailwind slate-900 style) */
+  --foreground: #f9fafb; /* light gray-white text */
+  --color-white: #111827; /* for light-on-dark swaps */
+  --color-text: #e5e7eb; /* neutral-200 */
+  --color-text-link: #93c5fd; /* lighter blue link */
+  --color-text-passive: #9ca3af; /* gray-400 */
+  --color-primary: #3b82f6; /* brighter blue for visibility */
+  --color-blue-light: #60a5fa; /* soft glow blue */
+  --color-yellow: #fbbf24; /* slightly warmer */
+  --color-green: #4ade80; /* brighter green for dark bg */
+  --color-brown: #f59e0b; /* keep same hue, slightly lighter contrast */
+  --color-purple: #a855f7; /* vivid purple */
+  --color-red: #f87171; /* bright alert red */
+  --color-text-green: #86efac;
+  --color-text-green-dark: #22c55e;
+  --color-text-brown: #fbbf24;
+  --color-text-blue: #93c5fd;
+  --color-text-red: #fca5a5;
+  --color-blue-background: #1e3a8a; /* deep blue bg */
+  --color-green-background: #064e3b; /* dark green tint */
+  --color-red-background: #7f1d1d; /* deep red tint */
+  --color-brown-background: #78350f; /* warm brown tint */
+  --color-purple-background: #4c1d95; /* deep purple tint */
+  --color-background-secondary: #1e293b; /* slate-800 */
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-mono);
+  // --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+}
+
+body {
+  background: var(--background);
+  color: var(--color-text);
+  font-family: var(--font-inter);
+}
+
+html {
+  font-size: 100%; //90% of 16px = 14.4px
+  box-sizing: border-box;
+  // outline: 1px solid red !important;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+  // outline: 1px solid red !important;
+}
+
+.container {
+  max-width: var(--container-width);
+  margin: 0 auto;
+}

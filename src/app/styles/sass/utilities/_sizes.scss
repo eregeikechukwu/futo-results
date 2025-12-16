@@ -1,0 +1,10 @@
+@import "../functions/toRem.scss";
+
+@for $i from 1 through 1000 {
+  .h-#{$i} {
+    height: toRem($i);
+  }
+  .w-#{$i} {
+    width: toRem($i);
+  }
+}

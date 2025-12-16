@@ -1,0 +1,111 @@
+@import "../functions/toRem.scss";
+
+//shorthand padding
+@for $i from 1 through 150 {
+  .p-#{$i} {
+    padding: toRem($i);
+  }
+}
+
+//Padding- right
+@for $i from 1 through 150 {
+  .pr-#{$i} {
+    padding-right: toRem($i);
+  }
+}
+//Padding- left
+@for $i from 1 through 150 {
+  .pl-#{$i} {
+    padding-left: toRem($i);
+  }
+}
+//Padding- top
+@for $i from 1 through 150 {
+  .pt-#{$i} {
+    padding-top: toRem($i);
+  }
+}
+//Padding- bottom
+@for $i from 1 through 150 {
+  .pb-#{$i} {
+    padding-bottom: toRem($i);
+  }
+}
+//padding-x
+@for $i from 1 through 200 {
+  .px-#{$i} {
+    padding-left: toRem($i);
+    padding-right: toRem($i);
+  }
+}
+//padding-y
+@for $i from 1 through 150 {
+  .py-#{$i} {
+    padding-top: toRem($i);
+    padding-bottom: toRem($i);
+  }
+}
+
+//shorthand margin
+@for $i from 1 through 150 {
+  .m-#{$i} {
+    margin: toRem($i);
+  }
+}
+
+//Margin- right
+@for $i from 1 through 150 {
+  .mr-#{$i} {
+    margin-right: toRem($i);
+  }
+}
+//Margin- left
+@for $i from 1 through 300 {
+  .ml-#{$i} {
+    margin-left: toRem($i);
+  }
+}
+//Margin- top
+@for $i from 1 through 150 {
+  .mt-#{$i} {
+    margin-top: toRem($i);
+  }
+}
+//Margin- bottom
+@for $i from 1 through 150 {
+  .mb-#{$i} {
+    margin-bottom: toRem($i);
+  }
+}
+
+//margin-x
+@for $i from 1 through 150 {
+  .mx-#{$i} {
+    margin-left: toRem($i);
+    margin-right: toRem($i);
+  }
+}
+
+//margin-y
+@for $i from 1 through 150 {
+  .my-#{$i} {
+    margin-top: toRem($i);
+    margin-bottom: toRem($i);
+  }
+}
+
+//Gaps for flex and grids
+@for $i from 1 through 150 {
+  .gap-#{$i} {
+    gap: toRem($i);
+  }
+}
+
+//border- radius
+.rounded-small {
+  border-radius: 12px;
+}
+
+.rounded-medium {
+  border-radius: 16px;
+}

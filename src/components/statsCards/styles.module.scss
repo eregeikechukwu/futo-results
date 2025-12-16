@@ -1,0 +1,74 @@
+@import "../../app/styles/sass/functions/toRem.scss";
+
+.advisorStatsCard {
+  display: flex;
+  flex-direction: column;
+  line-height: toRem(24);
+
+  & > div {
+    display: flex;
+    gap: toRem(8);
+    justify-content: space-between;
+
+    div &:nth-child(1) {
+      h3 {
+        display: block;
+      }
+      p {
+        font-size: toRem(30);
+        line-height: toRem(36);
+        font-weight: 700;
+        margin-top: toRem(4);
+      }
+    }
+
+    div:nth-child(2) {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: toRem(48) !important;
+      width: toRem(48) !important;
+      border-radius: toRem(12);
+    }
+  }
+
+  p {
+    margin-top: toRem(16);
+    font-size: toRem(14);
+    line-height: toRem(20);
+    font-weight: 500;
+  }
+}
+
+.advisorStudentsStatsCard {
+  display: flex;
+  justify-content: space-between;
+
+  // & > div {
+  //   display: flex;
+  //   gap: toRem(8);
+  //   justify-content: space-between;
+
+  // }
+
+  & div:nth-child(1) {
+    h3 {
+      display: block;
+    }
+    p {
+      font-size: toRem(24);
+      line-height: toRem(32);
+      font-weight: 700;
+      margin-top: toRem(4);
+    }
+  }
+
+  & div:nth-child(2) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: toRem(40) !important;
+    width: toRem(40) !important;
+    border-radius: toRem(12);
+  }
+}

@@ -1,0 +1,51 @@
+@import "../functions/toRem.scss";
+
+@for $i from 1 through 150 {
+  .text-#{$i} {
+    font-size: toRem($i);
+  }
+}
+
+@for $i from 1 through 150 {
+  .lh-#{$i} {
+    line-height: toRem($i);
+  }
+}
+
+.body-text {
+  font-size: toRem(20);
+  line-height: toRem(28);
+}
+
+.text-small {
+  font-size: toRem(12);
+  line-height: toRem(16);
+}
+
+.text-large {
+  font-size: toRem(24);
+  line-height: toRem(32);
+}
+
+.text-small-passive {
+  color: var(--color-text-passive);
+  font-size: toRem(12);
+  line-height: toRem(16);
+}
+
+.secondary-heading {
+  font-size: toRem(14);
+  line-height: toRem(20);
+}
+
+.primary-heading {
+  font-size: toRem(36);
+  line-height: toRem(40);
+  font-weight: bold;
+}
+
+.text-medium {
+  font-size: toRem(18);
+  line-height: toRem(28);
+  font-weight: 600;
+}
