@@ -10,6 +10,11 @@ import {
   LogOut,
   ArrowDownToLine,
   Plus,
+  FileChartColumnIncreasing,
+  Calculator,
+  User2,
+  Trophy,
+  RefreshCcwIcon,
 } from "lucide-react";
 
 export const iconMap: { [key: string]: React.ComponentType<LucideProps> } = {
@@ -23,4 +28,9 @@ export const iconMap: { [key: string]: React.ComponentType<LucideProps> } = {
   Logout: LogOut,
   ArrowDownToLine: ArrowDownToLine,
   Plus: Plus,
+  FileChartColumnIncreasing: FileChartColumnIncreasing,
+  Calculator: Calculator,
+  User2: User2,
+  Trophy: Trophy,
+  RefreshCcwIcon: RefreshCcwIcon,
 };

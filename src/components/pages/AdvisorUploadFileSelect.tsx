@@ -8,11 +8,13 @@ import { InfoCard } from "../utilities";
 import { uploadImageForOCR } from "../../../lib/api";
 import { Modal } from "../modals/overlay";
 import { ProgressBar } from "../ocrProgress";
+import { OcrJob } from "@/app/types/advisor";
+import { useExcelParser } from "../../../lib/excelToJson";
+import { parse } from "path";
+import { ExcelParseResult, ParsedResult } from "@/app/types/resultsUpload";
 
 export function AdvisorUploadFileSelect(
-  setParsedJson: React.Dispatch<
-    React.SetStateAction<Record<string, string | null>[]>
-  >
+  setParsedJson: React.Dispatch<React.SetStateAction<ParsedResult[]>>
 ) {
   const [mode, setMode] = useState("Excel");
   const [dragging, setDragging] = useState(false);
@@ -24,6 +26,9 @@ export function AdvisorUploadFileSelect(
     message: "Ready to upload",
   });
   const fileRef = useRef<File | null>(null);
+
+  //Excel Processing hook
+  const { isLoading, error: excelError, parseFile } = useExcelParser();
 
   //MOdal to display progress
   const [modalState, setModalState] = useState(false);
@@ -46,27 +51,64 @@ export function AdvisorUploadFileSelect(
     toggleLoader();
     fileRef.current = file;
     setErrorMessage(null);
+    setProgress({
+      percent: 0,
+      phase: "idle",
+      message: "Ready to upload",
+    });
 
     try {
       // Only call ONCE with progress callback
-      const job = await uploadImageForOCR(file, (progressUpdate) => {
-        setProgress(progressUpdate);
-        // console.log("Progress update:", progressUpdate); // Debug log
-      });
 
-      if (job.status !== "done") {
-        console.error("Job did not complete:", job.status, job.error);
-        return;
+      if (
+        excelUploadFormats.includes(file.name.slice(file.name.lastIndexOf(".")))
+      ) {
+        const results = await parseFile(file);
+
+        if (!results.success) {
+          console.error("Excel parsing failed:", results.error);
+          setErrorMessage(excelError);
+          throw new Error(results.error);
+        }
+        setProgress({
+          ...progress,
+          percent: 100,
+          phase: "done",
+          message: "Excel parsing completed",
+        });
+
+        setTimeout(() => {
+          //Make sure not to change ths order
+          console.log(
+            "Final results bbbbbbbbbbbooooooooooooooooooobbbbbbbbbbbbbbb:",
+            errorMessage
+          );
+          setModalState(false);
+          setParsedJson((results.data as unknown as ParsedResult[]) || []);
+        }, 1000);
+      } else {
+        const job = await uploadImageForOCR(file, (progressUpdate) => {
+          setProgress(progressUpdate);
+          // console.log("Progress update:", progressUpdate); // Debug log
+        });
+
+        if (job.status !== "done") {
+          console.error("Job did not complete:", job.status, job.error);
+          return;
+        }
+
+        console.log("OCR Job completed successfully:", job);
+
+        setTimeout(() => {
+          //Make sure not to change ths order
+          console.log(
+            "Final results bbbbbbbbbbbooooooooooooooooooobbbbbbbbbbbbbbb:",
+            errorMessage
+          );
+          setModalState(false);
+          setParsedJson(job?.result?.data || job?.result?.parsedJson as ParsedResult[]);
+        }, 1000);
       }
-      setTimeout(() => {
-        //Make sure not to change ths order
-        console.log(
-          "Final results bbbbbbbbbbbooooooooooooooooooobbbbbbbbbbbbbbb:",
-          errorMessage
-        );
-        setModalState(false);
-        setParsedJson(job.result?.parsedJson || []);
-      }, 1000);
     } catch (error) {
       console.error("Upload failed:", error);
       setErrorMessage(error);

@@ -35,7 +35,7 @@ export default function Home() {
             <div className="">
               <h1 className="text-48 lh-60 font-bold mb-24 animateFadeIn">
                 Your Results,
-                <p className="text-[var(--color-primary)]">
+                <p className="text-[var(--color-primary)] h-[inherit]">
                   <TextAdd>Anytime.</TextAdd>
                 </p>
               </h1>

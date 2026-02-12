@@ -1,15 +1,14 @@
-@import "tailwindcss";
-@import "../styles/sass/main.scss";
+@use "tailwindcss" as *;
 
-@import "sass/abstracts/variables.scss";
-@import "sass/abstracts/mixins.scss";
+@use "sass/abstracts/variables.scss" as *;
+@use "sass/abstracts/mixins.scss" as *;
 
-@import "sass/functions/toRem.scss";
+@use "sass/functions/toRem.scss" as *;
 
-@import "sass/utilities/typography.scss";
-@import "sass/utilities/spacing.scss";
-@import "sass/utilities/sizes";
-@import "sass/utilities/reusables";
+@use "sass/utilities/typography.scss" as *;
+@use "sass/utilities/spacing.scss" as *;
+@use "sass/utilities/sizes" as *;
+@use "sass/utilities/reusables" as *;
 
 :root {
   --background: #ffffff;
@@ -51,8 +50,8 @@
   --color-shadow-colored: 0 0 #0000;
   --base-font-size: 16px;
   --container-width: 1300px;
-  --nav-height: 64px;
-  --sidebar-width: 256px;
+  --nav-height: 4rem;
+  --sidebar-width: 16rem;
 }
 
 .dark {
@@ -100,7 +99,7 @@ body {
 }
 
 html {
-  font-size: 100%; //90% of 16px = 14.4px
+  font-size: 85%; //90% of 16px = 14.4px
   box-sizing: border-box;
   // outline: 1px solid red !important;
 }

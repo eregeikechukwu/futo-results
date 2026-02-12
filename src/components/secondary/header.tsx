@@ -7,13 +7,15 @@ export function Header({
   subHeading,
   button,
   icon,
-  toggleModal,
+  onClick,
+  extraButton,
 }: {
   heading: string;
   subHeading: string;
   button?: string;
   icon?: string;
-  toggleModal?: () => void;
+  onClick?: () => void;
+  extraButton?: React.ReactNode;
 }) {
   return (
     <div className="flex justify-between items-center">
@@ -21,14 +23,19 @@ export function Header({
         <h2 className="text-large block font-bold">{heading}</h2>
         <p className="mt-4 text-[var(--color-text-link)]">{subHeading}</p>
       </div>
-      {button && icon && (
-        <button onClick={toggleModal} className="gap-8 button-primary">
+     <div className="flex gap-12">
+       {button && icon && (
+        <button onClick={onClick} className="gap-8 button-primary">
           {React.createElement(require("../../utils/iconMap").iconMap[icon], {
             size: 17,
           } as RefAttributes<SVGElement>)}{" "}
           {button}
         </button>
       )}
+
+      {/* Extra button */}
+      {extraButton}
+     </div>
     </div>
   );
 }

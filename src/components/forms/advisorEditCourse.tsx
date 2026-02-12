@@ -6,7 +6,7 @@ import { advisorCourseSchema } from "@/utils/advisorDashboardSchemas";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
-import { AdvisorCourseFields } from "../forms/reusables";
+import { AdvisorCourseFields, Form } from "../forms/reusables";
 import { LoaderSpinner1 } from "../secondary/loaders";
 
 export function EditCourse({
@@ -42,8 +42,7 @@ export function EditCourse({
 
   return (
     <FormProvider {...methods}>
-      <form
-        className="flex flex-col h-full gap-16"
+      <Form
         onSubmit={methods.handleSubmit(onSubmit)}
       >
         {/* //All the fields in one componenent */}
@@ -64,7 +63,7 @@ export function EditCourse({
             {isSubmitting && <LoaderSpinner1 />}
           </button>
         </div>
-      </form>
+      </Form>
     </FormProvider>
   );
 }

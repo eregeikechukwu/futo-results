@@ -12,18 +12,18 @@ export default function AdvisorCourses() {
   const activeSesson = "2024/2025";
 
   const totalCourses = advisorCourses.filter(
-    (course) => course.session === activeSesson
+    (course) => course.session === activeSesson,
   );
   const totalCoursesCount = totalCourses.length;
   const totalCredits: number = totalCourses.reduce(
     (acc, course) => acc + Number(course.unit),
-    0
+    0,
   );
   const harmattan = totalCourses.filter(
-    (course) => course.semester === "Harmattan"
+    (course) => course.semester === "Harmattan",
   ).length;
   const rain = totalCourses.filter(
-    (course) => course.semester === "Rain"
+    (course) => course.semester === "Rain",
   ).length;
 
   const { toggleModal, ModalTemplate } = useModalTemplate();
@@ -36,7 +36,7 @@ export default function AdvisorCourses() {
         subHeading="Add, edit, and organize departmental courses"
         icon="Plus"
         button="Add Course"
-        toggleModal={toggleModal}
+        onClick={toggleModal}
       />
 
       {/* Stats card */}

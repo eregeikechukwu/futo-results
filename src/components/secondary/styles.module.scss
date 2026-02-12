@@ -1,5 +1,5 @@
 @use "../../app/styles/sass/abstracts/mixins.scss" as *;
-@import "../../app/styles/sass/functions/toRem.scss";
+@use "../../app/styles/sass/functions/toRem.scss" as *;
 
 .quickAction {
   border-radius: toRem(12);

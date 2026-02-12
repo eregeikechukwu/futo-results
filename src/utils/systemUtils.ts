@@ -1,6 +1,18 @@
+import { readonly } from "zod";
+
 // Defaults
 export const units = [1, 2, 3, 4, 5, 6];
 export const semesters = ["Harmattan", "Rain"];
+
+//Grading system
+export function computeGrade(total: number): string {
+  if (total >= 70) return "A";
+  if (total >= 60) return "B";
+  if (total >= 50) return "C";
+  if (total >= 45) return "D";
+  if (total >= 40) return "E";
+  return "F";
+}
 
 //Upload format options
 export const excelUploadFormats = [".xlsx", ".xls", ".csv"];
@@ -27,38 +39,43 @@ export function formatSessionInput(value: string): string | undefined {
 export const editCourseFields = [
   {
     name: "name",
-    placeholder: "John Doe",
+    placeholder: "eg: John Doe (optional)",
     type: "text",
     maxLength: 100,
     className: "w-200",
+    readonly: false,
   },
   {
     name: "regNo",
-    placeholder: "20231245887",
+    placeholder: "eg: 20231245887",
     type: "number",
     maxLength: 11,
     className: "w-200",
+    readonly: false,
   },
   {
     name: "test",
-    placeholder: "20",
+    placeholder: "eg: 20",
     type: "number",
     maxLength: 2,
     className: "w-50",
+    readonly: false,
   },
   {
     name: "lab",
-    placeholder: "20",
+    placeholder: "eg: 20",
     type: "number",
     maxLength: 2,
     className: "w-50",
+    readonly: false,
   },
   {
     name: "exam",
-    placeholder: "60",
+    placeholder: "eg: 60",
     type: "number",
     maxLength: 2,
     className: "w-50",
+    readonly: false,
   },
   {
     name: "total",
@@ -66,19 +83,22 @@ export const editCourseFields = [
     type: "number",
     maxLength: 3,
     className: "w-50",
+    readonly: true,
   },
   {
     name: "grade",
-    placeholder: "60",
+    placeholder: "eg: A",
     type: "text",
     maxLength: 1,
-    className: "w-50",
+    className: "w-50 font-bold",
+    readonly: true,
   },
   {
     name: "remark",
-    placeholder: "EXCELLENT",
+    placeholder: "eg: PASS",
     type: "text",
     maxLength: 10,
-    className: "w-100",
+    className: "w-100 font-bold",
+    readonly: true,
   },
 ];

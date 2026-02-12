@@ -18,47 +18,82 @@ export function Modal({
   toggleModal: () => void;
   stall: boolean;
 }) {
-  const [stallState, setStallState] = useState(true);
+  const [stallState, setStallState] = useState(stall);
 
   useEffect(() => {
     setStallState(stall);
   }, [stall]);
 
+  // Prevent closing with Escape when stalled; allow when not stalled
+  useEffect(() => {
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === "Escape" && state && !stallState) {
+        toggleModal();
+      }
+    }
+
+    if (state) {
+      window.addEventListener("keydown", handleKey);
+      return () => window.removeEventListener("keydown", handleKey);
+    }
+  }, [state, stallState, toggleModal]);
+
   return (
-    <div className={`modal ${!state ? "!hidden" : ""}`}>
+    <div
+      className={`modal fixed inset-0 z-50 flex items-center justify-center ${
+        !state ? "pointer-events-none" : ""
+      }`}
+      aria-hidden={!state}
+    >
       <div
         className={`modal-content ${
           withTemplate ? "modal-content-styled" : ""
+        } transition-transform duration-300 ease-out transform ${
+          state
+            ? "opacity-100 translate-y-0 scale-100"
+            : "opacity-0 translate-y-4 scale-95"
         }`}
       >
         <div className="flex justify-between relative">
           <span className="text-medium">{title}</span>
-          <div
-            className={`transition-all duration-1000 ${
-              !withTemplate
-                ? "p-8 center-child rounded-full bg-white absolute -top-10 left-1/2"
-                : ""
-            } ${stallState ? "opacity-0" : "opacity-100"} `}
-          >
-            <X
-              className={`text-[var(--color-text-link)]  cursor-pointer `}
-              size={20}
-              onClick={toggleModal}
-            />
-          </div>
+          {!stallState && (
+            <div
+              className={`transition-all duration-300 ${
+                !withTemplate
+                  ? "p-8 center-child rounded-full bg-white absolute -top-10 left-1/2"
+                  : ""
+              } opacity-100 `}
+            >
+              <X
+                className={`text-[var(--color-text-link)]  cursor-pointer `}
+                size={20}
+                onClick={toggleModal}
+              />
+            </div>
+          )}
         </div>
         <div>{children}</div>
       </div>
-      <div onClick={toggleModal}>
-        <Overlay />
+
+      <div
+        onClick={() => {
+          if (!stallState && state) toggleModal();
+        }}
+        className={`absolute inset-0 z-40`}
+      >
+        <Overlay active={state} />
       </div>
     </div>
   );
 }
 
-export function Overlay() {
+export function Overlay({ active = true }: { active?: boolean }) {
   return (
-    <div className="fixed inset-0 z-50 min-w-screen min-h-screen bg-gray-600 opacity-50 " />
+    <div
+      className={`fixed inset-0 z-40 min-w-screen min-h-screen bg-gray-600 transition-opacity duration-300 ${
+        active ? "opacity-50" : "opacity-0 pointer-events-none"
+      }`}
+    />
   );
 }
 
@@ -67,11 +102,11 @@ export function useModalTemplate(stall = false, withTemplate = true) {
 
   const toggleModalMain = useCallback(() => {
     setIsModalOpen((prev) => {
-      // If stall is true and modal is open, don't close it
-      // Otherwise toggle normally
+      // If modal is open and stall is true, don't close it
+      if (prev && stall) return prev;
       return !prev;
     });
-  }, [stall]); // stall in dependency array
+  }, [stall]);
 
   // const Modal = useMemo(
   //   () =>
@@ -97,8 +132,6 @@ export function useModalTemplate(stall = false, withTemplate = true) {
     );
   }
 
-  //   [isModalOpen, toggleModal] // toggleModal is now properly updated when stall changes
-  // );
   return {
     ModalTemplate,
     isModalOpen,

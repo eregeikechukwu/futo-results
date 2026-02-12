@@ -23,7 +23,7 @@ function CountUp({
         start = end;
         clearInterval(counter);
       }
-      setCount(Math.floor(start));
+      setCount(+start.toFixed(2));
     }, 16);
 
     return () => clearInterval(counter);

@@ -14,6 +14,54 @@ import {
   semesterOptions,
   unitsOptions,
 } from "@/utils/systemUtils";
+import { AddedResult } from "@/app/types/resultsUpload";
+
+export function TextFieldResult({
+  name,
+  label,
+  required,
+  type = "text",
+  id,
+  onChange,
+  placeholder,
+  pattern,
+  inputMode,
+  maxLength = 100,
+}: TextFieldProps) {
+  const { register, formState, setValue, watch } =
+    useFormContext<AddedResult>();
+  const error = formState.errors[name as keyof AddedResult]?.message as
+    | string
+    | undefined;
+
+  const value = watch(name as keyof AddedResult) || "";
+
+  return (
+    <div className="modal-field">
+      {label && <Label htmlFor={id ?? String(name)}>{label}</Label>}
+
+      <input
+        id={id ?? String(name)}
+        {...register(name as keyof AddedResult, { required })}
+        type={type}
+        value={value}
+        pattern={pattern}
+        inputMode={inputMode}
+        maxLength={maxLength}
+        onChange={(e) => {
+          let val: string | number = e.target.value;
+          if (onChange) val = onChange(val) ?? val;
+          if (type === "number") val = Number(val);
+          console.log(val);
+          setValue(name as keyof AddedResult, val);
+        }}
+        placeholder={placeholder}
+        aria-invalid={!!error}
+      />
+      {!!error && <Error>{error}</Error>}
+    </div>
+  );
+}
 
 export function TextField({
   name,
@@ -41,9 +89,9 @@ export function TextField({
         type={type}
         value={value}
         onChange={(e) => {
-          let val: string = e.target.value;
+          let val: string | number = e.target.value;
           if (onChange) val = onChange(val) ?? val;
-          setValue(name as keyof CourseData, val);
+          setValue(name as keyof CourseData, String(val));
         }}
         placeholder={placeholder}
         aria-invalid={!!error}
@@ -121,5 +169,29 @@ export function AdvisorCourseFields() {
         placeholder="eg. 2024/2025"
       />
     </ModalForm>
+  );
+}
+
+export function Form({
+  children,
+  onSubmit,
+}: {
+  children: React.ReactNode;
+  onSubmit?: () => void;
+}) {
+  const submit = onSubmit
+    ? (e: React.FormEvent) => {
+        e.preventDefault();
+        onSubmit();
+      }
+    : undefined;
+
+  return (
+    <form
+      onSubmit={(e) => submit && submit(e)}
+      className="flex flex-col h-full gap-16"
+    >
+      {children}
+    </form>
   );
 }

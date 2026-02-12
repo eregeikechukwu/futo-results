@@ -1,4 +1,4 @@
-@import "../functions/toRem.scss";
+@use "../functions/toRem.scss" as *;
 
 //shorthand padding
 @for $i from 1 through 150 {

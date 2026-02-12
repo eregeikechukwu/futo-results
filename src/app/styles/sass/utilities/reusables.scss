@@ -1,4 +1,4 @@
-@import "../functions/toRem.scss";
+@use "../functions/toRem.scss" as *;
 
 .button-primary {
   font-size: toRem(18);
@@ -270,6 +270,7 @@
 }
 
 .cancel-btn {
+  cursor: pointer;
   border-color: #d1d5db;
   border-radius: toRem(8);
   border-style: solid;
@@ -353,8 +354,8 @@
     background-color: var(--color-black-background-light);
 
     & th {
-       font-size: toRem(12);
-  line-height: toRem(16);
+      font-size: toRem(12);
+      line-height: toRem(16);
       text-transform: uppercase;
       text-align: left;
       padding-inline: toRem(24); // px-24 = 24 * 0.25rem
@@ -382,4 +383,10 @@
       }
     }
   }
+}
+
+// flex-col
+.flex-col{
+  display: flex;
+  flex-direction: column;
 }

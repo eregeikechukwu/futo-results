@@ -12,8 +12,8 @@ const links = [
     href: "/advisor/under-construction",
     icon: "Calendar",
   },
-  { name: "Reports", href: "/advisor/under-construction", icon: "File" },
-  { name: "Settings", href: "/advisor/under-construction", icon: "Settings" },
+  // { name: "Reports", href: "/advisor/under-construction", icon: "File" },
+  // { name: "Settings", href: "/advisor/under-construction", icon: "Settings" },
   { name: "Logout", href: "/advisor/auth", icon: "Logout" },
 ];
 
@@ -23,9 +23,10 @@ export default function AdvisorMainLayout({
   children: React.ReactNode;
 }) {
   return (
-    <DashboardLayout links={links}>
+    <DashboardLayout user="advisor" links={links}>
       <div>
-        <div className="fixed top-0 z-20 h-[var(--nav-height)] bg-[var(--color-white)] shadow-sm px-32 w-full flex items-center justify-between">
+        {/* Nav */}
+        <div className="fixed top-0 z-20 h-[var(--nav-height)] bg-[var(--color-white)] shadow-sm px-32 w-[calc(100vw-var(--sidebar-width))] flex items-center justify-between">
           {/* Title */}
           <div>
             <h1 className="text-medium">Dr. Emmanuel Erege</h1>
@@ -36,7 +37,7 @@ export default function AdvisorMainLayout({
 
           {/* Notification and profile */}
           <div className="flex gap-24 items-center">
-            <Notification />
+            <Notification count={2} />
             <span className="w-1 h-26 bg-[var(--color-border-light)]">
               &nbsp;
             </span>

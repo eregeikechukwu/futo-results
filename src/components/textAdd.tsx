@@ -13,7 +13,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
  */
 export function TextAdd({ children }: { children: string }) {
   // State for currently visible characters
-  const [textVis, setVisState] = useState<string[]>([]);
+  const [textVis, setVisState] = useState<string[]>([""]);
 
   // State for cursor blink animation
   const [cursor, setCursor] = useState(true);
@@ -80,7 +80,7 @@ export function TextAdd({ children }: { children: string }) {
       // Type each character with delay
       typeIntervalRef.current = setInterval(() => {
         if (charIndex < characters.length) {
-          setVisState((prev) => [...prev, characters[charIndex]]);
+          setVisState((prev) => [...prev, characters[charIndex - 1]]);
           charIndex++;
         } else {
           // Typing complete, clean up and trigger callback

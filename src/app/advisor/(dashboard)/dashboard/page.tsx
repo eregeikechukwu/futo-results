@@ -50,7 +50,7 @@ export default function AdvisorDashboard() {
         />
 
         {/* Progress bars and upload summary */}
-        <div className="grid grid-cols-[repeat(2,minmax(420px,1fr))] gap-32">
+        <div className="grid grid-cols-[repeat(2,minmax(400px,1fr))] gap-32">
           <div className="dashboard-container">
             {/* Heading */}
             <div className="flex justify-between mb-30">

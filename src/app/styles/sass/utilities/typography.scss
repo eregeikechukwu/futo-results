@@ -1,4 +1,4 @@
-@import "../functions/toRem.scss";
+@use "../functions/toRem.scss" as *;
 
 @for $i from 1 through 150 {
   .text-#{$i} {
@@ -25,6 +25,11 @@
 .text-large {
   font-size: toRem(24);
   line-height: toRem(32);
+}
+
+.text-extra-large {
+  font-size: toRem(30);
+  line-height: toRem(36);
 }
 
 .text-small-passive {

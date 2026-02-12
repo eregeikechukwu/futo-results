@@ -25,8 +25,19 @@ export type TextFieldProps = {
   required?: boolean;
   type?: string;
   id?: string;
-  onChange?: (input: string) => string | undefined;
+  onChange?: (input: string) => number | string | undefined;
   placeholder?: string;
+  maxLength?: number;
+  pattern?: string;
+  inputMode?:
+    | "url"
+    | "search"
+    | "text"
+    | "tel"
+    | "numeric"
+    | "none"
+    | "decimal"
+    | undefined;
 };
 
 export type SelectOptions = { value: string | number; label: string };

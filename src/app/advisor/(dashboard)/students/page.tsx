@@ -5,17 +5,34 @@ import { advisorStudents } from "@/mock/advisorStudents";
 import { AdvisorStudentsStatsCards } from "@/components/statsCards/statsCards";
 import { Header } from "@/components/secondary/header";
 import { DashboardContainer } from "@/components/secondary/common";
+import { useModalTemplate } from "@/components/modals/overlay";
+import { PlusIcon } from "lucide-react";
+import { AddStudentForm } from "@/components/forms/addStudent";
 
 export default function ManageSTudents() {
+  const { toggleModal, ModalTemplate } = useModalTemplate();
+
   const verifiedStudents = advisorStudents.filter(
-    (student) => student.status === "verified"
+    (student) => student.status === "verified",
   ).length;
   const pendingStudents = advisorStudents.filter(
-    (student) => student.status === "pending"
+    (student) => student.status === "pending",
   ).length;
   const flaggedStudents = advisorStudents.filter(
-    (student) => student.status === "flagged"
+    (student) => student.status === "flagged",
   ).length;
+
+  const TypeStudent = () => {
+    return (
+      <button
+        onClick={toggleModal}
+        className="button-primary flex gap-8 items-center"
+      >
+        Type in Student
+        <PlusIcon size={17} className="" />
+      </button>
+    );
+  };
 
   return (
     <DashboardContainer>
@@ -25,6 +42,7 @@ export default function ManageSTudents() {
         subHeading="View and manage student registrations and verifications"
         icon="ArrowDownToLine"
         button="Import from Google Form"
+        extraButton={<TypeStudent />}
       />
 
       {/* Stats card */}
@@ -36,6 +54,12 @@ export default function ManageSTudents() {
       />
       {/* Students table */}
       <AdvisorStudentsTable />
+
+      {/* Type in Student thruogh form */}
+      <ModalTemplate title={"Add New Student"}>
+        {/* <AddStudent toggleModal={toggleModal} /> */}
+        <AddStudentForm toggleModal={toggleModal} />
+      </ModalTemplate>
     </DashboardContainer>
   );
 }

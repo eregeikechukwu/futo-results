@@ -12,9 +12,11 @@ type dashboardLinksType = {
 };
 
 export function DashboardLayout({
+  user,
   children,
   links,
 }: {
+  user: "advisor" | "student";
   children: React.ReactNode;
   links: dashboardLinksType[];
 }) {
@@ -25,7 +27,9 @@ export function DashboardLayout({
       {/* Sidebar below */}
       <aside className="shadow-lg z-10 fixed inset-y-0">
         {/* Logo below */}
-        <DashboardLogo>Advisor Portal</DashboardLogo>
+        <DashboardLogo>
+          {user.slice(0, 1).toUpperCase() + user.slice(1)} Portal
+        </DashboardLogo>
         <nav className="px-16 py-32 w-256 h-[calc(100vh-var(--nav-height))]">
           <ul className={styles.navList}>
             {links.map((link) => (
@@ -40,7 +44,7 @@ export function DashboardLayout({
                   {/* @ts-ignore */}
                   {React.createElement(
                     require("../../utils/iconMap").iconMap[link.icon],
-                    { size: 17 } as RefAttributes<SVGSVGElement>
+                    { size: 17 } as RefAttributes<SVGSVGElement>,
                   )}
                   <span className="capitalize">{link.name}</span>
                 </a>

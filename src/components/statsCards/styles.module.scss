@@ -1,4 +1,4 @@
-@import "../../app/styles/sass/functions/toRem.scss";
+@use "../../app/styles/sass/functions/toRem.scss" as *;
 
 .advisorStatsCard {
   display: flex;
