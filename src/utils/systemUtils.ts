@@ -1,17 +1,77 @@
-import { readonly } from "zod";
-
 // Defaults
 export const units = [1, 2, 3, 4, 5, 6];
 export const semesters = ["Harmattan", "Rain"];
 
-//Grading system
-export function computeGrade(total: number): string {
+// Strict grade letters used across result rendering and CGPA calculations.
+export type GradeLetter = "A" | "B" | "C" | "D" | "E" | "F";
+
+// Visual tones for grade badges.
+export type GradeTone = {
+  bg: string;
+  text: string;
+};
+
+// 5-point grading scale.
+export const gradePointMap: Record<GradeLetter, number> = {
+  A: 5,
+  B: 4,
+  C: 3,
+  D: 2,
+  E: 1,
+  F: 0,
+};
+
+// Shared grade color system used in student pages.
+export const gradeToneMap: Record<GradeLetter, GradeTone> = {
+  A: { bg: "var(--color-green-background)", text: "var(--color-text-green-dark)" },
+  B: { bg: "var(--color-blue-background)", text: "var(--color-text-blue)" },
+  C: { bg: "var(--color-brown-background)", text: "var(--color-text-brown)" },
+  D: { bg: "var(--color-purple-background)", text: "var(--color-white)" },
+  E: { bg: "var(--color-red-background)", text: "var(--color-text-red)" },
+  F: { bg: "var(--color-red)", text: "var(--color-white)" },
+};
+
+const gradeLetters = ["A", "B", "C", "D", "E", "F"] as const;
+
+// Grading system from total score.
+export function computeGrade(total: number): GradeLetter {
   if (total >= 70) return "A";
   if (total >= 60) return "B";
   if (total >= 50) return "C";
   if (total >= 45) return "D";
   if (total >= 40) return "E";
   return "F";
+}
+
+// Normalizes unknown/loose string values to strict A-F letters.
+export function toGradeLetter(value: string): GradeLetter {
+  if (gradeLetters.includes(value as GradeLetter)) {
+    return value as GradeLetter;
+  }
+
+  return "F";
+}
+
+// Computes CGPA from unit + grade pairs.
+export function calculateCgpaFromGrades(
+  courses: { unit: number; grade: GradeLetter }[],
+): number {
+  const validCourses = courses.filter((course) => course.unit > 0);
+  const totalUnits = validCourses.reduce((sum, course) => sum + course.unit, 0);
+
+  if (!totalUnits) return 0;
+
+  const weightedPointTotal = validCourses.reduce(
+    (sum, course) => sum + course.unit * gradePointMap[course.grade],
+    0,
+  );
+
+  return weightedPointTotal / totalUnits;
+}
+
+// Standardized CGPA formatting for UI display.
+export function formatCgpa(value: number): string {
+  return value.toFixed(2);
 }
 
 //Upload format options

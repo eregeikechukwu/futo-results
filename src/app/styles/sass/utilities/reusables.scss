@@ -196,6 +196,14 @@
   }
 }
 
+.button-green {
+  background-color: var(--color-green);
+  &:hover,
+  &:active {
+    background-color: var(--color-text-green);
+  }
+}
+
 // Grid cards
 .cardGrid {
   display: grid;
@@ -386,7 +394,7 @@
 }
 
 // flex-col
-.flex-col{
+.flex-col {
   display: flex;
   flex-direction: column;
 }

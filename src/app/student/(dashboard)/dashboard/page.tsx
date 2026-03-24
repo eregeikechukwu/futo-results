@@ -1,5 +1,7 @@
+import AreaChart from "@/components/chart";
 import { StudentStatCard } from "@/components/statsCards/studentStatCard";
 import { studentsDashboardStats } from "@/utils/studentDashboardStats";
+import Link from "next/link";
 
 export default function StudentDashboard() {
   return (
@@ -16,9 +18,11 @@ export default function StudentDashboard() {
         </div>
 
         {/* Button */}
-        <button className="text-[var(--color-primary)] bg-white px-24 py-12 rounded-xl font-[600] w-max cursor-pointer hover:bg-gray-100 active:opacity-80 transition-all">
-          View Results
-        </button>
+        <Link href={"/student/results"}>
+          <button className="text-[var(--color-primary)] bg-white px-24 py-12 rounded-xl font-[600] w-max cursor-pointer hover:bg-gray-100 active:opacity-80 transition-all">
+            View Results
+          </button>
+        </Link>
       </div>
 
       {/* Stats */}
@@ -29,6 +33,12 @@ export default function StudentDashboard() {
       </div>
 
       {/* GPA progress */}
+      <AreaChart />
+
+      {/* Heading or CTA */}
+      <div className="grid grid-cols-[repeat(auto-fit,minmax())]">
+        <div className="dashboard-container"></div>
+      </div>
     </div>
   );
 }

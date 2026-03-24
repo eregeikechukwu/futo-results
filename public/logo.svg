@@ -1,0 +1,111 @@
+ <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 200 200"
+        width="200"
+        height="200"
+        class="logo"
+      >
+        {/* <!-- Background circle --> */}
+        <circle
+          cx="100"
+          cy="100"
+          r="95"
+          fill="#f0f7ff"
+          stroke="#0066cc"
+          strokeWidth="2"
+        />
+
+        {/* <!-- Main logo group --> */}
+        <g transform="translate(100, 100)">
+          {/* <!-- Graduation cap top --> */}
+          <path
+            d="M -35 -15 L 0 -35 L 35 -15 Z"
+            fill="#0066cc"
+            stroke="#004499"
+            strokeWidth="1.5"
+          />
+
+          {/* <!-- Graduation cap board --> */}
+          <rect
+            x="-38"
+            y="-12"
+            width="76"
+            height="8"
+            fill="#0052a3"
+            stroke="#003d7a"
+            strokeWidth="1.5"
+            rx="2"
+          />
+
+          {/* <!-- Tassel --> */}
+          <line x1="0" y1="0" x2="0" y2="25" stroke="#0066cc" strokeWidth="2" />
+          <circle cx="0" cy="28" r="3" fill="#0066cc" />
+
+          {/* <!-- Chart bars (results visualization) --> */}
+          <g transform="translate(-20, 5)">
+            {/* <!-- Bar 1 --> */}
+            <rect
+              x="0"
+              y="8"
+              width="8"
+              height="20"
+              fill="#0099ff"
+              stroke="#0066cc"
+              strokeWidth="1"
+              rx="1"
+            />
+
+            {/* <!-- Bar 2 --> */}
+            <rect
+              x="12"
+              y="2"
+              width="8"
+              height="26"
+              fill="#0066cc"
+              stroke="#004499"
+              strokeWidth="1"
+              rx="1"
+            />
+
+            {/* <!-- Bar 3 --> */}
+            <rect
+              x="24"
+              y="5"
+              width="8"
+              height="23"
+              fill="#00ccff"
+              stroke="#0066cc"
+              strokeWidth="1"
+              rx="1"
+            />
+          </g>
+
+          {/* <!-- Upward arrow (achievement/progress) --> */}
+          <g transform="translate(15, -5)">
+            <path
+              d="M 0 15 L 0 0 M -5 5 L 0 0 L 5 5"
+              stroke="#00cc66"
+              strokeWidth="2.5"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </g>
+        </g>
+
+        {/* <!-- Platform name arc (optional - can be removed) --> */}
+        <defs>
+          <path id="topArc" d="M 30,100 A 70,70 0 0,1 170,100" fill="none" />
+        </defs>
+        <text
+          fontFamily="Arial, sans-serif"
+          fontSize="14"
+          fontWeight="bold"
+          fill="#0066cc"
+          letterSpacing="2"
+        >
+          <textPath href="#topArc" startOffset="50%" textAnchor="middle">
+            <!-- FUTO RESULTS -->
+          </textPath>
+        </text>
+      </svg>
