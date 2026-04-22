@@ -1,0 +1,60 @@
+@use "../../app/styles/sass/functions/toRem.scss" as *;
+@use "../../app/styles/sass/abstracts/mixins.scss" as *;
+
+.root {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: toRem(14);
+}
+
+.title {
+  font-size: toRem(24);
+  line-height: toRem(32);
+  font-weight: 700;
+}
+
+.subtitle {
+  margin-top: toRem(4);
+  color: var(--color-text-link);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: toRem(12);
+}
+
+.actionButton {
+  gap: toRem(8);
+}
+
+// Core responsive move: stack heading and action area to preserve tap targets and readability.
+@include mobile-compact {
+  .root {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .title {
+    font-size: toRem(20);
+    line-height: toRem(28);
+  }
+
+  .subtitle {
+    font-size: toRem(13);
+    line-height: toRem(19);
+  }
+
+  .actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: toRem(10);
+  }
+
+  .actionButton {
+    justify-content: center;
+    width: 100%;
+  }
+}

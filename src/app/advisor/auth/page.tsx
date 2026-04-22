@@ -4,13 +4,14 @@ import AdvisorLoginForm from "@/components/forms/advisorForm";
 import { AuthCard, AuthHeading, InfoCard } from "@/components/utilities";
 import AuthLayout from "@/layouts/AuthLayout";
 import { ShieldCheck } from "lucide-react";
+import styles from "@/app/styles/authPages.module.scss";
 
 export default function AdvisorAuth() {
   return (
     <div>
       <AuthLayout type="advisor">
         <AuthCard>
-          <div className="py-4 px-12 m-16 bg-[#dbeafe] rounded-full flex gap-8 text-[var(--color-blue-light)] items-center">
+          <div className={styles.advisorBadge}>
             <ShieldCheck height={18} width={18} />
             <p>Advisor Access</p>
           </div>
@@ -19,7 +20,7 @@ export default function AdvisorAuth() {
             subHeading="Secure access for departmental staff"
           />
           <AdvisorLoginForm />
-          <div className="mt-24">
+          <div className={styles.authInfoWrap}>
             <InfoCard
               heading="Restricted Access"
               variant="small"

@@ -1,3 +1,5 @@
+@use "./variables.scss" as *;
+
 @mixin heading {
   color: red;
   font-size: 2rem;
@@ -12,4 +14,82 @@
 @mixin secondary-heading {
   font-size: toRem(14);
   line-height: toRem(20);
+}
+
+//Responsive mixin Function
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == mobile {
+    @media (min-width: $min-mobile) and (max-width: $max-mobile) {
+      @content;
+    }
+  }
+  @if $breakpoint == small {
+    @media (min-width: $min-small) and (max-width: $max-small) {
+      @content;
+    }
+  }
+  @if $breakpoint == medium {
+    @media (min-width: $min-medium) and (max-width: $max-medium) {
+      @content;
+    }
+  }
+  @if $breakpoint == large {
+    @media (min-width: $min-large) and (max-width: $max-large) {
+      @content;
+    }
+  }
+  @if $breakpoint == extra-large {
+    @media (min-width: $min-extra-large) and (max-width: $max-extra-large) {
+      @content;
+    }
+  }
+}
+
+@mixin respond-to-abs($breakpoint) {
+  @if $breakpoint == mobile {
+    @media (max-width: $max-mobile) {
+      @content;
+    }
+  }
+  @if $breakpoint == small {
+    @media (max-width: $max-small) {
+      @content;
+    }
+  }
+  @if $breakpoint == medium {
+    @media (max-width: $min-medium) {
+      @content;
+    }
+  }
+  @if $breakpoint == large {
+    @media (max-width: $max-large) {
+      @content;
+    }
+  }
+  @if $breakpoint == extra-large {
+    @media (max-width: $max-extra-large) {
+      @content;
+    }
+  }
+}
+
+//Responsive Typography
+@mixin font-size-responsive($mobile, $medium, $large) {
+  font-size: $large;
+
+  @include respond-to-abs(medium) {
+    font-size: $medium;
+  }
+
+  @include respond-to(mobile) {
+    font-size: $mobile;
+  }
+}
+
+// Shared compact breakpoint used across dashboard/auth/landing responsive modules.
+// Keeps mobile behavior centralized so future breakpoint changes happen in one place.
+@mixin mobile-compact {
+  @include respond-to-abs(small) {
+    @content;
+  }
 }

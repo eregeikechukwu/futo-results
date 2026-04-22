@@ -1,0 +1,83 @@
+@use "../../../styles/sass/functions/toRem.scss" as *;
+@use "../../../styles/sass/abstracts/mixins.scss" as *;
+
+.heroCard {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: toRem(24);
+  padding: toRem(32);
+  border-radius: toRem(16);
+  background: linear-gradient(to right, #2563eb, #1d4ed8);
+}
+
+.heroTitleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: toRem(8);
+  color: var(--color-white);
+}
+
+.heroTitle {
+  font-size: toRem(30);
+  line-height: toRem(36);
+  font-weight: 700;
+}
+
+.heroSubtitle {
+  line-height: toRem(24);
+}
+
+.heroButton {
+  color: var(--color-primary);
+  background-color: var(--color-white);
+  padding: toRem(12) toRem(24);
+  border-radius: toRem(12);
+  font-weight: 600;
+  width: max-content;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.heroButton:hover {
+  background-color: #f3f4f6;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(toRem(224), 1fr));
+  gap: toRem(24);
+}
+
+.bottomSpacer {
+  min-height: toRem(4);
+}
+
+// Core responsive move: collapse hero + stat density for one-handed phone scanning.
+@include mobile-compact {
+  .heroCard {
+    gap: toRem(18);
+    padding: toRem(18);
+  }
+
+  .heroTitle {
+    font-size: toRem(22);
+    line-height: toRem(30);
+  }
+
+  .heroSubtitle {
+    font-size: toRem(14);
+    line-height: toRem(21);
+  }
+
+  .heroButton {
+    width: 100%;
+    text-align: center;
+    padding-inline: toRem(14);
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+    gap: toRem(14);
+  }
+}

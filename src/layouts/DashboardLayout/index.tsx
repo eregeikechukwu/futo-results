@@ -4,6 +4,8 @@ import { DashboardLogo } from "@/components/utilities";
 import React, { RefAttributes } from "react";
 import { usePathname } from "next/navigation";
 import styles from "./styles.module.scss";
+import { Menu, X } from "lucide-react";
+import { useEffect, useState } from "react";
 
 type dashboardLinksType = {
   name: string;
@@ -21,21 +23,48 @@ export function DashboardLayout({
   links: dashboardLinksType[];
 }) {
   const url = usePathname();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // Close the mobile drawer on route changes so page transitions stay clean.
+  useEffect(() => {
+    setIsSidebarOpen(false);
+  }, [url]);
 
   return (
-    <div className="flex">
+    <div className={styles.wrapper}>
+      {/* Core responsive move: expose global nav through a compact toggle on small viewports. */}
+      <button
+        type="button"
+        aria-label={isSidebarOpen ? "Close navigation menu" : "Open navigation menu"}
+        className={styles.mobileMenuButton}
+        onClick={() => setIsSidebarOpen((prev) => !prev)}
+      >
+        {isSidebarOpen ? <X size={18} /> : <Menu size={18} />}
+      </button>
+
+      {isSidebarOpen && (
+        <button
+          type="button"
+          className={styles.mobileOverlay}
+          aria-label="Close navigation overlay"
+          // Overlay click closes the drawer to mimic native mobile side-panel behavior.
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar below */}
-      <aside className="shadow-lg z-10 fixed inset-y-0">
+      <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.sidebarOpen : ""}`}>
         {/* Logo below */}
         <DashboardLogo>
           {user.slice(0, 1).toUpperCase() + user.slice(1)} Portal
         </DashboardLogo>
-        <nav className="px-16 py-32 w-256 h-[calc(100vh-var(--nav-height))]">
+        <nav className={styles.nav}>
           <ul className={styles.navList}>
             {links.map((link) => (
               <li key={link.name}>
                 <a
                   href={link.href}
+                  onClick={() => setIsSidebarOpen(false)}
                   className={`${styles.link} ${
                     url === link.href ? styles.linkActive : styles.linkInactive
                   }`}
@@ -53,7 +82,7 @@ export function DashboardLayout({
           </ul>
         </nav>
       </aside>
-      <main className="bg-[var(--color-background-secondary)] !ml-[var(--sidebar-width)]  w-[calc(100%-var(--sidebar-width))] min-h-screen">
+      <main className={styles.main}>
         <div>{children}</div>
       </main>
     </div>

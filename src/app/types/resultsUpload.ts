@@ -26,11 +26,22 @@ export interface ExcelMetadata {
   headers: string[];
 }
 
+export interface ExcelRawType {
+  name: string | null;
+  regNo: string | number | null;
+  test: string | null;
+  lab: string | null;
+  exam: string | null;
+  total: string | null;
+  grade: string | null;
+  remark: string | null;
+}
+
 export interface ExcelParseResult<T = Record<string, unknown>> {
   /** Whether parsing was successful */
   success: boolean;
   /** Parsed data as array of objects */
-  data: T[];
+  data: ExcelRawType[];
   /** Metadata about the parsed file */
   metadata: ExcelMetadata | null;
   /** Error message if parsing failed */

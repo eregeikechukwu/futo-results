@@ -1,0 +1,13 @@
+@use "../app/styles/sass/functions/toRem.scss" as *;
+@use "../app/styles/sass/abstracts/mixins.scss" as *;
+
+.chartWrap {
+  height: toRem(300);
+}
+
+// Core responsive move: reduce chart height so the first insight stays above the fold on phones.
+@include mobile-compact {
+  .chartWrap {
+    height: toRem(220);
+  }
+}

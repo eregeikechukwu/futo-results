@@ -1,6 +1,7 @@
 "use client";
 
 import { formatCgpa, GradeLetter, toGradeLetter } from "@/utils/systemUtils";
+import styles from "./CourseGradeEditor.module.scss";
 
 export type CalculatorCourse = {
   id: string;
@@ -55,7 +56,7 @@ export function CourseGradeEditor({
 
   return (
     <div
-      className={`dashboard-container ${theme === "green" ? "border !border-[var(--color-green)] bg-[var(--color-green-background)]" : ""}`}
+      className={`dashboard-container ${styles.editorRoot} ${theme === "green" ? styles.editorGreen : ""}`}
     >
       <div className="mb-16">
         <h2 className="text-medium font-bold">{title}</h2>
@@ -64,7 +65,7 @@ export function CourseGradeEditor({
         </p>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className={styles.tableWrap}>
         <table className="table">
           <thead>
             <tr>
@@ -84,7 +85,7 @@ export function CourseGradeEditor({
                       updateCourse(course.id, { code: event.target.value })
                     }
                     placeholder="eg. MEE401"
-                    className="w-full py-8 px-12 rounded-small border-light secondary-heading input"
+                    className={`${styles.courseInput} input`}
                   />
                 </td>
                 <td>
@@ -95,7 +96,7 @@ export function CourseGradeEditor({
                         unit: Number(event.target.value),
                       })
                     }
-                    className="w-full py-8 px-12 rounded-small border-light secondary-heading input"
+                    className={`${styles.courseInput} input`}
                   >
                     {[1, 2, 3, 4, 5, 6].map((value) => (
                       <option key={value} value={value}>
@@ -112,7 +113,7 @@ export function CourseGradeEditor({
                         grade: toGradeLetter(event.target.value),
                       })
                     }
-                    className="w-full py-8 px-12 rounded-small border-light secondary-heading input"
+                    className={`${styles.courseInput} input`}
                   >
                     {gradeOptions.map((grade) => (
                       <option key={grade} value={grade}>
@@ -136,7 +137,7 @@ export function CourseGradeEditor({
         </table>
       </div>
 
-      <div className="mt-16 flex justify-between gap-8">
+      <div className={styles.actions}>
         <button
           type="button"
           onClick={addCourse}
@@ -146,11 +147,11 @@ export function CourseGradeEditor({
         </button>
 
         {/* REsults */}
-       {theme === "default" &&  <div>
-          <p className="secondary-heading text-[var(--color-text-link)]">
+       {theme === "default" &&  <div className={styles.resultCard}>
+          <p className={styles.resultTitle}>
             Current Calculated CGPA
           </p>
-          <h3 className="text-extra-large font-bold mt-8">
+          <h3 className={styles.resultValue}>
             {formatCgpa(result)} / 5.00
           </h3>
         </div> }

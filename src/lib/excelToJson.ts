@@ -1,14 +1,3 @@
-/**
- * Excel to JSON Parser for Next.js
- * Fully typed TypeScript implementation
- *
- * Installation:
- * npm install xlsx
- * npm install --save-dev @types/node
- *
- * File location: lib/excelParser.ts or utils/excelParser.ts
- */
-
 import * as XLSX from "xlsx";
 
 // ============================================================================
@@ -28,7 +17,7 @@ import * as XLSX from "xlsx";
  */
 export async function excelToJson<T = Record<string, unknown>>(
   input: ExcelInput,
-  options: ExcelParseOptions = {}
+  options: ExcelParseOptions = {},
 ): Promise<ExcelParseResult<T>> {
   const {
     sheetName = null,
@@ -62,7 +51,7 @@ export async function excelToJson<T = Record<string, unknown>>(
     if (!rawData || rawData.length === 0) {
       return {
         success: true,
-        data: [] as T[],
+        data: [] as ExcelRawType[],
         metadata: {
           sheetName: targetSheetName,
           totalSheets: workbook.SheetNames.length,
@@ -80,7 +69,7 @@ export async function excelToJson<T = Record<string, unknown>>(
 
     // Process each row
     const processedData = rawData.map((row) =>
-      processRow(row, { trimValues, convertNumbers })
+      processRow(row, { trimValues, convertNumbers }),
     ) as T[];
 
     // Get headers from first row
@@ -91,7 +80,7 @@ export async function excelToJson<T = Record<string, unknown>>(
 
     return {
       success: true,
-      data: processedData,
+      data: processedData as ExcelRawType[],
       metadata: {
         sheetName: targetSheetName,
         totalSheets: workbook.SheetNames.length,
@@ -107,7 +96,7 @@ export async function excelToJson<T = Record<string, unknown>>(
     return {
       success: false,
       error: errorMessage,
-      data: [] as T[],
+      data: [] as ExcelRawType[],
       metadata: null,
     };
   }
@@ -143,7 +132,7 @@ async function readWorkbook(input: ExcelInput): Promise<XLSX.WorkBook> {
   }
 
   throw new Error(
-    "Invalid input type. Must be File, Buffer, ArrayBuffer, or file path string"
+    "Invalid input type. Must be File, Buffer, ArrayBuffer, or file path string",
   );
 }
 
@@ -152,7 +141,7 @@ async function readWorkbook(input: ExcelInput): Promise<XLSX.WorkBook> {
  */
 function applyCustomHeaders(
   rawData: Record<string, unknown>[],
-  headers: string[]
+  headers: string[],
 ): Record<string, unknown>[] {
   return rawData.map((row) => {
     const newRow: Record<string, unknown> = {};
@@ -171,7 +160,7 @@ function applyCustomHeaders(
  */
 function processRow(
   row: Record<string, unknown>,
-  options: { trimValues: boolean; convertNumbers: boolean }
+  options: { trimValues: boolean; convertNumbers: boolean },
 ): Record<string, unknown> {
   const { trimValues, convertNumbers } = options;
   const processedRow: Record<string, unknown> = {};
@@ -211,12 +200,13 @@ function processRow(
 // React Hook for Next.js
 // ============================================================================
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, SetStateAction } from "react";
 import {
   ExcelInput,
   ExcelMetadata,
   ExcelParseOptions,
   ExcelParseResult,
+  ExcelRawType,
 } from "@/app/types/resultsUpload";
 
 export interface UseExcelParserReturn<T = Record<string, unknown>> {
@@ -231,7 +221,7 @@ export interface UseExcelParserReturn<T = Record<string, unknown>> {
   /** Parse Excel file */
   parseFile: (
     file: File,
-    options?: ExcelParseOptions
+    options?: ExcelParseOptions,
   ) => Promise<ExcelParseResult<T>>;
   /** Get available sheets */
   getSheets: (file: File) => Promise<string[]>;
@@ -256,6 +246,7 @@ export interface UseExcelParserReturn<T = Record<string, unknown>> {
  *   return <input type="file" onChange={(e) => handleUpload(e.target.files[0])} />;
  * }
  */
+
 export function useExcelParser<T = 1>(): UseExcelParserReturn<T> {
   const [data, setData] = useState<T[]>([]);
   const [metadata, setMetadata] = useState<ExcelMetadata | null>(null);
@@ -265,7 +256,7 @@ export function useExcelParser<T = 1>(): UseExcelParserReturn<T> {
   const parseFile = useCallback(
     async (
       file: File,
-      options?: ExcelParseOptions
+      options?: ExcelParseOptions,
     ): Promise<ExcelParseResult<T>> => {
       setIsLoading(true);
       setError(null);
@@ -274,7 +265,7 @@ export function useExcelParser<T = 1>(): UseExcelParserReturn<T> {
         const result = await excelToJson<T>(file, options);
 
         if (result.success) {
-          setData(result.data);
+          setData(result.data as SetStateAction<T[]>);
           setMetadata(result.metadata);
         } else {
           setError(result.error || "Failed to parse file");
@@ -289,14 +280,14 @@ export function useExcelParser<T = 1>(): UseExcelParserReturn<T> {
         return {
           success: false,
           error: errorMessage,
-          data: [] as T[],
+          data: [],
           metadata: null,
         };
       } finally {
         setIsLoading(false);
       }
     },
-    []
+    [],
   );
 
   const getSheets = useCallback(async (file: File): Promise<string[]> => {

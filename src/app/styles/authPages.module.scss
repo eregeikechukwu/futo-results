@@ -1,0 +1,70 @@
+@use "./sass/functions/toRem.scss" as *;
+@use "./sass/abstracts/mixins.scss" as *;
+
+.modeSwitcher {
+  width: 100%;
+  display: flex;
+  padding: toRem(6);
+  border-radius: toRem(16);
+  margin-bottom: toRem(32);
+  background: var(--color-background-mild);
+}
+
+.modeButton {
+  cursor: pointer;
+  flex: 1 1 50%;
+  border-radius: toRem(12);
+  line-height: toRem(24);
+  padding: toRem(12) toRem(16);
+  font-weight: 500;
+  transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.modeButtonActive {
+  background: var(--color-primary);
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.16);
+  color: var(--color-white);
+}
+
+.modeButtonInactive {
+  background: var(--color-background-mild);
+  color: var(--color-text-link);
+}
+
+.advisorBadge {
+  padding: toRem(4) toRem(12);
+  margin: toRem(16);
+  background: var(--color-blue-background);
+  border-radius: 9999px;
+  display: flex;
+  gap: toRem(8);
+  align-items: center;
+  color: var(--color-blue-light);
+}
+
+.authInfoWrap {
+  margin-top: toRem(24);
+}
+
+// Core responsive move: keep mode switch and badge compact without shrinking tap targets.
+@include mobile-compact {
+  .modeSwitcher {
+    margin-bottom: toRem(20);
+  }
+
+  .modeButton {
+    padding: toRem(10) toRem(10);
+    font-size: toRem(14);
+    line-height: toRem(20);
+  }
+
+  .advisorBadge {
+    margin: toRem(10);
+    width: 100%;
+    justify-content: center;
+  }
+
+  .authInfoWrap {
+    margin-top: toRem(18);
+  }
+}

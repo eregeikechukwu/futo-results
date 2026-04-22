@@ -13,7 +13,7 @@ export function AuthCTABtn({
     <button
       type="submit"
       disabled={isSubmitting}
-      className="text-medium cursor-pointer transition-all hover:bg-[var(--color-blue-light)] rounded-small shadow-xl center-child bg-[var(--color-primary)] group text-[var(--color-white)]  py-16 w-full"
+      className={`text-medium cursor-pointer transition-all hover:bg-[var(--color-blue-light)] rounded-small shadow-xl center-child bg-[var(--color-primary)] group text-[var(--color-white)]  py-16 w-full ${isSubmitting && "opacity-70 cursor-not-allowed hover:bg-[var(--color-primary)]"}`}
       onClick={CTA}
     >
       <p className=" flex items-center">{children}</p>

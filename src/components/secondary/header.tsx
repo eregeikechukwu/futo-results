@@ -1,6 +1,7 @@
 "use client";
 
 import React, { RefAttributes } from "react";
+import styles from "./header.module.scss";
 
 export function Header({
   heading,
@@ -18,14 +19,14 @@ export function Header({
   extraButton?: React.ReactNode;
 }) {
   return (
-    <div className="flex justify-between items-center">
+    <div className={styles.root}>
       <div>
-        <h2 className="text-large block font-bold">{heading}</h2>
-        <p className="mt-4 text-[var(--color-text-link)]">{subHeading}</p>
+        <h2 className={styles.title}>{heading}</h2>
+        <p className={styles.subtitle}>{subHeading}</p>
       </div>
-     <div className="flex gap-12">
+     <div className={styles.actions}>
        {button && icon && (
-        <button onClick={onClick} className="gap-8 button-primary">
+        <button onClick={onClick} className={`button-primary ${styles.actionButton}`}>
           {React.createElement(require("../../utils/iconMap").iconMap[icon], {
             size: 17,
           } as RefAttributes<SVGElement>)}{" "}

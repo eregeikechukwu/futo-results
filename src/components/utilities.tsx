@@ -2,11 +2,12 @@ import { Info, LucideCircleAlert, TriangleAlert, X } from "lucide-react";
 import { Logo } from "./secondary/logo";
 import { error } from "console";
 import React from "react";
+import styles from "./utilities.module.scss";
 
 export function AuthCard({ children }: { children: React.ReactNode }) {
   return (
-    <div className="p-32 flex mb-16 flex-col items-center text-center bg-[var(--color-white)] shadow-2xl rounded-[24px]">
-      <div className="mb-16">
+    <div className={styles.authCard}>
+      <div className={styles.authLogo}>
         <Logo width={64} />
       </div>
       {children}
@@ -22,11 +23,11 @@ export function AuthHeading({
   subHeading: string;
 }) {
   return (
-    <div className="mb-32">
-      <h1 className="text-3xl font-bold mb-8" data-metatip="true">
+    <div className={styles.authHeading}>
+      <h1 className={styles.authHeadingTitle} data-metatip="true">
         {heading}
       </h1>
-      <p className="text-[var(--color-text-link)] lh-24">{subHeading}</p>
+      <p className={styles.authHeadingSub}>{subHeading}</p>
     </div>
   );
 }

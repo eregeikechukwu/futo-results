@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import { Toaster } from "react-hot-toast";
 import "./styles/globals.scss";
 
 const inter = Inter({
@@ -28,6 +29,18 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.variable} ${Mono.variable} antialiased `}>
         {children}
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 3000,
+            style: {
+              background: "#dbeafe",
+              color: "#1e40af",
+              borderRadius: "8px",
+              border: "2px solid #3b82f6",
+            },
+          }}
+        />
       </body>
     </html>
   );

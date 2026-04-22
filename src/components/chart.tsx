@@ -15,6 +15,7 @@ import { Line } from "react-chartjs-2";
 import { useRef } from "react";
 import { resultData } from "@/mock/resultsData";
 import { gpas } from "@/utils/studentDashboardStats";
+import styles from "./chart.module.scss";
 
 ChartJS.register(
   CategoryScale,
@@ -95,7 +96,7 @@ export default function AreaChart() {
   };
 
   return (
-    <div style={{ height: 300 }}>
+    <div className={styles.chartWrap}>
       <Line ref={chartRef} data={data} options={options} />
     </div>
   );

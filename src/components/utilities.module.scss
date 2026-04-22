@@ -1,0 +1,58 @@
+@use "../app/styles/sass/functions/toRem.scss" as *;
+@use "../app/styles/sass/abstracts/mixins.scss" as *;
+
+.authCard {
+  width: 100%;
+  padding: toRem(32);
+  margin-bottom: toRem(16);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: var(--color-white);
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.14);
+  border-radius: toRem(24);
+}
+
+.authLogo {
+  margin-bottom: toRem(16);
+}
+
+.authHeading {
+  margin-bottom: toRem(32);
+}
+
+.authHeadingTitle {
+  font-size: toRem(30);
+  line-height: toRem(36);
+  font-weight: 700;
+  margin-bottom: toRem(8);
+}
+
+.authHeadingSub {
+  color: var(--color-text-link);
+  line-height: toRem(24);
+}
+
+// Core responsive move: tighten auth card spacing while keeping hierarchy intact.
+@include mobile-compact {
+  .authCard {
+    padding: toRem(18) toRem(14);
+    border-radius: toRem(18);
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.12);
+  }
+
+  .authHeading {
+    margin-bottom: toRem(20);
+  }
+
+  .authHeadingTitle {
+    font-size: toRem(24);
+    line-height: toRem(30);
+  }
+
+  .authHeadingSub {
+    font-size: toRem(14);
+    line-height: toRem(20);
+  }
+}

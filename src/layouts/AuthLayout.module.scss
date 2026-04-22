@@ -1,0 +1,73 @@
+@use "../app/styles/sass/functions/toRem.scss" as *;
+@use "../app/styles/sass/abstracts/mixins.scss" as *;
+
+.root {
+  min-height: 100vh;
+  background: linear-gradient(
+    135deg,
+    var(--color-blue-background),
+    var(--color-white)
+  );
+  @include center-child;
+}
+
+.shell {
+  width: 100%;
+  max-width: var(--container-width);
+  display: grid;
+  align-items: center;
+  padding: toRem(16);
+  grid-template-columns: repeat(2, minmax(toRem(500), 1fr));
+  gap: toRem(48);
+}
+
+.visualPanel {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  left: toRem(20);
+  right: 50vw;
+}
+
+.visualImage {
+  width: auto;
+  height: 90vh;
+  border-radius: toRem(24);
+  box-shadow: 0 16px 28px rgba(15, 23, 42, 0.18);
+}
+
+.formPanel {
+  padding-inline: toRem(36);
+  grid-column: 2 / 3;
+}
+
+// Core responsive move: drop fixed split layout to a stacked flow and prevent overflow.
+@include mobile-compact {
+  .shell {
+    grid-template-columns: 1fr;
+    gap: toRem(20);
+    padding: toRem(12);
+  }
+
+  .visualPanel {
+    position: static;
+    transform: none;
+    left: auto;
+    right: auto;
+    width: 100%;
+    order: 1;
+  }
+
+  .visualImage {
+    width: 100%;
+    height: toRem(200);
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .formPanel {
+    grid-column: auto;
+    order: 2;
+    padding-inline: 0;
+  }
+}

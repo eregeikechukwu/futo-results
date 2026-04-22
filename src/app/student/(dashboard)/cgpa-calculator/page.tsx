@@ -8,6 +8,7 @@ import { DashboardContainer } from "@/components/secondary/common";
 import { Header } from "@/components/secondary/header";
 import { calculateCgpaFromGrades, formatCgpa } from "@/utils/systemUtils";
 import { useEffect, useMemo, useRef, useState } from "react";
+import styles from "./cgpa.module.scss";
 
 function createDefaultCourse(seed: string): CalculatorCourse {
   // Single factory keeps initial course row shape consistent in both sections.
@@ -127,19 +128,17 @@ export default function CgpaCalculatorPage() {
         theme="green"
       />
 
-      <div className="dashboard-container flex items-center justify-between border !border-[var(--color-green)] bg-[var(--color-green-background)]">
+      <div className={`dashboard-container ${styles.summaryCard}`}>
         <div>
-          <p className="secondary-heading text-[var(--color-text-link)]">
-            Projected Section CGPA
-          </p>
-          <h3 className="text-extra-large font-bold mt-8 text-[var(--color-text-green-dark)]">
+          <p className={styles.summaryTitle}>Projected Section CGPA</p>
+          <h3 className={styles.summaryValue}>
             {formatCgpa(projectedCgpa)} / 5.00
           </h3>
-          <p className="secondary-heading mt-8">
+          <p className={styles.summaryHint}>
             Cumulative Projected CGPA (Main + Projected):
-            <span className="font-bold text-[var(--color-text-green-dark)] ml-8">
+            <strong>
               {formatCgpa(cumulativeProjectedCgpa)} / 5.00
-            </span>
+            </strong>
           </p>
         </div>
         <button

@@ -181,7 +181,7 @@ export function AdvisorStudentsStatsCards({
         theme="var(--color-brown)"
         bg="var(--color-brown-background)"
       >
-        <Check size={iconSize} />
+        <Clock3 size={iconSize} />
       </CardTemplate>
 
       {/* Card 4 */}
@@ -191,7 +191,7 @@ export function AdvisorStudentsStatsCards({
         theme="var(--color-red)"
         bg="var(--color-red-background)"
       >
-        <Check size={iconSize} />
+        <Flag size={iconSize} />
       </CardTemplate>
     </div>
   );

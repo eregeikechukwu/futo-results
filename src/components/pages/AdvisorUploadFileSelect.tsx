@@ -5,16 +5,16 @@ import { excelUploadFormats } from "@/utils/systemUtils";
 import { BrainCircuit, FileSpreadsheet } from "lucide-react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { InfoCard } from "../utilities";
-import { uploadImageForOCR } from "../../../lib/api";
+import { uploadImageForOCR } from "../../lib/api";
 import { Modal } from "../modals/overlay";
 import { ProgressBar } from "../ocrProgress";
 import { OcrJob } from "@/app/types/advisor";
-import { useExcelParser } from "../../../lib/excelToJson";
+import { useExcelParser } from "../../lib/excelToJson";
 import { parse } from "path";
 import { ExcelParseResult, ParsedResult } from "@/app/types/resultsUpload";
 
 export function AdvisorUploadFileSelect(
-  setParsedJson: React.Dispatch<React.SetStateAction<ParsedResult[]>>
+  setParsedJson: React.Dispatch<React.SetStateAction<ParsedResult[]>>,
 ) {
   const [mode, setMode] = useState("Excel");
   const [dragging, setDragging] = useState(false);
@@ -63,6 +63,7 @@ export function AdvisorUploadFileSelect(
       if (
         excelUploadFormats.includes(file.name.slice(file.name.lastIndexOf(".")))
       ) {
+        // Excel action
         const results = await parseFile(file);
 
         if (!results.success) {
@@ -77,16 +78,28 @@ export function AdvisorUploadFileSelect(
           message: "Excel parsing completed",
         });
 
+        const normalizedData = results.data.map((data) => {
+          return {
+            name: data.Name,
+            regNo: data.RegNo,
+            test: data.Test,
+            lab: data.Lab,
+            exam: data.Exam,
+            total: data.Total,
+            remark: data.Remark,
+          };
+        });
+
         setTimeout(() => {
           //Make sure not to change ths order
-          console.log(
-            "Final results bbbbbbbbbbbooooooooooooooooooobbbbbbbbbbbbbbb:",
-            errorMessage
-          );
+
           setModalState(false);
-          setParsedJson((results.data as unknown as ParsedResult[]) || []);
+          console.log(results, "New loadss rf");
+          setParsedJson((normalizedData as unknown as ParsedResult[]) || []);
         }, 1000);
       } else {
+        // OCR action
+
         const job = await uploadImageForOCR(file, (progressUpdate) => {
           setProgress(progressUpdate);
           // console.log("Progress update:", progressUpdate); // Debug log
@@ -103,10 +116,12 @@ export function AdvisorUploadFileSelect(
           //Make sure not to change ths order
           console.log(
             "Final results bbbbbbbbbbbooooooooooooooooooobbbbbbbbbbbbbbb:",
-            errorMessage
+            errorMessage,
           );
           setModalState(false);
-          setParsedJson(job?.result?.data || job?.result?.parsedJson as ParsedResult[]);
+          setParsedJson(
+            job?.result?.data || (job?.result?.parsedJson as ParsedResult[]),
+          );
         }, 1000);
       }
     } catch (error) {
@@ -152,7 +167,7 @@ export function AdvisorUploadFileSelect(
         borderActive: "border-purple-400",
         borderHover: "hover:border-purple-400",
         bg: "bg-purple-100",
-        btnColor: "bg-purple-600 hover:bg-purple-700 ",
+        btnColor: "bg-purple-600 hover:bg-purple-700",
         iconColor: "text-purple-600",
       },
     },
@@ -299,7 +314,7 @@ export function AdvisorUploadFileSelect(
       );
     },
 
-    [mode, error, dragging, progress, toggleLoader, errorMessage, modalState]
+    [mode, error, dragging, progress, toggleLoader, errorMessage, modalState],
   );
 
   return { FileSelectComponent, mode };

@@ -1,0 +1,54 @@
+@use "../../../styles/sass/functions/toRem.scss" as *;
+@use "../../../styles/sass/abstracts/mixins.scss" as *;
+
+.summaryCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid var(--color-green);
+  background: var(--color-green-background);
+}
+
+.summaryTitle {
+  color: var(--color-text-link);
+  font-size: toRem(14);
+  line-height: toRem(20);
+}
+
+.summaryValue {
+  font-size: toRem(30);
+  line-height: toRem(36);
+  font-weight: 700;
+  margin-top: toRem(8);
+  color: var(--color-text-green-dark);
+}
+
+.summaryHint {
+  font-size: toRem(14);
+  line-height: toRem(20);
+  margin-top: toRem(8);
+}
+
+.summaryHint strong {
+  margin-left: toRem(8);
+  color: var(--color-text-green-dark);
+}
+
+// Core responsive move: switch summary card from row to stacked flow for narrower screens.
+@include mobile-compact {
+  .summaryCard {
+    flex-direction: column;
+    align-items: stretch;
+    gap: toRem(14);
+  }
+
+  .summaryValue {
+    font-size: toRem(24);
+    line-height: toRem(30);
+  }
+
+  .summaryHint {
+    font-size: toRem(13);
+    line-height: toRem(18);
+  }
+}

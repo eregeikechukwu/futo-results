@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Newspaper, CloudUpload, ShieldCheckIcon } from "lucide-react";
 import Link from "next/link";
 import { TextAdd } from "@/components/textAdd";
+import styles from "./home.module.scss";
 
 export default function Home() {
   const linkItems = [
@@ -18,10 +19,10 @@ export default function Home() {
   return (
     <main>
       {/* Header */}
-      <nav className="h-72  center-child shadow-[0_0_6px_0_rgba(37,99,235,0.35)]">
-        <div className="container flex justify-between  items-center px-34 ">
+      <nav className={styles.headerNav}>
+        <div className={styles.headerInner}>
           <LogoWithName isLight={false} />
-          <p className="lh-20 text-14 text-[var(--color-text-link)]">
+          <p className={styles.deptText}>
             Department of Mechatronics Engineering
           </p>
         </div>
@@ -30,53 +31,57 @@ export default function Home() {
       {/* Body */}
       <div>
         {/* Hero */}
-        <section className="h-screen mt-3  bg-gradient-to-br from-[var(--color-blue-background)] to-[var(--color-white)]">
-          <div className="grid h-full px-32 grid-cols-2 gap-48 items-center container">
-            <div className="">
-              <h1 className="text-48 lh-60 font-bold mb-24 animateFadeIn">
+        <section className={styles.heroSection}>
+          <div className={styles.heroGrid}>
+            <div>
+              <h1 className={`${styles.heroTitle} animateFadeIn`}>
                 Your Results,
-                <p className="text-[var(--color-primary)] h-[inherit]">
+                <span className={styles.heroAccent}>
                   <TextAdd>Anytime.</TextAdd>
-                </p>
+                </span>
               </h1>
-              <p className="text-20 text-[var(--color-text-link)] lh-32.5">
+              <p className={styles.heroBody}>
                 Access verified academic results securely from your department.
                 Simple, transparent, and always available.
               </p>
-              <div className="flex gap-16 mt-32">
+              <div className={styles.heroActions}>
                 <Link href="/student/auth">
-                  <button className="button-primary text-white hover:bg-[var(--color-blue-light)] bg-[var(--color-primary)] shadow-lg hover:shadow-xl">
+                  <button
+                    className={`button-primary text-white hover:bg-[var(--color-blue-light)] bg-[var(--color-primary)] heroActionButton`}
+                  >
                     I'm a Student
                   </button>
                 </Link>
                 <Link href="/advisor/auth">
-                  <button className="button-primary bg-[#f3f4f6] hover:bg-[#e2e8ec] shadow-md hover:shadow-lg">
+                  <button
+                    className={`button-primary bg-[#f3f4f6] hover:bg-[#e2e8ec] heroActionButton`}
+                  >
                     I'm an Advisor
                   </button>
                 </Link>
               </div>
             </div>
-            <div className="shadow-2xl`">
+            <div className={styles.heroImageWrap}>
               <Image
                 alt="hero image"
                 height={2000}
                 width={1500}
                 src={"/images/hero-option2.jpg"}
-                className="w-full h-max rounded-[24px]"
+                className={styles.heroImage}
               />
             </div>
           </div>
         </section>
         {/* How it works section */}
         <section>
-          <div className="container  py-80 px-32 text-center">
-            <div className="mb-64">
-              <h2 className="text-36 mb-12 lh-40 font-bold">How it Works</h2>
-              <p className="body-text text-[var(--color-text-link)]">
+          <div className={styles.sectionShell}>
+            <div className={styles.howHeader}>
+              <h2 className={styles.howTitle}>How it Works</h2>
+              <p className={styles.howSubtitle}>
                 Simple steps to access your verified results
               </p>
             </div>
-            <div className="grid w-full gap-32 grid-cols-[repeat(auto-fill,minmax(300px,1fr))] text-center ">
+            <div className={styles.howGrid}>
               <div className="bg-[var(--color-blue-background)]  transition-[0.7s] p-32 hover:shadow-lg group rounded-[16px] justify-between flex flex-col items-center">
                 <div className="rounded-full mb-[1.5rem] bg-[var(--color-primary)] transition-[0.4s] center-child w-64 h-64 group-hover:scale-[1.09375]">
                   <Newspaper className="w-24 h-25 text-[var(--color-white)] " />
@@ -118,10 +123,10 @@ export default function Home() {
         </section>
 
         {/* About section */}
-        <section id="about" className="bg-[var(--color-primary)]">
-          <div className="px-175 text-center center-child flex-col py-80  text-[#dbeafe] container">
-            <h2 className="text-36 lh-40 font-bold mb-24">About the Portal</h2>
-            <p className="text-20 lh-32 mb-32">
+        <section id="about" className={styles.aboutSection}>
+          <div className={styles.aboutShell}>
+            <h2 className={styles.aboutTitle}>About the Portal</h2>
+            <p className={styles.aboutText}>
               Our Student Result Portal ensures complete transparency,
               convenience, and integrity in accessing academic results. Built
               with security and user experience in mind, this platform provides
@@ -130,10 +135,10 @@ export default function Home() {
               protection and authenticity.
             </p>
 
-            <div className="bg-[#ffffff1a] rounded-[16px] w-max lh-24 p-24">
+            <div className={styles.supportCard}>
               <p>Need help or have questions?</p>
               <a
-                className="text-white font-[600] mt-10"
+                className={styles.supportMail}
                 href="mailto:eregeikechukwu@gmail.com"
               >
                 support@studentportal.edu
@@ -143,22 +148,22 @@ export default function Home() {
         </section>
 
         {/* Footer */}
-        <footer className="bg-[#111827] text-[#9ca3af] px-32 py-48">
-          <div className="flex justify-between">
+        <footer className={styles.footer}>
+          <div className={styles.footerInner}>
             <LogoWithName isLight={true} />
-            <div className="flex gap-24">
+            <div className={styles.footerLinks}>
               {linkItems.map((item) => (
                 <a
                   key={item.title}
                   href={item.link}
-                  className=" transition hover:text-white text-16 lh-24"
+                  className={styles.footerLink}
                 >
                   {item.title}
                 </a>
               ))}
             </div>
           </div>
-          <div className="pt-33 w-full text-center mt-36 border-t-[#1f2937] border-t-[1px]">
+          <div className={styles.footerCopy}>
             &copy; 2025 Student Result Portal. All rights reserved.
           </div>
         </footer>

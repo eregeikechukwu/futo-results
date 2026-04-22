@@ -13,6 +13,8 @@ import {
 } from "@/utils/systemUtils";
 import { useMemo, useState } from "react";
 import { resultData } from "@/mock/resultsData";
+import { ArrowDownToLine } from "lucide-react";
+import styles from "./results.module.scss";
 
 export default function StudentResultsPage() {
   const [selectedSemester, setSelectedSemester] = useState<string>(
@@ -41,14 +43,18 @@ export default function StudentResultsPage() {
   );
 
   const handleExportPdf = async () => {
-    // Creates logo buffer
-    const logoBuffer = await fetch("/images/logo.png").then((r) =>
-      r.arrayBuffer(),
-    );
-
     // Creates and downloads a real PDF file (no print popup dependency).
     setIsExporting(true);
     try {
+      // Logo is optional. If the file is missing, export still proceeds gracefully.
+      let logoBuffer: ArrayBuffer | undefined;
+      try {
+        const response = await fetch("/images/logo.png");
+        if (response.ok) logoBuffer = await response.arrayBuffer();
+      } catch {
+        logoBuffer = undefined;
+      }
+
       downloadSemesterResultPdf(
         { ...selectedResult, courses: normalizedCourses },
         semesterCgpa,
@@ -69,10 +75,10 @@ export default function StudentResultsPage() {
         onClick={handleExportPdf}
       />
 
-      {/* <div className="dashboard-container bg-gradient-to-r from-blue-600 to-blue-700 text-white flex flex-wrap justify-between gap-16 items-center">
+      {/* <div className={styles.exportCard}>
         <div>
-          <h3 className="text-24 lh-32 font-bold">Download Official Result Slip</h3>
-          <p className="secondary-heading mt-6 text-blue-100">
+          <h3 className={styles.exportTitle}>Download Official Result Slip</h3>
+          <p className={styles.exportSubtitle}>
             Export the selected semester as a ready-to-share PDF document.
           </p>
         </div>
@@ -80,15 +86,15 @@ export default function StudentResultsPage() {
           type="button"
           onClick={handleExportPdf}
           disabled={isExporting}
-          className="bg-white text-[var(--color-primary)] px-20 py-12 rounded-[12px] font-semibold flex items-center gap-8 cursor-pointer hover:bg-gray-100 disabled:opacity-70 disabled:cursor-not-allowed"
+          className={styles.exportButton}
         >
           <ArrowDownToLine size={18} />
           {isExporting ? "Exporting..." : "Export as PDF"}
         </button>
       </div> */}
 
-      <div className="dashboard-container flex gap-16 items-end">
-        <div className="w-full max-w-360">
+      <div className={`dashboard-container ${styles.controls}`}>
+        <div className={styles.semesterField}>
           <label
             htmlFor="semester"
             className="secondary-heading text-[var(--color-text-dark)]"
@@ -110,7 +116,7 @@ export default function StudentResultsPage() {
         </div>
       </div>
 
-      <div className="dashboard-container overflow-x-auto">
+      <div className={`dashboard-container ${styles.tableWrap}`}>
         <table className="table">
           <thead>
             <tr>
@@ -140,7 +146,7 @@ export default function StudentResultsPage() {
               </tr>
             ))}
             <tr>
-              <td colSpan={8} className="text-right font-bold">
+              <td colSpan={8} className={styles.cgpaCell}>
                 Semester CGPA: {formatCgpa(semesterCgpa)} / 5.00
               </td>
             </tr>

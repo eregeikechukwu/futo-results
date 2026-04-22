@@ -1,16 +1,17 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { set, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import { AuthCTABtn } from "../secondary/buttons";
 import { Eye, EyeClosed } from "lucide-react";
 import { useState } from "react";
 import { signupSchema } from "@/utils/authSchemas";
+import { SignupFormData } from "@/app/types/auth";
+import { handleSignUp } from "@/lib/auth/signup";
 
 //INfer typr from schema
-type SignupFormData = z.infer<typeof signupSchema>;
 
 export default function StudentSignupForm({
   setMode,
@@ -18,6 +19,7 @@ export default function StudentSignupForm({
   setMode: React.Dispatch<React.SetStateAction<string>>;
 }) {
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
   };
@@ -30,16 +32,21 @@ export default function StudentSignupForm({
   } = useForm<SignupFormData>({ resolver: zodResolver(signupSchema) });
 
   //Handle form submit
-  const onSubmit = async (data: SignupFormData) => {
-    console.log("form data: ", data);
-    //simulate backend call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    toast.success("login success");
-    reset();
+  const handleSignup = async (data: SignupFormData) => {
+    try {
+      setLoading(true);
+      await handleSignUp(data, setMode, reset);
+      toast.success("Signup successful! Please check your email for OTP.");
+    } catch (error: any) {
+      toast.error(error.message || "Signup failed. Please try again.");
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="w-full">
+    <form onSubmit={handleSubmit(handleSignup)} className="w-full">
       <div className="flex flex-col gap-24 mb-24">
         {/* Full name */}
         <div className="field">
@@ -122,7 +129,10 @@ export default function StudentSignupForm({
           </div>
         </div>
       </div>
-      <AuthCTABtn isSubmitting={isSubmitting} CTA={handleSubmit(onSubmit)}>
+      <AuthCTABtn
+        isSubmitting={isSubmitting || loading}
+        CTA={handleSubmit(handleSignup)}
+      >
         Create Account
       </AuthCTABtn>
 

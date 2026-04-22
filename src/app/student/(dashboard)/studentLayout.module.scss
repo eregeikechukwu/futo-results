@@ -1,0 +1,62 @@
+@use "../../styles/sass/functions/toRem.scss" as *;
+@use "../../styles/sass/abstracts/mixins.scss" as *;
+
+.topBar {
+  position: fixed;
+  top: 0;
+  z-index: 20;
+  height: var(--nav-height);
+  background-color: var(--color-white);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  padding-inline: toRem(32);
+  width: calc(100vw - var(--sidebar-width));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.titleWrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: toRem(18);
+  line-height: toRem(28);
+  font-weight: 600;
+}
+
+.subTitle {
+  color: var(--color-text-passive);
+  font-size: toRem(14);
+  line-height: toRem(20);
+}
+
+.content {
+  padding: toRem(32);
+  margin-top: var(--nav-height);
+  width: 100%;
+}
+
+// Core responsive move: keep top bar readable by reserving space for the mobile menu button.
+@include mobile-compact {
+  .topBar {
+    width: 100vw;
+    padding-inline: toRem(14);
+    padding-left: toRem(58);
+  }
+
+  .title {
+    font-size: toRem(15);
+    line-height: toRem(22);
+  }
+
+  .subTitle {
+    font-size: toRem(12);
+    line-height: toRem(16);
+  }
+
+  .content {
+    padding: toRem(16) toRem(12);
+  }
+}
