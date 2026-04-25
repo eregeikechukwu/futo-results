@@ -8,15 +8,19 @@ import { AuthCTABtn } from "../secondary/buttons";
 import { Eye, EyeClosed } from "lucide-react";
 import { useState } from "react";
 import { loginSchema } from "@/utils/authSchemas";
-
-//INfer typr from schema
-type LoginFormData = z.infer<typeof loginSchema>;
+import { LoginFormData } from "@/app/types/auth";
+import { handleStudentLogin } from "@/lib/auth/login";
+import { useRouter } from "next/navigation";
 
 export default function StudentLoginForm() {
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
   };
+
+  // Router fo login
+  const router = useRouter();
 
   const {
     register,
@@ -25,17 +29,21 @@ export default function StudentLoginForm() {
     reset,
   } = useForm<LoginFormData>({ resolver: zodResolver(loginSchema) });
 
-  //Handle form submit
-  const onSubmit = async (data: LoginFormData) => {
-    console.log("form data: ", data);
-    //simulate backend call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    toast.success("login success");
-    reset();
+  const handleLogin = async (data: LoginFormData) => {
+    try {
+      setLoading(true);
+      await handleStudentLogin(data, router, reset);
+      toast.success("Login successful! ");
+    } catch (error: any) {
+      toast.error(error.message || "Login failed. Please try again.");
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="w-full">
+    <form onSubmit={handleSubmit(handleLogin)} className="w-full">
       <div className="flex flex-col gap-24 mb-24">
         <div className="field">
           <label htmlFor="email">Email Address</label>
@@ -79,7 +87,7 @@ export default function StudentLoginForm() {
           </div>
         </div>
       </div>
-      <AuthCTABtn isSubmitting={isSubmitting} CTA={handleSubmit(onSubmit)}>
+      <AuthCTABtn isSubmitting={isSubmitting} CTA={handleSubmit(handleLogin)}>
         Login to Portal
       </AuthCTABtn>
 

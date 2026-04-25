@@ -19,9 +19,13 @@ export async function handleSignUp(
     .maybeSingle();
 
   if (preregError || !preregData) {
-    throw new Error(
-      "Your email and reg number do not match our preregistration records. Contact your advisor.",
-    );
+    console.log(preregError, " Error");
+    if (preregError?.message === "Failed to fetch") {
+      throw new Error("Failed to fetch, check your internet connection");
+    } else
+      throw new Error(
+        "Your email and reg number do not match our preregistration records. Contact your advisor.",
+      );
   }
 
   // step2: Create the auth account

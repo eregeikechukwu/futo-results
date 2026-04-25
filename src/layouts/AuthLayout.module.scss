@@ -23,6 +23,8 @@
 
 .visualPanel {
   position: fixed;
+  display: flex;
+  justify-content: center;
   top: 50%;
   transform: translateY(-50%);
   left: toRem(20);

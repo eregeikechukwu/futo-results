@@ -9,12 +9,18 @@ import { Eye, EyeClosed, KeyRound, Lock, LogIn, Mail } from "lucide-react";
 import { useState } from "react";
 import { advisorLoginSchema } from "@/utils/authSchemas";
 import { Error } from "../secondary/common";
+import { AdvisorLoginFormProps } from "@/app/types/auth";
+import { handleCredentials } from "@/lib/auth/advisorLogin";
 
 //INfer typr from schema
 type AdvisorLoginFormData = z.infer<typeof advisorLoginSchema>;
 
-export default function AdvisorLoginForm() {
+export default function AdvisorLoginForm({
+  onOtpSent,
+  setCredentials,
+}: AdvisorLoginFormProps) {
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [isLoading, setIsloading] = useState(false);
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
   };
@@ -30,13 +36,17 @@ export default function AdvisorLoginForm() {
 
   //Handle form submit
   const onSubmit = async (data: AdvisorLoginFormData) => {
-    //simulate backend call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    toast.success("login success");
-
-    //redirect to dashboard - simulate
-    window.location.href = "/advisor/dashboard";
-    reset();
+    try {
+      setIsloading(true);
+      await handleCredentials(data);
+      setCredentials(data);
+      onOtpSent(data.email);
+    } catch (error: any) {
+      toast.error(error.message || "Login failed. Please try again later");
+      setIsloading(false);
+    } finally {
+      setIsloading(false);
+    }
   };
 
   return (
@@ -86,33 +96,11 @@ export default function AdvisorLoginForm() {
             {errors.password && <Error>{errors.password.message}</Error>}
           </div>
         </div>
-
-        {/* 2FA code */}
-        <div className="field">
-          <label htmlFor="twofa">
-            <span>
-              <KeyRound />
-            </span>
-            Access Code
-          </label>
-          <div className="input" id="password">
-            <input
-              id="twofa"
-              placeholder="Department Access Code"
-              type="password"
-              {...register("twofa")}
-            />
-            {/* Error */}
-            {errors.twofa && <Error>{errors.twofa.message}</Error>}
-          </div>
-          {!errors?.twofa && (
-            <p className="text-small-passive text-start  mt-5">
-              Additional security for advisor accounts
-            </p>
-          )}
-        </div>
       </div>
-      <AuthCTABtn isSubmitting={isSubmitting} CTA={handleSubmit(onSubmit)}>
+      <AuthCTABtn
+        isSubmitting={isSubmitting || isLoading}
+        CTA={handleSubmit(onSubmit)}
+      >
         <span className="group-hover:translate-x-1 transition mr-9">
           <LogIn height={19} width={19} />
         </span>
