@@ -1,5 +1,7 @@
 @use "tailwindcss" as *;
 
+@use "sass/main/animations.scss" as *;
+
 @use "sass/abstracts/variables.scss" as *;
 @use "sass/abstracts/mixins.scss" as *;
 
@@ -113,4 +115,10 @@ html {
 .container {
   max-width: var(--container-width);
   margin: 0 auto;
+}
+
+// remove broser's default eye
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-textfield-decoration-container {
+  display: none !important;
 }

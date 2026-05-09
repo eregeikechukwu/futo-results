@@ -1,10 +1,10 @@
 import { SignupFormData } from "@/app/types/auth";
-import toast from "react-hot-toast";
 import { supabase } from "../supabase";
+import { errorThrowHandler } from "@/helpers/errorHandler";
 
 export async function handleSignUp(
   data: SignupFormData,
-  setMode: React.Dispatch<React.SetStateAction<string>>,
+  setMode: (mode: "login" | "sign-up") => void,
   reset: () => void,
 ) {
   console.log("form data: ", data);
@@ -19,13 +19,14 @@ export async function handleSignUp(
     .maybeSingle();
 
   if (preregError || !preregData) {
-    console.log(preregError, " Error");
-    if (preregError?.message === "Failed to fetch") {
-      throw new Error("Failed to fetch, check your internet connection");
-    } else
-      throw new Error(
-        "Your email and reg number do not match our preregistration records. Contact your advisor.",
-      );
+    console.error(preregError + " ... Error");
+    alert(preregError?.message);
+    errorThrowHandler(
+      preregError,
+      "Your email and reg number do not match our preregistration records. Contact your advisor.",
+    );
+    throw new Error(preregError?.message);
+    throw new Error(preregError?.message);
   }
 
   // step2: Create the auth account
@@ -43,16 +44,16 @@ export async function handleSignUp(
   });
 
   if (signupError || !userData) {
-    throw new Error(
-      //   signupError?.message ||
+    errorThrowHandler(
+      signupError,
       "An error occurred during signup. Please try again.",
     );
+    throw new Error(signupError?.message);
   }
 
   // Step SHow check your email message
   // The students rwo creation and claimed=true happen in  /auth/confirm
   // When the student clicks the link - NOT here
 
-  toast.success("Check you email for a confirmation link!");
   setMode("login");
 }

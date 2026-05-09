@@ -1,5 +1,6 @@
 @use "../app/styles/sass/functions/toRem.scss" as *;
 @use "../app/styles/sass/abstracts/mixins.scss" as *;
+@use "../app/styles/sass/main/animations.scss" as *;
 
 .authCard {
   width: 100%;
@@ -12,6 +13,7 @@
   background: var(--color-white);
   box-shadow: 0 16px 32px rgba(15, 23, 42, 0.14);
   border-radius: toRem(24);
+  animation: fadeIn 0.5s ease-out;
 }
 
 .authLogo {
@@ -54,5 +56,33 @@
   .authHeadingSub {
     font-size: toRem(14);
     line-height: toRem(20);
+  }
+}
+
+.desktopOnly {
+  background:
+    linear-gradient(#ffffffbd, #3b82f6bd),
+    url("/images/hero-option5.jpg") no-repeat center;
+  backdrop-filter: blur(4px);
+  z-index: 30;
+
+  background-size: cover;
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1rem;
+  min-height: 100vh;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    backdrop-filter: blur(6px);
+    background: rgba(255, 255, 255, 0.5);
+    z-index: -1;
   }
 }

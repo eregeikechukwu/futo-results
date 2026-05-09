@@ -17,13 +17,13 @@ export function useFileDragDrop(
     const fileType = file.type;
     let isAllowed = false;
 
-    if (mode === "Excel") {
+    if (mode === "excel") {
       isAllowed = excelUploadFormats.includes(
         file.name.slice(file.name.lastIndexOf("."))
       );
     }
 
-    if (mode === "OCR") {
+    if (mode === "ocr") {
       isAllowed = fileType.includes("image/") || fileType === "application/pdf";
     }
 

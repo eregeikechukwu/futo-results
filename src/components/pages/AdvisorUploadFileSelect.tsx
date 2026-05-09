@@ -12,11 +12,12 @@ import { OcrJob } from "@/app/types/advisor";
 import { useExcelParser } from "../../lib/excelToJson";
 import { parse } from "path";
 import { ExcelParseResult, ParsedResult } from "@/app/types/resultsUpload";
+import toast from "react-hot-toast";
 
 export function AdvisorUploadFileSelect(
   setParsedJson: React.Dispatch<React.SetStateAction<ParsedResult[]>>,
 ) {
-  const [mode, setMode] = useState("Excel");
+  const [mode, setMode] = useState<"excel" | "ocr">("excel");
   const [dragging, setDragging] = useState(false);
   const [error, setError] = useState<boolean | null>(null);
   const [errorMessage, setErrorMessage] = useState<unknown | null>(false);
@@ -67,7 +68,7 @@ export function AdvisorUploadFileSelect(
         const results = await parseFile(file);
 
         if (!results.success) {
-          console.error("Excel parsing failed:", results.error);
+          toast.error("Excel parsing failed: " + results.error);
           setErrorMessage(excelError);
           throw new Error(results.error);
         }
@@ -78,24 +79,12 @@ export function AdvisorUploadFileSelect(
           message: "Excel parsing completed",
         });
 
-        const normalizedData = results.data.map((data) => {
-          return {
-            name: data.Name,
-            regNo: data.RegNo,
-            test: data.Test,
-            lab: data.Lab,
-            exam: data.Exam,
-            total: data.Total,
-            remark: data.Remark,
-          };
-        });
-
         setTimeout(() => {
           //Make sure not to change ths order
 
           setModalState(false);
           console.log(results, "New loadss rf");
-          setParsedJson((normalizedData as unknown as ParsedResult[]) || []);
+          setParsedJson((results.data as unknown as ParsedResult[]) || []);
         }, 1000);
       } else {
         // OCR action
@@ -120,12 +109,16 @@ export function AdvisorUploadFileSelect(
           );
           setModalState(false);
           setParsedJson(
-            job?.result?.data || (job?.result?.parsedJson as ParsedResult[]),
+            (job?.result?.parsedJson as ParsedResult[]) ||
+              (job?.result?.parsedJson as ParsedResult[]),
           );
         }, 1000);
       }
     } catch (error) {
-      console.error("Upload failed:", error);
+      toast.error(
+        "Upload failed: " +
+          (error instanceof Error ? error.message : String(error)),
+      );
       setErrorMessage(error);
       fileRef.current = null;
     } finally {
@@ -172,7 +165,7 @@ export function AdvisorUploadFileSelect(
       },
     },
   ];
-  const activeMode = modes.find((m) => m.name === mode);
+  const activeMode = modes.find((m) => m.name.toLowerCase() === mode);
 
   const buttonCommonClasses =
     "cursor-pointer basis-1/2 rounded-[8px] lh-24 py-14 px-16 font-medium transition-colors center-child gap-8 ";
@@ -192,11 +185,13 @@ export function AdvisorUploadFileSelect(
                 <button
                   key={m.name}
                   className={`${buttonCommonClasses} ${
-                    mode === m.name
+                    mode === m.name.toLowerCase()
                       ? "bg-white shadow-sm text-[var(--color-primary)]"
                       : "text-[var(--color-text-link)] hover:text-[var(--color-gray-800)]"
                   }`}
-                  onClick={() => setMode(m.name)}
+                  onClick={() =>
+                    setMode(m.name.toLowerCase() as "excel" | "ocr")
+                  }
                 >
                   <span>
                     {m.name === "Excel" ? (
@@ -239,7 +234,7 @@ export function AdvisorUploadFileSelect(
                     dragging && "animate-bounce"
                   }`}
                 >
-                  {mode === "Excel" ? (
+                  {mode === "excel" ? (
                     <FileSpreadsheet size={25} />
                   ) : (
                     <BrainCircuit size={25} />
@@ -261,7 +256,7 @@ export function AdvisorUploadFileSelect(
                 >
                   {error
                     ? `Invalid file type. Please upload ${
-                        mode === "Excel"
+                        mode === "excel"
                           ? "an Excel file (.xlsx, .xls, .csv)"
                           : "a PDF or image file (JPEG, PNG)."
                       }`
@@ -269,7 +264,7 @@ export function AdvisorUploadFileSelect(
                 </p>
 
                 {/* OCR tips */}
-                {mode === "OCR" && (
+                {mode === "ocr" && (
                   <InfoCard
                     type="info"
                     heading="OCR Tips for Best Results"
@@ -303,6 +298,7 @@ export function AdvisorUploadFileSelect(
               state={modalState}
             >
               <ProgressBar
+                mode={mode}
                 file={fileRef}
                 retry={onFileSelected}
                 errorMessage={errorMessage}

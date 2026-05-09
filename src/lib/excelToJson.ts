@@ -78,9 +78,23 @@ export async function excelToJson<T = Record<string, unknown>>(
         ? Object.keys(processedData[0] as Record<string, unknown>)
         : [];
 
+    const normalizedData = processedData.map((data) => {
+      const record = data as Record<string, string | null>;
+      return {
+        name: record.Name,
+        regNo: record.RegNo,
+        test: record.Test,
+        lab: record.Lab,
+        exam: record.Exam,
+        total: record.Total,
+        remark: record.Remark,
+        grade: record.Grade,
+      };
+    });
+
     return {
       success: true,
-      data: processedData as ExcelRawType[],
+      data: normalizedData,
       metadata: {
         sheetName: targetSheetName,
         totalSheets: workbook.SheetNames.length,

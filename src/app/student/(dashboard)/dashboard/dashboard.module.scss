@@ -77,7 +77,7 @@
   }
 
   .statsGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(toRem(150), 1fr));
     gap: toRem(14);
   }
 }

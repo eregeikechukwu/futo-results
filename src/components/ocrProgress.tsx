@@ -4,11 +4,13 @@ import { Progress } from "@/app/types/advisor";
 import { CheckCircle, Loader2, X } from "lucide-react";
 
 export function ProgressBar({
+  mode,
   file,
   retry,
   progress,
   errorMessage,
 }: {
+  mode: "excel" | "ocr";
   file: React.RefObject<File | null>;
   retry: (file: File) => Promise<void>;
   progress: Progress;
@@ -66,7 +68,7 @@ export function ProgressBar({
           <div className="flex-1 flex justify-between">
             <div>
               <h2 className="text-lg font-bold text-gray-900">
-                {"Processing Image"}
+                {mode === "ocr" ? "Processing Image" : "Processing Excel File"}
               </h2>
               <p
                 className={`text-sm ${

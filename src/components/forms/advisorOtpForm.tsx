@@ -80,6 +80,7 @@ export function AdvisorOtpForm({
     });
 
     if (error) {
+      console.log("OTP error", error);
       if (error.message.includes("expired")) {
         toast.error("Code expired. Go back and sign in again.");
       } else {

@@ -1,7 +1,6 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { set, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import { AuthCTABtn } from "../secondary/buttons";
@@ -10,16 +9,20 @@ import { useState } from "react";
 import { signupSchema } from "@/utils/authSchemas";
 import { SignupFormData } from "@/app/types/auth";
 import { handleSignUp } from "@/lib/auth/signup";
+import { errorToastHandler } from "@/helpers/errorHandler";
 
 //INfer typr from schema
 
 export default function StudentSignupForm({
   setMode,
+  loading,
+  setLoading,
 }: {
-  setMode: React.Dispatch<React.SetStateAction<string>>;
+  setMode: (mode: "login" | "sign-up") => void;
+  loading: boolean;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
   };
@@ -36,9 +39,11 @@ export default function StudentSignupForm({
     try {
       setLoading(true);
       await handleSignUp(data, setMode, reset);
-      toast.success("Signup successful! Please check your email for OTP.");
+      toast.success(
+        "Signup successful! Please check your email for verification link.",
+      );
     } catch (error: any) {
-      toast.error(error.message || "Signup failed. Please try again.");
+      errorToastHandler(error, "Signup failed. Please try again.");
       setLoading(false);
     } finally {
       setLoading(false);

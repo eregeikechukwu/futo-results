@@ -8,7 +8,8 @@ import { useState } from "react";
 import styles from "@/app/styles/authPages.module.scss";
 
 export default function StudentAuthPage() {
-  const [mode, setMode] = useState("sign-up");
+  const [mode, setModeState] = useState("sign-up");
+  const [loading, setLoading] = useState(false);
 
   const Modes = [
     {
@@ -26,6 +27,13 @@ export default function StudentAuthPage() {
   ];
   const activeMode = Modes.find((m) => m.name === mode);
 
+  const setMode = (mode: "sign-up" | "login") => {
+    if (loading) {
+      return;
+    }
+    setModeState(mode);
+  };
+
   return (
     <div>
       <AuthLayout type="student">
@@ -36,16 +44,18 @@ export default function StudentAuthPage() {
             subHeading={activeMode?.subLabel || ""}
           />
           {/* Mode Switcher */}
-          <div className={styles.modeSwitcher}>
+          <div
+            className={`${styles.modeSwitcher} transition-opacity transition-[0.5s] ${loading && "opacity-[50%] cursor-[not-allowed]"}`}
+          >
             {Modes.map((m) => (
               <button
                 key={m.id}
-                onClick={() => setMode(m.name)}
+                onClick={() => setMode(m.name as "login" | "sign-up")}
                 className={`${styles.modeButton} ${
                   mode === m.name
                     ? styles.modeButtonActive
                     : styles.modeButtonInactive
-                }`}
+                }  ${loading && "!cursor-[not-allowed]"}`}
               >
                 {m.name
                   .split("-")
@@ -57,9 +67,13 @@ export default function StudentAuthPage() {
 
           {/* Form */}
           {mode === "sign-up" ? (
-            <StudentSignupForm setMode={setMode} />
+            <StudentSignupForm
+              loading={loading}
+              setLoading={setLoading}
+              setMode={setMode}
+            />
           ) : (
-            <StudentLoginForm />
+            <StudentLoginForm loading={loading} setLoading={setLoading} />
           )}
         </AuthCard>
       </AuthLayout>

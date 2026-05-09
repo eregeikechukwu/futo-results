@@ -29,7 +29,6 @@ export default function AdvisorLoginForm({
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    reset,
   } = useForm<AdvisorLoginFormData>({
     resolver: zodResolver(advisorLoginSchema),
   });
@@ -101,21 +100,8 @@ export default function AdvisorLoginForm({
         isSubmitting={isSubmitting || isLoading}
         CTA={handleSubmit(onSubmit)}
       >
-        <span className="group-hover:translate-x-1 transition mr-9">
-          <LogIn height={19} width={19} />
-        </span>
-        Sign In to Dashboard
+        Send OTP
       </AuthCTABtn>
-
-      {/* Forgot Password Link */}
-      <div className="mt-26 text-center">
-        <a
-          href="#"
-          className="text-[var(--color-blue-light)] hover:underline hover:text-[var(--color-blue-light)]"
-        >
-          Forgot Password?
-        </a>
-      </div>
     </form>
   );
 }

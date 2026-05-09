@@ -3,23 +3,19 @@
 import AuthLayout from "@/layouts/AuthLayout";
 import AdvisorLoginForm from "@/components/forms/advisorForm";
 import { AuthCard, AuthHeading, InfoCard } from "@/components/utilities";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import { ShieldCheck } from "lucide-react";
 import styles from "@/app/styles/authPages.module.scss";
-import { handleCredentials } from "@/lib/auth/advisorLogin";
 
 import { useState } from "react";
-import { AdvisorLoginFormData, LoginFormData } from "@/app/types/auth";
-import { advisorLoginSchema } from "@/utils/authSchemas";
+import { LoginFormData } from "@/app/types/auth";
 import { AdvisorOtpForm } from "@/components/forms/advisorOtpForm";
+import { ForgotPaasswordForm } from "@/components/forms/forgotPassword";
 
 export default function AdvisorAuth() {
-  const [screen, setScreen] = useState<"credentials" | "otp">("otp");
+  const [screen, setScreen] = useState<"credentials" | "otp">("credentials");
   const [credentials, setCredentials] = useState<LoginFormData | null>(null);
-
+  const [forgotPasswordMode, setForgotPasswordMode] = useState(false);
   const onBack = () => setScreen("credentials");
 
   return (
@@ -38,6 +34,12 @@ export default function AdvisorAuth() {
             <AdvisorLoginForm
               setCredentials={setCredentials}
               onOtpSent={() => setScreen("otp")}
+            />
+            {/* Forgot Password Link */}
+            <ForgotPaasswordForm
+              role="advisor"
+              setForgotPasswordMode={setForgotPasswordMode}
+              forgotPasswordMode={forgotPasswordMode}
             />
             <div className={styles.authInfoWrap}>
               <InfoCard

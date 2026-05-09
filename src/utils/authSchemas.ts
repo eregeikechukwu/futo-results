@@ -1,4 +1,5 @@
 import z from "zod";
+import { passwordLength } from "./systemUtils";
 
 //Validation schema
 export const signupSchema = z.object({
@@ -26,17 +27,17 @@ export const signupSchema = z.object({
       return year <= currentYear;
     }, "Admission year cannot be in the future"),
   email: z.string().email("invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z.string().min(passwordLength, `Password must be at least ${passwordLength} characters`),
 });
 
 //Validation schema
 export const loginSchema = z.object({
   email: z.string().email("invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z.string().min(passwordLength, `Password must be at least ${passwordLength} characters`),
 });
 
 //Validation schema
 export const advisorLoginSchema = z.object({
   email: z.string().email("invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z.string().min(passwordLength, `Password must be at least ${passwordLength} characters`),
 });

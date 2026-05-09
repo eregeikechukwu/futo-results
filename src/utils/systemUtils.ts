@@ -162,3 +162,6 @@ export const editCourseFields = [
     readonly: true,
   },
 ];
+
+// Universal password length
+export const passwordLength = 6

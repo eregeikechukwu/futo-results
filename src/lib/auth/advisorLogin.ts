@@ -1,3 +1,4 @@
+import { errorThrowHandler } from "@/helpers/errorHandler";
 import { createSupabaseClient } from "../supabase/client";
 
 export const handleCredentials = async (data: {
@@ -14,19 +15,17 @@ export const handleCredentials = async (data: {
     });
 
   if (loginError) {
-    console.log(loginError.message);
-    if (loginError.message === "Failed to fetch") {
-      throw new Error("Failed to fetch, check your internet connection");
-    }
-    throw new Error("Incorrect email or password.");
-    return;
+    errorThrowHandler(
+      loginError?.message,
+      "Invalid email or password. Please try again.",
+    );
   }
 
   // Step 2: Confirm they are an advisor
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")
-    .eq("id", authData.user.id)
+    .eq("id", authData?.user?.id)
     .single();
 
   if (profile?.role !== "advisor") {
@@ -47,7 +46,7 @@ export const handleCredentials = async (data: {
   });
 
   if (otpError) {
-    throw new Error("Failed to send verification code. Try again.");
+    errorThrowHandler(otpError, "Failed to send OTP. Please try again.");
   }
 
   // STep 5: Switch to OTP screen
