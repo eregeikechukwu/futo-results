@@ -1,6 +1,6 @@
 "use client";
 
-import AuthLayout from "@/layouts/AuthLayout";
+import AuthLayout from "@/layouts/authLayout/AuthLayout";
 import AdvisorLoginForm from "@/components/forms/advisorForm";
 import { AuthCard, AuthHeading, InfoCard } from "@/components/utilities";
 import toast from "react-hot-toast";

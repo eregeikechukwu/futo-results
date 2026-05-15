@@ -1,5 +1,5 @@
-@use "../app/styles/sass/functions/toRem.scss" as *;
-@use "../app/styles/sass/abstracts/mixins.scss" as *;
+@use "../../app/styles/sass/functions/toRem.scss" as *;
+@use "../../app/styles/sass/abstracts/mixins.scss" as *;
 
 .root {
   min-height: 100vh;
@@ -36,6 +36,10 @@
   height: 90vh;
   border-radius: toRem(24);
   box-shadow: 0 16px 28px rgba(15, 23, 42, 0.18);
+
+  @include respond-to-abs(medium) {
+    display: none;
+  }
 }
 
 .formPanel {

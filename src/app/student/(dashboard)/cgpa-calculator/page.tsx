@@ -36,12 +36,35 @@ const useUpdateEffect = function (
 };
 
 export default function CgpaCalculatorPage() {
-  const [mainCourses, setMainCourses] = useState<CalculatorCourse[]>([
-    createDefaultCourse("main-1"),
-  ]);
-  const [projectedCourses, setProjectedCourses] = useState<CalculatorCourse[]>([
-    createDefaultCourse("projected-1"),
-  ]);
+  // Setup local storage form main and projected course data
+  const getMainCourseFromLocalStorage = () => {
+    const mainCourseCGPA = localStorage.getItem("mainCourseCGPA");
+    return mainCourseCGPA
+      ? JSON.parse(mainCourseCGPA)
+      : [createDefaultCourse("main-1")];
+  };
+  const getProjectedCourseFromLocalStorage = () => {
+    const mainCourseCGPA = localStorage.getItem("projectedCourseCGPA");
+    return mainCourseCGPA
+      ? JSON.parse(mainCourseCGPA)
+      : [createDefaultCourse("projected-1")];
+  };
+
+  // initially set the tate from localStorage on firt  rebnder
+  const [mainCourses, setMainCourses] = useState<CalculatorCourse[]>(
+    getMainCourseFromLocalStorage(),
+  );
+  const [projectedCourses, setProjectedCourses] = useState<CalculatorCourse[]>(
+    getProjectedCourseFromLocalStorage(),
+  );
+
+  useEffect(() => {
+    localStorage.setItem("mainCourseCGPA", JSON.stringify(mainCourses));
+    localStorage.setItem(
+      "projectedCourseCGPA",
+      JSON.stringify(projectedCourses),
+    );
+  }, [mainCourses, projectedCourses]);
 
   const [mainCgpa, setMainCgpa] = useState<number>(0);
   const [projectedCgpa, setProjectedCgpa] = useState<number>(0);
@@ -136,9 +159,7 @@ export default function CgpaCalculatorPage() {
           </h3>
           <p className={styles.summaryHint}>
             Cumulative Projected CGPA (Main + Projected):
-            <strong>
-              {formatCgpa(cumulativeProjectedCgpa)} / 5.00
-            </strong>
+            <strong>{formatCgpa(cumulativeProjectedCgpa)} / 5.00</strong>
           </p>
         </div>
         <button

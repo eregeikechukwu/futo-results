@@ -1,5 +1,5 @@
 import React from "react";
-import { LoaderSpinner3 } from "./loaders";
+import { LoaderSpinner3 } from "./loaders/loaders";
 
 export function AuthCTABtn({
   children,

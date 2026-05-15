@@ -1,7 +1,7 @@
 "use client";
 
 import { AuthCard, AuthHeading } from "@/components/utilities";
-import AuthLayout from "@/layouts/AuthLayout";
+import AuthLayout from "@/layouts/authLayout/AuthLayout";
 import { SetPasswordForm } from "@/components/forms/setPassword";
 
 export default function SetPasswordPage() {

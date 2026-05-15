@@ -7,7 +7,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import { AdvisorCourseFields, Form } from "../forms/reusables";
-import { LoaderSpinner1 } from "../secondary/loaders";
+import { LoaderSpinner1 } from "../secondary/loaders/loaders";
 
 export function EditCourse({
   course,
@@ -42,9 +42,7 @@ export function EditCourse({
 
   return (
     <FormProvider {...methods}>
-      <Form
-        onSubmit={methods.handleSubmit(onSubmit)}
-      >
+      <Form onSubmit={methods.handleSubmit(onSubmit)}>
         {/* //All the fields in one componenent */}
         <AdvisorCourseFields />
 

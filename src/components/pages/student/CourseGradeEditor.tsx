@@ -52,6 +52,7 @@ export function CourseGradeEditor({
   const removeCourse = (id: string) => {
     const nextCourses = courses.filter((course) => course.id !== id);
     onChange(nextCourses.length ? nextCourses : courses);
+    // Dont allow deletion of last course.
   };
 
   return (
@@ -147,14 +148,12 @@ export function CourseGradeEditor({
         </button>
 
         {/* REsults */}
-       {theme === "default" &&  <div className={styles.resultCard}>
-          <p className={styles.resultTitle}>
-            Current Calculated CGPA
-          </p>
-          <h3 className={styles.resultValue}>
-            {formatCgpa(result)} / 5.00
-          </h3>
-        </div> }
+        {theme === "default" && (
+          <div className={styles.resultCard}>
+            <p className={styles.resultTitle}>Current Calculated CGPA</p>
+            <h3 className={styles.resultValue}>{formatCgpa(result)} / 5.00</h3>
+          </div>
+        )}
       </div>
     </div>
   );

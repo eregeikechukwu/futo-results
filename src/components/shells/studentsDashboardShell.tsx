@@ -3,6 +3,13 @@
 import Notification from "@/components/secondary/notification";
 import { DashboardLayout } from "@/layouts/DashboardLayout";
 import styles from "./studentLayout.module.scss";
+import { protectDashboardAccess } from "@/helpers/protectDashboardAccess";
+import {
+  BigLoader,
+  LoaderSpinner1,
+  LoaderSpinner3,
+} from "../secondary/loaders/loaders";
+import { useAuth } from "@/contexts/AuthContext";
 
 const links = [
   { name: "dashboard", href: "/student/dashboard", icon: "LayoutDashboard" },
@@ -21,29 +28,24 @@ const links = [
   { name: "Logout", href: "/advisor/auth", icon: "Logout" },
 ];
 
-export  function StudentsDashboardShell({
+export function StudentsDashboardShell({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  console.log("WHhats even the poin to f all these");
+  const { profile, isStudent, isAdvisor, isAdmin } =
+    protectDashboardAccess("student");
+  const { loading } = useAuth();
 
-  // Blocking UI until mount to prevent hydration mismatch
-  // const isDomMounted = useOnMount();
+  // Show nothing or loader  before profile is been fetched to prevent hydration mismatch
+  if (loading)
+    return (
+      <>
+        <BigLoader />
+      </>
+    );
 
-  // if (!isDomMounted) {
-  //   return <LoaderSpinner1 color="black" size={70} />; // or a loading spinner
-  // }
-
-  // // Fetch student data
-  // const { data: student } = await supabase
-  //   .from("students")
-  //   .select(
-  //     `id, reg_number, admission_year, status, profiles!inner (full_name, email), departments!inner (name, code)`,
-  //   )
-  //   .eq("profile_id", user.id)
-  //   .single();
-
-  // Calculate current level from active term
   return (
     <DashboardLayout user="student" links={links}>
       <div>

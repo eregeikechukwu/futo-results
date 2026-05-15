@@ -6,11 +6,13 @@ import { usePathname } from "next/navigation";
 import styles from "./styles.module.scss";
 import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 type dashboardLinksType = {
   name: string;
   href: string;
   icon: string;
+  action?: () => void;
 };
 
 export function DashboardLayout({
@@ -25,6 +27,14 @@ export function DashboardLayout({
   const url = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  // Get the logout function
+  const { signOut } = useAuth();
+
+  // SIgn out fucntion
+  const signOutFunction = (name) => {
+    if (name === "Logout") signOut();
+  };
+
   // Close the mobile drawer on route changes so page transitions stay clean.
   useEffect(() => {
     setIsSidebarOpen(false);
@@ -35,7 +45,9 @@ export function DashboardLayout({
       {/* Core responsive move: expose global nav through a compact toggle on small viewports. */}
       <button
         type="button"
-        aria-label={isSidebarOpen ? "Close navigation menu" : "Open navigation menu"}
+        aria-label={
+          isSidebarOpen ? "Close navigation menu" : "Open navigation menu"
+        }
         className={styles.mobileMenuButton}
         onClick={() => setIsSidebarOpen((prev) => !prev)}
       >
@@ -53,7 +65,9 @@ export function DashboardLayout({
       )}
 
       {/* Sidebar below */}
-      <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.sidebarOpen : ""}`}>
+      <aside
+        className={`${styles.sidebar} ${isSidebarOpen ? styles.sidebarOpen : ""}`}
+      >
         {/* Logo below */}
         <DashboardLogo>
           {user.slice(0, 1).toUpperCase() + user.slice(1)} Portal
@@ -61,7 +75,7 @@ export function DashboardLayout({
         <nav className={styles.nav}>
           <ul className={styles.navList}>
             {links.map((link) => (
-              <li key={link.name}>
+              <li key={link.name} onClick={() => signOutFunction(link.name)}>
                 <a
                   href={link.href}
                   onClick={() => setIsSidebarOpen(false)}

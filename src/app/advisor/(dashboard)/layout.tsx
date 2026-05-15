@@ -1,5 +1,4 @@
-import { protectDashboardAccess } from "@/helpers/protectStudentDashboardAccess";
-import { Providers } from "@/app/providers";
+import { protectDashboardAccess } from "@/helpers/protectDashboardAccess";
 import AdvisorDashboardShell from "@/components/shells/advisorDashboardShell";
 
 export default async function AdvisorMainLayout({
@@ -7,11 +6,7 @@ export default async function AdvisorMainLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const user = await protectDashboardAccess("advisor");
+  const user = protectDashboardAccess("advisor");
 
-  return (
-    <Providers role="advisor">
-      <AdvisorDashboardShell>{children}</AdvisorDashboardShell>
-    </Providers>
-  );
+  return <AdvisorDashboardShell>{children}</AdvisorDashboardShell>;
 }

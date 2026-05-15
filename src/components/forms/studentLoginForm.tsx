@@ -95,7 +95,7 @@ export default function StudentLoginForm({
             </div>
           </div>
         </div>
-        <AuthCTABtn isSubmitting={isSubmitting} CTA={handleSubmit(handleLogin)}>
+        <AuthCTABtn isSubmitting={loading} CTA={handleSubmit(handleLogin)}>
           Login to Portal
         </AuthCTABtn>
       </form>

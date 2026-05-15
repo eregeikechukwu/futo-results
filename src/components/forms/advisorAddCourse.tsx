@@ -6,7 +6,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import { AdvisorCourseFields, Form } from "../forms/reusables";
-import { LoaderSpinner1 } from "../secondary/loaders";
+import { LoaderSpinner1 } from "../secondary/loaders/loaders";
 
 export function AddCourse({ toggleModal }: { toggleModal: () => void }) {
   const methods = useForm<CourseData>({

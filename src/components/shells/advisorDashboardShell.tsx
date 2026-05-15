@@ -4,9 +4,8 @@ import { DashboardLayout } from "@/layouts/DashboardLayout";
 import Notification from "@/components/secondary/notification";
 import { DesktopOnly } from "@/components/pages/desktopOnly";
 import { useOnMount } from "@/app/hooks/useOnMount";
-import { LoaderSpinner1 } from "@/components/secondary/loaders";
+import { LoaderSpinner1 } from "@/components/secondary/loaders/loaders";
 import { useDesktopOnly } from "@/app/hooks/useDesktopOnly";
-import { Providers } from "@/app/providers";
 
 const links = [
   { name: "dashboard", href: "/advisor/dashboard", icon: "LayoutDashboard" },
@@ -23,7 +22,7 @@ const links = [
   { name: "Logout", href: "/advisor/auth", icon: "Logout" },
 ];
 
-export default async function AdvisorDashboardShell({
+export default function AdvisorDashboardShell({
   children,
 }: {
   children: React.ReactNode;
@@ -43,33 +42,31 @@ export default async function AdvisorDashboardShell({
   }
 
   return (
-    <Providers role="advisor">
-      <DashboardLayout user="advisor" links={links}>
-        <div>
-          {/* Nav */}
-          <div className="fixed top-0 z-20 h-[var(--nav-height)] bg-[var(--color-white)] shadow-sm px-32 w-[calc(100vw-var(--sidebar-width))] flex items-center justify-between">
-            {/* Title */}
-            <div>
-              <h1 className="text-medium">Dr. Emmanuel Erege</h1>
-              <h2 className="text-[var(--color-text-passive)] secondary-heading">
-                Mechatronics Engineering Department
-              </h2>
-            </div>
+    <DashboardLayout user="advisor" links={links}>
+      <div>
+        {/* Nav */}
+        <div className="fixed top-0 z-20 h-[var(--nav-height)] bg-[var(--color-white)] shadow-sm px-32 w-[calc(100vw-var(--sidebar-width))] flex items-center justify-between">
+          {/* Title */}
+          <div>
+            <h1 className="text-medium">Dr. Emmanuel Erege</h1>
+            <h2 className="text-[var(--color-text-passive)] secondary-heading">
+              Mechatronics Engineering Department
+            </h2>
+          </div>
 
-            {/* Notification and profile */}
-            <div className="flex gap-24 items-center">
-              <Notification count={2} />
-              <span className="w-1 h-26 bg-[var(--color-border-light)]">
-                &nbsp;
-              </span>
-              <div className="secondary-heading text-[var(--color-white)] rounded-full bg-[var(--color-primary)] center-child w-32 h-32 font-medium">
-                EE
-              </div>
+          {/* Notification and profile */}
+          <div className="flex gap-24 items-center">
+            <Notification count={2} />
+            <span className="w-1 h-26 bg-[var(--color-border-light)]">
+              &nbsp;
+            </span>
+            <div className="secondary-heading text-[var(--color-white)] rounded-full bg-[var(--color-primary)] center-child w-32 h-32 font-medium">
+              EE
             </div>
           </div>
-          <div className="p-32 w-full !mt-[var(--nav-height)]">{children}</div>
         </div>
-      </DashboardLayout>
-    </Providers>
+        <div className="p-32 w-full !mt-[var(--nav-height)]">{children}</div>
+      </div>
+    </DashboardLayout>
   );
 }

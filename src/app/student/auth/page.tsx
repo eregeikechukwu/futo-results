@@ -3,8 +3,8 @@
 import StudentLoginForm from "@/components/forms/studentLoginForm";
 import StudentSignupForm from "@/components/forms/studentSignUpForm";
 import { AuthCard, AuthHeading } from "@/components/utilities";
-import AuthLayout from "@/layouts/AuthLayout";
-import { useState } from "react";
+import AuthLayout from "@/layouts/authLayout/AuthLayout";
+import { useEffect, useState } from "react";
 import styles from "@/app/styles/authPages.module.scss";
 
 export default function StudentAuthPage() {
