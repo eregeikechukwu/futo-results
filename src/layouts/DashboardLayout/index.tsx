@@ -4,9 +4,12 @@ import { DashboardLogo } from "@/components/utilities";
 import React, { RefAttributes } from "react";
 import { usePathname } from "next/navigation";
 import styles from "./styles.module.scss";
-import { Menu, X } from "lucide-react";
+import { Check, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { ModalForm } from "@/components/secondary/common";
+import { useModalTemplate } from "@/components/modals/overlay";
+import { CustomBtn } from "@/components/secondary/buttons";
 
 type dashboardLinksType = {
   name: string;
@@ -26,13 +29,16 @@ export function DashboardLayout({
 }) {
   const url = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { ModalTemplate, toggleModal } = useModalTemplate(false);
 
   // Get the logout function
   const { signOut } = useAuth();
 
   // SIgn out fucntion
   const signOutFunction = (name) => {
-    if (name === "Logout") signOut();
+    if (name === "Logout") {
+      toggleModal();
+    }
   };
 
   // Close the mobile drawer on route changes so page transitions stay clean.
@@ -77,7 +83,7 @@ export function DashboardLayout({
             {links.map((link) => (
               <li key={link.name} onClick={() => signOutFunction(link.name)}>
                 <a
-                  href={link.href}
+                  href={link.name === "Logout" ? "#" : link.href}
                   onClick={() => setIsSidebarOpen(false)}
                   className={`${styles.link} ${
                     url === link.href ? styles.linkActive : styles.linkInactive
@@ -99,6 +105,27 @@ export function DashboardLayout({
       <main className={styles.main}>
         <div>{children}</div>
       </main>
+
+      {/* Logout confirmation modal */}
+      <ModalTemplate>
+        <div className="flex flex-col gap-20 text-center">
+          <h2 className="font-semibold">Are you sure you want to logout?</h2>
+          <div className="flex justify-between">
+            <CustomBtn
+              className="bg-red-500  h-50 w-[48%] center-child !p-0 rounded-full"
+              onClick={() => signOut()}
+            >
+              <Check stroke="white" />
+            </CustomBtn>
+            <CustomBtn
+              onClick={toggleModal}
+              className="bg-gray-400 h-50 w-[48%] center-child !p-0 rounded-full"
+            >
+              <X stroke="Black" />
+            </CustomBtn>
+          </div>
+        </div>
+      </ModalTemplate>
     </div>
   );
 }

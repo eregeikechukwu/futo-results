@@ -14,6 +14,7 @@ export interface StudentsData {
   admission_year: number;
   status: string;
   departments: {
+    id: string;
     name: string;
     code: string;
   };
@@ -27,6 +28,7 @@ export interface AdvisorData {
     id: string;
     admission_year: number;
     departments: {
+      id: string;
       name: string;
       code: string;
     };

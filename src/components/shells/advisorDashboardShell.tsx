@@ -3,9 +3,10 @@
 import { DashboardLayout } from "@/layouts/DashboardLayout";
 import Notification from "@/components/secondary/notification";
 import { DesktopOnly } from "@/components/pages/desktopOnly";
-import { useOnMount } from "@/app/hooks/useOnMount";
-import { LoaderSpinner1 } from "@/components/secondary/loaders/loaders";
+import { BigLoader } from "@/components/secondary/loaders/loaders";
 import { useDesktopOnly } from "@/app/hooks/useDesktopOnly";
+import { protectDashboardAccess } from "@/helpers/protectDashboardAccess";
+import { useAuth } from "@/contexts/AuthContext";
 
 const links = [
   { name: "dashboard", href: "/advisor/dashboard", icon: "LayoutDashboard" },
@@ -19,7 +20,7 @@ const links = [
   },
   // { name: "Reports", href: "/advisor/under-construction", icon: "File" },
   // { name: "Settings", href: "/advisor/under-construction", icon: "Settings" },
-  { name: "Logout", href: "/advisor/auth", icon: "Logout" },
+  { name: "Logout", href: "", icon: "Logout" },
 ];
 
 export default function AdvisorDashboardShell({
@@ -27,15 +28,21 @@ export default function AdvisorDashboardShell({
 }: {
   children: React.ReactNode;
 }) {
-  // BLocking UI onsmall screens
+  const { loading } = useAuth();
   const isSmallScreen = useDesktopOnly();
 
-  // Blocking UI until mount to prevent hydration mismatch
-  const isDomMounted = useOnMount();
+  protectDashboardAccess("advisor");
 
-  if (!isDomMounted) {
-    return <LoaderSpinner1 color="black" size={70} />; // or a loading spinner
-  }
+  const { profile, advisorData } = useAuth();
+
+  // Show nothing or loader  before profile is been fetched to prevent hydration mismatch
+  if (loading)
+    return (
+      <>
+        <BigLoader />
+      </>
+    );
+  // BLocking UI onsmall screens
 
   if (isSmallScreen) {
     return <DesktopOnly />;
@@ -48,9 +55,11 @@ export default function AdvisorDashboardShell({
         <div className="fixed top-0 z-20 h-[var(--nav-height)] bg-[var(--color-white)] shadow-sm px-32 w-[calc(100vw-var(--sidebar-width))] flex items-center justify-between">
           {/* Title */}
           <div>
-            <h1 className="text-medium">Dr. Emmanuel Erege</h1>
+            <h1 className="text-medium">
+              {advisorData?.title} {profile?.full_name}
+            </h1>
             <h2 className="text-[var(--color-text-passive)] secondary-heading">
-              Mechatronics Engineering Department
+              {advisorData?.advisor_assignments[0].departments.name} Department
             </h2>
           </div>
 

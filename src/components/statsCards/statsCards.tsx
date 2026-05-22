@@ -16,14 +16,14 @@ export function AdvisorStatsCards({
   newStudents,
   uploadedResults,
   recentResults,
-  activeSessions,
+  classLevel,
   pendingReviews,
 }: {
   totalStudents: number;
   newStudents: number;
   uploadedResults: number;
   recentResults: number;
-  activeSessions: number;
+  classLevel: number;
   pendingReviews: number;
 }) {
   return (
@@ -98,9 +98,9 @@ export function AdvisorStatsCards({
         <div className={`dashboard-container ${styles.advisorStatsCard}`}>
           <div>
             <div>
-              <TextLink>Active Sessions</TextLink>
+              <TextLink>Class level</TextLink>
               <p>
-                <CountUp end={activeSessions} />
+                <CountUp end={classLevel} />
               </p>
             </div>
             <div className="text-[var(--color-purple)]  bg-[var(--color-purple-background)]">

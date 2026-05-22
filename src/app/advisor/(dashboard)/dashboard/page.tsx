@@ -1,3 +1,5 @@
+"use client";
+
 import ProgressBar from "@/components/secondary/ProgressBar";
 import { AdvisorQuickActions } from "@/components/secondary/advisorQuickActions";
 import { ReportCards } from "@/components/statsCards/reportsCards";
@@ -5,13 +7,46 @@ import { AdvisorStatsCards } from "@/components/statsCards/statsCards";
 import { Heading2 } from "@/components/secondary/typography";
 import { Calendar, UserCheck2Icon } from "lucide-react";
 import React from "react";
-
-export const metadata = {
-  title: "Advisor Dashboard",
-  description: "Advisor Dashboard - for managing students, courses, and more.",
-};
+import { useAdvisorDashboardStats, useUploadActivity } from "@/lib/hooks";
+import { useAuth } from "@/contexts/AuthContext";
+import toast from "react-hot-toast";
+import SomethingWentWrong from "@/components/secondary/error/somethingWentWrong";
+import { LoaderSpinner3 } from "@/components/secondary/loaders/loaders";
 
 export default function AdvisorDashboard() {
+  const { loading, profile, advisorData } = useAuth();
+
+  console.log(advisorData, profile, " advisor Data it is");
+
+  if (!advisorData || !profile) {
+    toast.error(
+      "Something went wrong getting asvisor data, please reload and try again.",
+    );
+    return <SomethingWentWrong />;
+  }
+
+  if (loading) return <LoaderSpinner3 />;
+
+  const {
+    data: statsData,
+    isLoading,
+    error,
+  } = useAdvisorDashboardStats(
+    profile?.id,
+    advisorData?.id,
+    advisorData?.advisor_assignments[0].departments.id,
+    advisorData?.advisor_assignments[0].admission_year,
+  );
+  const {
+    data: uploadActivity,
+    isLoading: uploadActivityLoading,
+    error: uploadActivityError,
+  } = useUploadActivity(profile?.id);
+
+  if (isLoading || uploadActivityLoading) return <div>Skeleton</div>;
+
+  console.log("uploadActivity: ", uploadActivity, "statsdata: ", statsData);
+
   const uploadActivities = [
     { month: "January", uploaded: 23, total: 50 },
     { month: "February", uploaded: 35, total: 50 },
@@ -20,16 +55,19 @@ export default function AdvisorDashboard() {
     { month: "May", uploaded: 47, total: 50 },
   ];
 
+  console.log(statsData?.targetLevel);
+
   return (
     <>
       <div className="dashboard-main-container">
         <div className="flex justify-between  items-center bg-gradient-to-r from-[#effff8] to-[var(--color-white)] border border-[var(--color-blue-background)] rounded-[16px] lh-24 p-24">
           <div>
             <h1 className="text-24 lh-32 font-bold mb-8">
-              Welcome back, Dr. Emmanuel Erege
+              Welcome back, {advisorData?.title} {profile.full_name}
             </h1>
             <h2 className="text-[var(--color-text-link)]">
-              Mechatronics Engineering Department • Academic Session 2025/2026
+              {advisorData.advisor_assignments[0].departments.name} Department •
+              Academic Session {statsData?.activeTerm.session}
             </h2>
           </div>
 
@@ -41,12 +79,12 @@ export default function AdvisorDashboard() {
 
         {/* Stats Cards */}
         <AdvisorStatsCards
-          totalStudents={120}
-          newStudents={12}
-          uploadedResults={45}
-          recentResults={8}
-          activeSessions={3}
-          pendingReviews={5}
+          totalStudents={statsData?.totalStudents}
+          newStudents={statsData?.newStudents}
+          uploadedResults={statsData?.uploadedResults}
+          recentResults={statsData?.recentResults}
+          classLevel={statsData?.targetLevel || 0}
+          pendingReviews={statsData?.pendingReviews}
         />
 
         {/* Progress bars and upload summary */}
@@ -62,7 +100,7 @@ export default function AdvisorDashboard() {
 
             {/* Progress bars */}
             <div className="flex flex-col gap-16">
-              {uploadActivities.map((activity) => (
+              {(uploadActivity || uploadActivities).map((activity) => (
                 <ProgressBar
                   key={activity.month}
                   title={activity.month.slice(0, 3)}

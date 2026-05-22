@@ -12,14 +12,15 @@ export function protectDashboardAccess(role: "student" | "advisor") {
 
   useEffect(() => {
     if (loading) return; // Still loading, don't redirect yet
-    console.log(loading, "From protected dahsboard 3");
 
     if (!profile) {
       router.replace(role === "student" ? "/student/auth" : "/advisor/auth");
+      return;
     }
 
     if (profile?.role !== role && !isAdmin) {
       router.replace("/unauthorized");
+      return;
     }
   }, [loading, profile, isStudent, router, role, isAdvisor, isAdmin]);
 

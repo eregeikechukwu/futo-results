@@ -1,0 +1,301 @@
+@use "./styles/sass/functions/toRem.scss" as *;
+@use "./styles/sass/abstracts/mixins.scss" as *;
+
+.headerNav {
+  height: toRem(72);
+  box-shadow: 0 0 6px 0 rgba(37, 99, 235, 0.35);
+  @include center-child;
+}
+
+.headerInner {
+  width: 100%;
+  max-width: var(--container-width);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-inline: toRem(34);
+  gap: toRem(16);
+}
+
+.deptText {
+  font-size: toRem(14);
+  line-height: toRem(20);
+  color: var(--color-text-link);
+}
+
+.heroSection {
+  min-height: calc(100vh - toRem(72));
+  margin-top: toRem(3);
+  background: linear-gradient(
+    135deg,
+    var(--color-blue-background),
+    var(--color-white)
+  );
+
+  display: flex;
+  align-items: center;
+}
+
+.heroGrid {
+  height: 100%;
+  max-width: var(--container-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: toRem(48);
+  align-items: center;
+  padding-inline: toRem(32);
+  padding-block: toRem(28);
+}
+
+.heroTitle {
+  font-size: toRem(48);
+  line-height: toRem(60);
+  font-weight: 700;
+  margin-bottom: toRem(24);
+}
+
+.heroAccent {
+  color: var(--color-primary);
+  display: block;
+}
+
+.heroBody {
+  font-size: toRem(20);
+  line-height: toRem(32.5);
+  color: var(--color-text-link);
+}
+
+.heroActions {
+  display: flex;
+  gap: toRem(16);
+  margin-top: toRem(32);
+}
+
+.heroActionButton {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+}
+
+.heroImageWrap {
+  border-radius: toRem(24);
+  overflow: hidden;
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.18);
+}
+
+.heroImage {
+  width: 100%;
+  height: auto;
+}
+
+.sectionShell {
+  width: 100%;
+  max-width: var(--container-width);
+  margin: 0 auto;
+  padding: toRem(80) toRem(32);
+  text-align: center;
+}
+
+.howHeader {
+  margin-bottom: toRem(64);
+}
+
+.howTitle {
+  font-size: toRem(36);
+  line-height: toRem(40);
+  font-weight: 700;
+  margin-bottom: toRem(12);
+}
+
+.howSubtitle {
+  font-size: toRem(20);
+  line-height: toRem(28);
+  color: var(--color-text-link);
+}
+
+.howGrid {
+  width: 100%;
+  display: grid;
+  gap: toRem(32);
+  grid-template-columns: repeat(auto-fill, minmax(toRem(320), 1fr));
+  text-align: center;
+}
+
+.aboutSection {
+  background: var(--color-primary);
+}
+
+.aboutShell {
+  max-width: var(--container-width);
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #dbeafe;
+  padding: toRem(80) toRem(175);
+}
+
+.aboutTitle {
+  font-size: toRem(36);
+  line-height: toRem(40);
+  font-weight: 700;
+  margin-bottom: toRem(24);
+}
+
+.aboutText {
+  font-size: toRem(20);
+  line-height: toRem(32);
+  margin-bottom: toRem(32);
+}
+
+.supportCard {
+  width: max-content;
+  border-radius: toRem(16);
+  padding: toRem(24);
+  background: rgba(255, 255, 255, 0.1);
+  line-height: toRem(24);
+}
+
+.supportMail {
+  color: var(--color-white);
+  font-weight: 600;
+  margin-top: toRem(10);
+}
+
+.footer {
+  background: #111827;
+  color: #9ca3af;
+  padding: toRem(48) toRem(32);
+}
+
+.footerInner {
+  max-width: var(--container-width);
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: toRem(20);
+}
+
+.footerLinks {
+  display: flex;
+  gap: toRem(24);
+}
+
+.footerLink {
+  font-size: toRem(16);
+  line-height: toRem(24);
+  transition: color 0.2s;
+}
+
+.footerLink:hover {
+  color: var(--color-white);
+}
+
+.footerCopy {
+  padding-top: toRem(33);
+  width: 100%;
+  text-align: center;
+  margin-top: toRem(36);
+  border-top: 1px solid #1f2937;
+}
+
+// Core responsive move: convert hero from split layout to single flow and prioritize actions.
+@include mobile-compact {
+  .headerInner {
+    padding-inline: toRem(14);
+  }
+
+  .deptText {
+    display: none;
+  }
+
+  .heroSection {
+    min-height: auto;
+  }
+
+  .heroGrid {
+    grid-template-columns: 1fr;
+    gap: toRem(24);
+    padding-inline: toRem(12);
+    padding-block: toRem(20);
+  }
+
+  .heroTitle {
+    font-size: toRem(32);
+    line-height: toRem(42);
+    margin-bottom: toRem(14);
+  }
+
+  .heroBody {
+    font-size: toRem(16);
+    line-height: toRem(25);
+  }
+
+  .heroActions {
+    flex-direction: column;
+    margin-top: toRem(24);
+  }
+
+  .heroActionButton {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .sectionShell {
+    padding: toRem(56) toRem(12);
+  }
+
+  .howHeader {
+    margin-bottom: toRem(36);
+  }
+
+  .howTitle {
+    font-size: toRem(28);
+    line-height: toRem(34);
+  }
+
+  .howSubtitle {
+    font-size: toRem(16);
+    line-height: toRem(24);
+  }
+
+  .howGrid {
+    grid-template-columns: 1fr;
+    gap: toRem(16);
+  }
+
+  .aboutShell {
+    padding: toRem(56) toRem(12);
+  }
+
+  .aboutTitle {
+    font-size: toRem(28);
+    line-height: toRem(34);
+  }
+
+  .aboutText {
+    font-size: toRem(16);
+    line-height: toRem(25);
+  }
+
+  .supportCard {
+    width: 100%;
+  }
+
+  // Core responsive move: stack footer brand + links for simpler thumb navigation.
+  .footer {
+    padding: toRem(32) toRem(12);
+  }
+
+  .footerInner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .footerLinks {
+    flex-wrap: wrap;
+    row-gap: toRem(10);
+    column-gap: toRem(16);
+  }
+}

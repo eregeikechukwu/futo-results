@@ -10,7 +10,8 @@ import {
 import { AdvisorData, AuthContextType, Profile, StudentsData } from "./types";
 import { User } from "@supabase/supabase-js";
 import { createSupabaseClient } from "@/lib/supabase/client";
-import { errorToastHandler } from "@/helpers/errorHandler";
+import { errorThrowHandler, errorToastHandler } from "@/helpers/errorHandler";
+import { redirect, useRouter } from "next/navigation";
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -31,6 +32,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [advisorData, setAdvisorData] = useState<AdvisorData | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // const [instanceId] = useState(() => Math.random().toString(36).slice(2));
+
+  // useEffect(() => {
+  //   console.log("AuthProvider MOUNTED, instance:", instanceId);
+  //   return () => console.log("AuthProvider UNMOUNTED, instance:", instanceId);
+  // }, []);
+
   const fetchStudentData = async (profileId: string) => {
     const supabase = createSupabaseClient();
     const { data, error } = await supabase
@@ -49,15 +57,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data, error } = await supabase
       .from("advisors")
       .select(
-        "id, title, advisor_assignments (id, admission_year, departments!inner (name, code))",
+        "id, title, advisor_assignments (id, admission_year, departments!inner (id, name, code))",
       )
       .eq("profile_id", profileId)
       .single();
     if (error) errorToastHandler(error);
+    if (error) errorThrowHandler(error);
     if (data) setAdvisorData(data as unknown as AdvisorData);
   };
 
   const fetchProfile = useCallback(async (userId: string) => {
+    console.log("STack trace for fucntion call:  ", new Error().stack);
+
     const supabase = createSupabaseClient();
 
     setStudentData(null);
@@ -90,63 +101,77 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = useCallback(async () => {
     const supabase = createSupabaseClient();
-    await supabase.auth.signOut();
-    setUser(null);
-    setProfile(null);
-    setStudentData(null);
-    setAdvisorData(null);
+
+    console.log("Frpm logout yikes");
+    const { error } = await supabase.auth.signOut();
+
+    if (error) errorThrowHandler(error);
+
+    // router.replace("/advisor/auth");
   }, []);
 
- useEffect(() => {
-  const supabase = createSupabaseClient();
-  console.log("AuthProvider useEffect fired");
+  useEffect(() => {
+    const supabase = createSupabaseClient();
+    console.log("AuthProvider useEffect fired");
 
-  let subscription: { unsubscribe: () => void } | null = null;
+    let subscription: { unsubscribe: () => void } | null = null;
 
-  // getSession() initializes the client's cookie storage first
-  // Once it resolves, the client is fully ready for onAuthStateChange
-  supabase.auth.getSession().then(({ data: { session } }) => {
-    console.log("getSession resolved:", session?.user?.id ?? "no user");
+    // getSession() initializes the client's cookie storage first
+    // Once it resolves, the client is fully ready for onAuthStateChange
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("getSession resolved:", session?.user?.id ?? "no user");
 
-    // Set initial user state from session
-    if (session?.user) {
-      setUser(session.user);
-      fetchProfile(session.user.id);
-    } else {
-      setLoading(false);
-    }
-
-    // NOW set up the listener — client is fully initialized at this point
-    const { data } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log("onAuthStateChange:", event, session?.user?.id ?? "no user");
-
-        if (event === "SIGNED_OUT") {
-          setUser(null);
-          setProfile(null);
-          setStudentData(null);
-          setAdvisorData(null);
-          setLoading(false);
-          return;
-        }
-
-        // INITIAL_SESSION is already handled by getSession above
-        if (event === "INITIAL_SESSION") return;
-
-        if (session?.user) {
-          setUser(session.user);
-          await fetchProfile(session.user.id);
-        } else {
-          setLoading(false);
-        }
+      // Set initial user state from session
+      if (session?.user) {
+        setUser(session.user);
+        fetchProfile(session.user.id);
+      } else {
+        setLoading(false);
       }
-    );
 
-    subscription = data.subscription;
-  });
+      // NOW set up the listener — client is fully initialized at this point
+      const { data, error } = supabase.auth.onAuthStateChange(
+        async (event, session) => {
+          console.log(
+            "onAuthStateChange:",
+            event,
+            session?.user?.id ?? "no user",
+          );
 
-  return () => subscription?.unsubscribe();
-}, [fetchProfile]);
+          if (event === "TOKEN_REFRESHED") {
+            if (session?.user) setUser(session.user);
+            return;
+          }
+
+          if (event === "SIGNED_OUT") {
+            setUser(null);
+            setProfile(null);
+            setStudentData(null);
+            setAdvisorData(null);
+            setLoading(false);
+            return;
+          }
+
+          // INITIAL_SESSION is already handled by getSession above
+          if (event === "INITIAL_SESSION") return;
+
+          if (session?.user) {
+            setUser(session.user);
+            console.log("It happeded here o");
+            await fetchProfile(session.user.id);
+          } else {
+            setLoading(false);
+          }
+        },
+      );
+
+      if (error) errorThrowHandler(error);
+
+      subscription = data.subscription;
+    });
+
+    return () => subscription?.unsubscribe();
+  }, [fetchProfile]);
 
   const isStudent = profile?.role === "student";
   const isAdvisor = profile?.role === "advisor";

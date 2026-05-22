@@ -89,7 +89,7 @@ export function TextAdd({ children }: { children: string }) {
         }
       }, 100); // 100ms per character for smooth typing
     },
-    [characters]
+    [characters],
   );
 
   /**
@@ -131,15 +131,13 @@ export function TextAdd({ children }: { children: string }) {
   }, [runAnimationCycle, clearAllIntervals]);
 
   return (
-    <span className="inline-flex items-center">
-      {/* Typed text */}
+    <span className="relative inline-flex items-center leading-none">
       <span>{textVis.join("")}</span>
 
-      {/* Blinking cursor */}
       <span
-        className={`inline-block w-[2px] h-[1em] ml-[2px] bg-current transition-opacity duration-100 ${
+        className={`absolute left-full ml-[2px] top-1/2 -translate-y-1/2 w-[2px] h-[1em] bg-current transition-opacity duration-100 ${
           cursor ? "opacity-100" : "opacity-0"
-        }`}
+        } ${textVis.length === 0 && "translate-y-[-3rem]"}`}
         aria-hidden="true"
       />
     </span>

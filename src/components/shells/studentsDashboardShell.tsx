@@ -34,8 +34,9 @@ export function StudentsDashboardShell({
   children: React.ReactNode;
 }) {
   console.log("WHhats even the poin to f all these");
-  const { profile, isStudent, isAdvisor, isAdmin } =
-    protectDashboardAccess("student");
+
+  // Protect the dashboard
+  protectDashboardAccess("student");
   const { loading } = useAuth();
 
   // Show nothing or loader  before profile is been fetched to prevent hydration mismatch

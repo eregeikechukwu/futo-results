@@ -5,7 +5,7 @@ export function AdvisorQuickActions() {
   const iconSize = 22;
 
   return (
-    <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-16">
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-16">
       <div
         className={`bg-blue-50 hover:bg-[var(--color-blue-background)] ${styles.quickAction}`}
       >

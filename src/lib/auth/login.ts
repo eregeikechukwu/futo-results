@@ -1,7 +1,6 @@
 "use client";
 
 import { createSupabaseClient } from "../supabase/client";
-import toast from "react-hot-toast";
 import { LoginFormData } from "@/app/types/auth";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 

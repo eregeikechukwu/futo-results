@@ -55,7 +55,7 @@ export function Modal({
         }`}
       >
         <div className="flex justify-between relative">
-          <span className="text-medium">{title}</span>
+          {title && <span className="text-medium">{title}</span>}
           {!stallState && (
             <div
               className={`transition-all duration-300 ${
@@ -97,7 +97,7 @@ export function Overlay({ active = true }: { active?: boolean }) {
   );
 }
 
-export function useModalTemplate(stall = false, withTemplate = true) {
+export function useModalTemplate(stall = false) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const toggleModalMain = useCallback(() => {
@@ -111,11 +111,13 @@ export function useModalTemplate(stall = false, withTemplate = true) {
   // const Modal = useMemo(
   //   () =>
   function ModalTemplate({
+    withTemplate = true,
     children,
     title,
   }: {
+    withTemplate?: boolean;
     children: React.ReactNode;
-    title: string;
+    title?: string;
   }) {
     return (
       <div>

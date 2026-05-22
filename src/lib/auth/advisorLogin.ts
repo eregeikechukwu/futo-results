@@ -1,5 +1,6 @@
 import { errorThrowHandler } from "@/helpers/errorHandler";
 import { createSupabaseClient } from "../supabase/client";
+import { requestTimeout } from "@/helpers/requestTimeout";
 
 export const handleCredentials = async (data: {
   email: string;
@@ -8,11 +9,13 @@ export const handleCredentials = async (data: {
   const supabase = createSupabaseClient();
 
   // STep1: Verify email + Pasword
-  const { data: authData, error: loginError } =
-    await supabase.auth.signInWithPassword({
+  const { data: authData, error: loginError } = await Promise.race([
+    supabase.auth.signInWithPassword({
       email: data.email,
       password: data.password,
-    });
+    }),
+    requestTimeout(25000, "Login took too long.Reload and try again"),
+  ]);
 
   if (loginError) {
     errorThrowHandler(

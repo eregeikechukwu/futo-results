@@ -91,7 +91,7 @@ export function AdvisorOtpForm({
 
     toast.success("Verified successfully!");
     // Redirect to dashboard after successful verification
-    router.push("/advisor/dashboard");
+    router.replace("/advisor/dashboard");
   };
 
   //   Resendng for new email function

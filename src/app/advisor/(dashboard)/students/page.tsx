@@ -9,7 +9,7 @@ import { useModalTemplate } from "@/components/modals/overlay";
 import { PlusIcon } from "lucide-react";
 import { AddStudentForm } from "@/components/forms/addStudent";
 
-export default function ManageSTudents() {
+export default function ManageStudents() {
   const { toggleModal, ModalTemplate } = useModalTemplate();
 
   const verifiedStudents = advisorStudents.filter(
