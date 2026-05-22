@@ -55,23 +55,31 @@ export async function fetchAdvisorDashboardStats(
   const targetLevel = calculateStudentLevel(activeTermYear, admissionYear);
 
   // 1. Count total verified students in advisor's department for their assigned admission year
-  const { count: totalStudentsCount, error: totalError } = await supabase
-    .from("students")
+  const { count: totalStudentsCountFromStudents, error: totalError } =
+    await supabase
+      .from("students")
+      .select("id", { count: "exact", head: true })
+      .eq("department_id", departmentId)
+      .eq("admission_year", admissionYear);
+
+  const { count: studentsFromPreregistration, error: preError } = await supabase
+    .from("student_preregistrations")
     .select("id", { count: "exact", head: true })
     .eq("department_id", departmentId)
-    .eq("admission_year", admissionYear)
-    .eq("status", "verified");
+    .eq("created_by", advisorId)
+    .eq("claimed", "false");
 
-  if (totalError) throw totalError;
-  const totalStudents = totalStudentsCount || 0;
+  if (totalError || preError) throw totalError;
 
-  // 2. Count new students (joined this academic session)
+  const totalStudents =
+    totalStudentsCountFromStudents + studentsFromPreregistration || 0;
+
+  // 2. Count new students (joined this academic session) on the main students table
   const { count: newStudentsCount, error: newError } = await supabase
     .from("students")
     .select("id", { count: "exact", head: true })
     .eq("department_id", departmentId)
     .eq("admission_year", admissionYear)
-    .eq("status", "verified")
     .gte(
       "join_date",
       activeTerm
@@ -79,7 +87,6 @@ export async function fetchAdvisorDashboardStats(
         : "",
     );
 
-  if (newError) throw newError;
   const newStudents = newStudentsCount || 0;
 
   // 3. Count published result batches (uploaded results) for this advisor
@@ -136,7 +143,7 @@ export async function fetchAdvisorDashboardStats(
     recentResults,
     targetLevel,
     pendingReviews,
-    activeTerm
+    activeTerm,
   };
 }
 
@@ -168,7 +175,6 @@ export async function fetchUploadActivity(advisorProfileId: string) {
 
   if (error) throw error;
   let totalUploaded = 0;
-
 
   // Group by month and count uploaded vs total
   const monthlyStats: Record<
@@ -236,7 +242,10 @@ export async function fetchUploadActivity(advisorProfileId: string) {
  * @returns Array of recent batches with course and term information
  * @throws Error if Supabase query fails
  */
-export async function fetchRecentBatches(advisorId: string, limit: number = 5) {
+export async function fetchRecentBatches(
+  advisorProfileId: string,
+  limit: number = 3,
+) {
   const supabase = createSupabaseClient();
 
   const { data, error } = await supabase
@@ -257,7 +266,7 @@ export async function fetchRecentBatches(advisorId: string, limit: number = 5) {
       )
     `,
     )
-    .eq("uploaded_by", advisorId)
+    .eq("uploaded_by", advisorProfileId)
     .order("created_at", { ascending: false })
     .limit(limit);
 

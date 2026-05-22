@@ -7,7 +7,7 @@ import ReportBar from "../secondary/reportBar";
 type ReportCardProps = {
   title: string;
   color: "brown" | "green" | "red";
-  items: string;
+  coursecode: string;
   date: string;
   status: string;
 };
@@ -40,35 +40,33 @@ type ReportCardProps = {
  * <ReportCards reports={reports || defaultReports} />
  * ```
  */
-export function ReportCards({
-  reports = [],
-}: {
-  reports?: ReportCardProps[];
-}) {
+export function ReportCards({ reports = [] }: { reports?: ReportCardProps[] }) {
   // Fallback default reports if empty (for UI consistency during loading)
   const defaultReports: ReportCardProps[] = [
     {
       title: "2023/2024 - Harmattan",
       color: "green",
-      items: "8 courses",
+      coursecode: "GET203",
       date: "2024-01-17",
       status: "Completed",
     },
     {
       title: "2023/2024 - Rain",
       color: "brown",
-      items: "7 courses",
+      coursecode: "GET207",
       date: "2024-07-10",
       status: "In Progress",
     },
     {
       title: "2024/2025 - Harmattan",
       color: "red",
-      items: "9 courses",
+      coursecode: "GET210",
       date: "2025-01-22",
       status: "Failed",
     },
   ];
+
+  console.log(reports, "reports");
 
   // Use provided reports if available, otherwise use defaults
   const displayReports = reports.length > 0 ? reports : defaultReports;

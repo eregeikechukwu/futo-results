@@ -45,5 +45,6 @@ export interface AuthContextType {
   isStudent: boolean;
   isAdvisor: boolean;
   isAdmin: boolean;
+  authInitialized: boolean;
   signOut: () => Promise<void>;
 }

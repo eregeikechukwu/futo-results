@@ -28,12 +28,11 @@ export default function AdvisorDashboardShell({
 }: {
   children: React.ReactNode;
 }) {
-  const { loading } = useAuth();
   const isSmallScreen = useDesktopOnly();
 
   protectDashboardAccess("advisor");
 
-  const { profile, advisorData } = useAuth();
+  const { loading, profile, advisorData } = useAuth();
 
   // Show nothing or loader  before profile is been fetched to prevent hydration mismatch
   if (loading)

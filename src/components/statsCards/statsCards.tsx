@@ -50,7 +50,7 @@ export function AdvisorStatsCards({
               <span className="text-[var(--color-text-green)]">
                 &#43;{newStudents}&nbsp;
               </span>
-              from last session
+              this session
             </p>
           )}
         </div>

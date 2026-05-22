@@ -5,13 +5,13 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import { AdvisorData, AuthContextType, Profile, StudentsData } from "./types";
 import { User } from "@supabase/supabase-js";
 import { createSupabaseClient } from "@/lib/supabase/client";
 import { errorThrowHandler, errorToastHandler } from "@/helpers/errorHandler";
-import { redirect, useRouter } from "next/navigation";
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -22,6 +22,7 @@ const AuthContext = createContext<AuthContextType>({
   isStudent: false,
   isAdvisor: false,
   isAdmin: false,
+  authInitialized: false,
   signOut: async () => {},
 });
 
@@ -31,6 +32,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [studentData, setStudentData] = useState<StudentsData | null>(null);
   const [advisorData, setAdvisorData] = useState<AdvisorData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authInitialized, setAuthInitialized] = useState(false);
+  const loadedProfileId = useRef<string | null>(null);
 
   // const [instanceId] = useState(() => Math.random().toString(36).slice(2));
 
@@ -67,7 +70,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const fetchProfile = useCallback(async (userId: string) => {
-    console.log("STack trace for fucntion call:  ", new Error().stack);
+    if (userId === loadedProfileId.current) {
+      setLoading(false);
+      return;
+    }
+
+    loadedProfileId.current = userId;
 
     const supabase = createSupabaseClient();
 
@@ -102,7 +110,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = useCallback(async () => {
     const supabase = createSupabaseClient();
 
-    console.log("Frpm logout yikes");
     const { error } = await supabase.auth.signOut();
 
     if (error) errorThrowHandler(error);
@@ -123,11 +130,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Set initial user state from session
       if (session?.user) {
+        setLoading(true);
         setUser(session.user);
         fetchProfile(session.user.id);
       } else {
         setLoading(false);
       }
+
+      // Set auth initialized to true in order to mark that the auth has been hydrated, incalse of token refresh and temporal profile nulls
+      setAuthInitialized(true);
 
       // NOW set up the listener — client is fully initialized at this point
       const { data, error } = supabase.auth.onAuthStateChange(
@@ -144,6 +155,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
 
           if (event === "SIGNED_OUT") {
+            loadedProfileId.current = null;
             setUser(null);
             setProfile(null);
             setStudentData(null);
@@ -156,6 +168,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (event === "INITIAL_SESSION") return;
 
           if (session?.user) {
+            setLoading(true);
             setUser(session.user);
             console.log("It happeded here o");
             await fetchProfile(session.user.id);
@@ -187,6 +200,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loading,
         isStudent,
         isAdvisor,
+        authInitialized,
         isAdmin,
         signOut,
       }}

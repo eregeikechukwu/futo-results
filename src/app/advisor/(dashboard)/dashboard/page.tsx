@@ -7,7 +7,11 @@ import { AdvisorStatsCards } from "@/components/statsCards/statsCards";
 import { Heading2 } from "@/components/secondary/typography";
 import { Calendar, UserCheck2Icon } from "lucide-react";
 import React from "react";
-import { useAdvisorDashboardStats, useUploadActivity } from "@/lib/hooks";
+import {
+  useAdvisorDashboardStats,
+  useRecentBatches,
+  useUploadActivity,
+} from "@/lib/hooks";
 import { useAuth } from "@/contexts/AuthContext";
 import toast from "react-hot-toast";
 import SomethingWentWrong from "@/components/secondary/error/somethingWentWrong";
@@ -18,7 +22,7 @@ export default function AdvisorDashboard() {
 
   console.log(advisorData, profile, " advisor Data it is");
 
-  if (!advisorData || !profile) {
+  if ( (!advisorData || !profile) && !loading) {
     toast.error(
       "Something went wrong getting asvisor data, please reload and try again.",
     );
@@ -43,17 +47,27 @@ export default function AdvisorDashboard() {
     error: uploadActivityError,
   } = useUploadActivity(profile?.id);
 
-  if (isLoading || uploadActivityLoading) return <div>Skeleton</div>;
+  // Ftehc report for report cards
+  const {
+    data: uploadSummaryData,
+    isLoading: uploadSummaryLoading,
+    error: uploadSummaryError,
+  } = useRecentBatches(profile?.id);
 
-  console.log("uploadActivity: ", uploadActivity, "statsdata: ", statsData);
+  const uploadSummary = uploadSummaryData?.map((batch) => {
+    return {
+      title: batch?.title,
+      color: batch?.color,
+      coursecode: batch?.courseCode,
+      date: batch?.createdAt.split("T")[0],
+      status: batch?.statusLabel,
+    };
+  });
 
-  const uploadActivities = [
-    { month: "January", uploaded: 23, total: 50 },
-    { month: "February", uploaded: 35, total: 50 },
-    { month: "March", uploaded: 41, total: 50 },
-    { month: "April", uploaded: 28, total: 50 },
-    { month: "May", uploaded: 47, total: 50 },
-  ];
+  if (isLoading || uploadActivityLoading || uploadSummaryLoading)
+    return <div>Skeleton</div>;
+
+  console.log("statsData.new: ", statsData?.totalStudents);
 
   console.log(statsData?.targetLevel);
 
@@ -100,14 +114,18 @@ export default function AdvisorDashboard() {
 
             {/* Progress bars */}
             <div className="flex flex-col gap-16">
-              {(uploadActivity || uploadActivities).map((activity) => (
-                <ProgressBar
-                  key={activity.month}
-                  title={activity.month.slice(0, 3)}
-                  progress={activity.uploaded}
-                  total={activity.total}
-                />
-              ))}
+              {uploadActivityError ? (
+                <div>Error fetching upload report</div>
+              ) : (
+                uploadActivity!.map((activity) => (
+                  <ProgressBar
+                    key={activity.month}
+                    title={activity.month.slice(0, 3)}
+                    progress={activity.uploaded}
+                    total={activity.total}
+                  />
+                ))
+              )}
             </div>
           </div>
           {/* Last Uploads summary */}
@@ -115,7 +133,7 @@ export default function AdvisorDashboard() {
             <div className="mb-24">
               <Heading2>Last Upload Summary</Heading2>
             </div>
-            <ReportCards />
+            <ReportCards reports={uploadSummary} />
           </div>
         </div>
 

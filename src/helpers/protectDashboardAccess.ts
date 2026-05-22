@@ -5,13 +5,13 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export function protectDashboardAccess(role: "student" | "advisor") {
-  const { profile, loading, isStudent, isAdvisor, isAdmin } = useAuth();
+  const { profile, loading, isStudent, isAdvisor, isAdmin, authInitialized } = useAuth();
   const router = useRouter();
 
   console.log(loading, profile, "From protected dahsboard");
 
   useEffect(() => {
-    if (loading) return; // Still loading, don't redirect yet
+    if (loading || !authInitialized) return; // Still loading, don't redirect yet
 
     if (!profile) {
       router.replace(role === "student" ? "/student/auth" : "/advisor/auth");
@@ -22,10 +22,10 @@ export function protectDashboardAccess(role: "student" | "advisor") {
       router.replace("/unauthorized");
       return;
     }
-  }, [loading, profile, isStudent, router, role, isAdvisor, isAdmin]);
+  }, [loading, profile, isStudent, router, role, isAdvisor, isAdmin, authInitialized]);
 
   // Get the authenticated user
   // Use getUser() not getSession() - getUser()
 
-  return { profile, loading, isStudent, isAdvisor, isAdmin };
+  return;
 }

@@ -174,7 +174,6 @@ export function AdvisorUploadFileSelect(
 
   const FileSelectComponent = useMemo(
     function FileSelectComponent() {
-      // console.log("Orogress updates from inside here  ", progress);
 
       return (
         <>

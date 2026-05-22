@@ -156,14 +156,14 @@ export function useUploadActivity(advisorProfileId: string) {
  * @param limit - Maximum number of batches to fetch (default: 5)
  * @returns Query result with recent batch data
  */
-export function useRecentBatches(advisorId: string, limit: number = 5) {
+export function useRecentBatches(advisorProfileId: string, limit: number = 5) {
   return useQuery({
-    queryKey: advisorDashboardKeys.recentBatchesDetail(advisorId, limit),
-    queryFn: () => fetchRecentBatches(advisorId, limit),
+    queryKey: advisorDashboardKeys.recentBatchesDetail(advisorProfileId, limit),
+    queryFn: () => fetchRecentBatches(advisorProfileId, limit),
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 30 * 60 * 1000, // 30 minutes
     refetchOnWindowFocus: true,
-    enabled: !!advisorId,
+    enabled: !!advisorProfileId,
     retry: 2,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });

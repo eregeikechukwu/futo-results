@@ -17,13 +17,13 @@ const h3Styles = "block secondary-heading font-semibold mb-2";
 export default function ReportBar({
   title,
   color,
-  items,
+  coursecode,
   date,
   status,
 }: {
   title: string;
   color: "green" | "red" | "brown";
-  items: string;
+  coursecode: string;
   date: string;
   status: string;
 }) {
@@ -40,7 +40,7 @@ export default function ReportBar({
         <div>
           <h3 className={`${h3Styles}`}>{title}</h3>
           <p className="text-small-passive">
-            {items} &bull; {date}
+            {coursecode} &bull; {date}
           </p>
         </div>
       </div>
@@ -58,24 +58,21 @@ export default function ReportBar({
 export function RecentResultReportBar({
   title,
   color,
-  items,
+  coursecode,
   date,
   img,
   onClick,
 }: {
   title: string;
   color?: "green" | "red" | "brown";
-  items: string;
+  coursecode: string;
   date: string;
   img: string;
   onClick?: () => void;
 }) {
   const colors = colorMap[color || "green"];
 
-  const { isModalOpen, toggleModal, ModalTemplate } = useModalTemplate(
-    false,
-    false,
-  );
+  const { isModalOpen, toggleModal, ModalTemplate } = useModalTemplate(false);
 
   return (
     <>
@@ -90,7 +87,7 @@ export function RecentResultReportBar({
             <div>
               <h3 className={`${h3Styles}`}>{title}</h3>
               <p className="text-small-passive">
-                {items} &bull; {date}
+                {coursecode} &bull; {date}
               </p>
             </div>
           </div>

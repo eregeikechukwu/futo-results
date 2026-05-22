@@ -80,11 +80,14 @@ export function AdvisorOtpForm({
     });
 
     if (error) {
-      console.log("OTP error", error);
-      if (error.message.includes("expired")) {
-        toast.error("Code expired. Go back and sign in again.");
+      const message = error.message.toLowerCase();
+
+      if (message.includes("expired") || message.includes("invalid")) {
+        toast.error("OTP is invalid or has expired");
+      } else if (message.includes("rate limit")) {
+        toast.error("Too many attempts. Please wait.");
       } else {
-        toast.error("Invalid code. Check your email and try again.");
+        toast.error("Verification failed");
       }
       return;
     }
