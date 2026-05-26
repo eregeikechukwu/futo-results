@@ -29,10 +29,10 @@ export interface ExcelMetadata {
 export interface ExcelRawType {
   name: string | null;
   regNo: string | number | null;
-  test: string | null;
-  lab: string | null;
-  exam: string | null;
-  total: string | null;
+  test: string | number | null;
+  lab: string | number | null;
+  exam: string | number | null;
+  total: string | number | null;
   grade: string | null;
   remark: string | null;
 }
@@ -41,7 +41,7 @@ export interface ExcelParseResult<T = Record<string, unknown>> {
   /** Whether parsing was successful */
   success: boolean;
   /** Parsed data as array of objects */
-  data: ExcelRawType[];
+  data: T[];
   /** Metadata about the parsed file */
   metadata: ExcelMetadata | null;
   /** Error message if parsing failed */
@@ -73,6 +73,12 @@ export interface StudentGrade {
  * Example: Generic CSV-like row
  */
 export type ExcelRow = Record<string, string | number | boolean | null>;
+
+export interface NormalizedStudentUploadRow {
+  // full_name: string | null;
+  reg_number: string | null;
+  email: string | null;
+}
 
 //Result addition form
 export interface AddedResult {

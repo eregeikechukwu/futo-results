@@ -33,10 +33,10 @@ export async function GET(request: NextRequest) {
     // Exchange the token for a session
     const { data, error } = await supabase.auth.verifyOtp({ token_hash, type }); // could be "email" (student) or "invite" (advisor)
 
-    console.log("3. verifyOtp error:", error);
-    console.log("4. session exists:", !!data.session);
-    console.log("5. user id:", data.session?.user?.id);
-    console.log("6. user metadata:", data.session?.user?.user_metadata);
+    // console.log("3. verifyOtp error:", error);
+    // console.log("4. session exists:", !!data.session);
+    // console.log("5. user id:", data.session?.user?.id);
+    // console.log("6. user metadata:", data.session?.user?.user_metadata);
 
     if (error && !data.session) {
       return NextResponse.redirect(
@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
           reg_number: regNumber,
           department_id: preReg.department_id,
           admission_year: preReg.admission_year,
-          status: "pending",
+          status: "verified",
           profile_id: data.session?.user.id,
         });
 

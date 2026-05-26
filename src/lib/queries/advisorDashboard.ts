@@ -60,14 +60,15 @@ export async function fetchAdvisorDashboardStats(
       .from("students")
       .select("id", { count: "exact", head: true })
       .eq("department_id", departmentId)
-      .eq("admission_year", admissionYear);
+      .eq("admission_year", admissionYear)
+      .is("deleted_at", null);
 
   const { count: studentsFromPreregistration, error: preError } = await supabase
     .from("student_preregistrations")
     .select("id", { count: "exact", head: true })
     .eq("department_id", departmentId)
     .eq("created_by", advisorId)
-    .eq("claimed", "false");
+    .eq("claimed", false);
 
   if (totalError || preError) throw totalError;
 
@@ -85,7 +86,7 @@ export async function fetchAdvisorDashboardStats(
       activeTerm
         ? new Date(activeTerm.session.split("/")[0]).toISOString()
         : "",
-    );
+    ).is("deleted_at", null)
 
   const newStudents = newStudentsCount || 0;
 

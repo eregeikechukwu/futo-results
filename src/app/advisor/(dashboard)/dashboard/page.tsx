@@ -21,8 +21,7 @@ export default function AdvisorDashboard() {
   const { loading, profile, advisorData } = useAuth();
 
   console.log(advisorData, profile, " advisor Data it is");
-
-  if ( (!advisorData || !profile) && !loading) {
+  if ((!advisorData || !profile) && !loading) {
     toast.error(
       "Something went wrong getting asvisor data, please reload and try again.",
     );
@@ -36,23 +35,23 @@ export default function AdvisorDashboard() {
     isLoading,
     error,
   } = useAdvisorDashboardStats(
-    profile?.id,
-    advisorData?.id,
-    advisorData?.advisor_assignments[0].departments.id,
-    advisorData?.advisor_assignments[0].admission_year,
+    profile!.id,
+    advisorData!.id,
+    advisorData?.advisor_assignments[0].departments.id!,
+    advisorData?.advisor_assignments[0].admission_year!,
   );
   const {
     data: uploadActivity,
     isLoading: uploadActivityLoading,
     error: uploadActivityError,
-  } = useUploadActivity(profile?.id);
+  } = useUploadActivity(profile!.id);
 
   // Ftehc report for report cards
   const {
     data: uploadSummaryData,
     isLoading: uploadSummaryLoading,
     error: uploadSummaryError,
-  } = useRecentBatches(profile?.id);
+  } = useRecentBatches(profile!.id);
 
   const uploadSummary = uploadSummaryData?.map((batch) => {
     return {
@@ -77,11 +76,11 @@ export default function AdvisorDashboard() {
         <div className="flex justify-between  items-center bg-gradient-to-r from-[#effff8] to-[var(--color-white)] border border-[var(--color-blue-background)] rounded-[16px] lh-24 p-24">
           <div>
             <h1 className="text-24 lh-32 font-bold mb-8">
-              Welcome back, {advisorData?.title} {profile.full_name}
+              Welcome back, {advisorData?.title} {profile?.full_name || ""}
             </h1>
             <h2 className="text-[var(--color-text-link)]">
-              {advisorData.advisor_assignments[0].departments.name} Department •
-              Academic Session {statsData?.activeTerm.session}
+              {advisorData?.advisor_assignments[0].departments.name} Department
+              • Academic Session {statsData?.activeTerm.session}
             </h2>
           </div>
 

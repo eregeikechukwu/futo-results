@@ -2,11 +2,19 @@ import { advisorCourseSchema } from "@/utils/advisorDashboardSchemas";
 import z from "zod";
 
 export interface AdvisorStudent {
+  id: string;
   name: string;
   email: string;
   regNumber: string;
   status: "verified" | "pending" | "flagged";
   joinDate: string;
+}
+export interface AdvisorStudentUpload {
+  name: string;
+  email: string;
+  regNumber: string;
+  // status: "verified" | "pending" | "flagged";
+  // joinDate: string;
 }
 
 export interface AdvisorCourse {

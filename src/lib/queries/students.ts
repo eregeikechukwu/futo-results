@@ -36,7 +36,7 @@ export async function fetchAdvisorStudentList(
     email: p.email,
     full_name: null,
     status: "pending" as const,
-    source: "preregistration" as const,
+    source: "student_preregistrations" as const,
   }));
 
   const activeList = (active ?? []).map((s) => ({

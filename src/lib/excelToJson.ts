@@ -1,8 +1,19 @@
+import { useState, useCallback } from "react";
 import * as XLSX from "xlsx";
+import {
+  ExcelInput,
+  ExcelMetadata,
+  ExcelParseOptions,
+  ExcelParseResult,
+  ExcelRawType,
+  NormalizedStudentUploadRow,
+} from "@/app/types/resultsUpload";
 
 // ============================================================================
 // Types
 // ============================================================================
+
+type ExcelParsedRow = Record<string, string | number | boolean | null>;
 
 // ============================================================================
 // Main Parser Function
@@ -15,10 +26,23 @@ import * as XLSX from "xlsx";
  * @param options - Optional configuration
  * @returns Result object with typed data and metadata
  */
-export async function excelToJson<T = Record<string, unknown>>(
+export async function excelToJson(
   input: ExcelInput,
+  type: "results",
+  options?: ExcelParseOptions,
+): Promise<ExcelParseResult<ExcelRawType>>;
+export async function excelToJson(
+  input: ExcelInput,
+  type: "students",
+  options?: ExcelParseOptions,
+): Promise<ExcelParseResult<NormalizedStudentUploadRow>>;
+export async function excelToJson(
+  input: ExcelInput,
+  type: "results" | "students",
   options: ExcelParseOptions = {},
-): Promise<ExcelParseResult<T>> {
+): Promise<
+  ExcelParseResult<ExcelRawType> | ExcelParseResult<NormalizedStudentUploadRow>
+> {
   const {
     sheetName = null,
     hasHeaders = true,
@@ -49,16 +73,26 @@ export async function excelToJson<T = Record<string, unknown>>(
     }) as Record<string, unknown>[];
 
     if (!rawData || rawData.length === 0) {
+      const metadata = {
+        sheetName: targetSheetName,
+        totalSheets: workbook.SheetNames.length,
+        availableSheets: workbook.SheetNames,
+        totalRows: 0,
+        headers: headers || [],
+      };
+
+      if (type === "results") {
+        return {
+          success: true,
+          data: [] as ExcelRawType[],
+          metadata,
+        };
+      }
+
       return {
         success: true,
-        data: [] as ExcelRawType[],
-        metadata: {
-          sheetName: targetSheetName,
-          totalSheets: workbook.SheetNames.length,
-          availableSheets: workbook.SheetNames,
-          totalRows: 0,
-          headers: headers || [],
-        },
+        data: [] as NormalizedStudentUploadRow[],
+        metadata,
       };
     }
 
@@ -68,49 +102,65 @@ export async function excelToJson<T = Record<string, unknown>>(
     }
 
     // Process each row
-    const processedData = rawData.map((row) =>
+    const processedData: ExcelParsedRow[] = rawData.map((row) =>
       processRow(row, { trimValues, convertNumbers }),
-    ) as T[];
+    );
 
     // Get headers from first row
     const detectedHeaders =
-      processedData.length > 0
-        ? Object.keys(processedData[0] as Record<string, unknown>)
-        : [];
+      processedData.length > 0 ? Object.keys(processedData[0]) : [];
 
-    const normalizedData = processedData.map((data) => {
-      const record = data as Record<string, string | null>;
+    const normalizedResultData = processedData.map((record) => ({
+      name: normalizeStringValue(record.Name),
+      regNo: normalizeRegNoValue(record.RegNo),
+      test: normalizeBuiltValue(record.Test),
+      lab: normalizeBuiltValue(record.Lab),
+      exam: normalizeBuiltValue(record.Exam),
+      total: normalizeBuiltValue(record.Total),
+      remark: normalizeStringValue(record.Remark),
+      grade: normalizeStringValue(record.Grade),
+    }));
+
+    const normalizedStudentsData = normalizeStudentUploadRows(processedData);
+
+    const metadata = {
+      sheetName: targetSheetName,
+      totalSheets: workbook.SheetNames.length,
+      availableSheets: workbook.SheetNames,
+      totalRows: processedData.length,
+      headers: detectedHeaders,
+    };
+
+    if (type === "results") {
       return {
-        name: record.Name,
-        regNo: record.RegNo,
-        test: record.Test,
-        lab: record.Lab,
-        exam: record.Exam,
-        total: record.Total,
-        remark: record.Remark,
-        grade: record.Grade,
+        success: true,
+        data: normalizedResultData,
+        metadata,
       };
-    });
+    }
 
     return {
       success: true,
-      data: normalizedData,
-      metadata: {
-        sheetName: targetSheetName,
-        totalSheets: workbook.SheetNames.length,
-        availableSheets: workbook.SheetNames,
-        totalRows: processedData.length,
-        headers: detectedHeaders,
-      },
+      data: normalizedStudentsData,
+      metadata,
     };
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error occurred";
 
+    if (type === "results") {
+      return {
+        success: false,
+        error: errorMessage,
+        data: [] as ExcelRawType[],
+        metadata: null,
+      };
+    }
+
     return {
       success: false,
       error: errorMessage,
-      data: [] as ExcelRawType[],
+      data: [] as NormalizedStudentUploadRow[],
       metadata: null,
     };
   }
@@ -175,12 +225,23 @@ function applyCustomHeaders(
 function processRow(
   row: Record<string, unknown>,
   options: { trimValues: boolean; convertNumbers: boolean },
-): Record<string, unknown> {
+): ExcelParsedRow {
   const { trimValues, convertNumbers } = options;
-  const processedRow: Record<string, unknown> = {};
+  const processedRow: ExcelParsedRow = {};
 
   for (const [key, value] of Object.entries(row)) {
-    let processedValue: unknown = value;
+    let processedValue: string | number | boolean | null = null;
+
+    if (
+      typeof value === "string" ||
+      typeof value === "number" ||
+      typeof value === "boolean" ||
+      value === null
+    ) {
+      processedValue = value;
+    } else if (value !== undefined) {
+      processedValue = String(value);
+    }
 
     // Trim strings
     if (trimValues && typeof processedValue === "string") {
@@ -193,11 +254,7 @@ function processRow(
     }
 
     // Convert numeric strings to numbers
-    if (
-      convertNumbers &&
-      typeof processedValue === "string" &&
-      processedValue !== null
-    ) {
+    if (convertNumbers && typeof processedValue === "string") {
       const num = Number(processedValue);
       if (!isNaN(num) && processedValue !== "") {
         processedValue = num;
@@ -210,22 +267,95 @@ function processRow(
   return processedRow;
 }
 
+/**
+ * Convert parsed Excel rows into normalized student upload format
+ */
+function normalizeStringValue(
+  value: string | number | boolean | null,
+): string | null {
+  if (typeof value === "string") return value;
+  if (typeof value === "number") return String(value);
+  if (typeof value === "boolean") return value ? "TRUE" : "FALSE";
+  return null;
+}
+
+function normalizeRegNoValue(
+  value: string | number | boolean | null,
+): string | number | null {
+  if (typeof value === "string" || typeof value === "number") return value;
+  if (typeof value === "boolean") return value ? "1" : "0";
+  return null;
+}
+
+function normalizeBuiltValue(
+  value: string | number | boolean | null,
+): string | number | null {
+  if (typeof value === "string" || typeof value === "number") return value;
+  if (typeof value === "boolean") return value ? 1 : 0;
+  return null;
+}
+
+export function normalizeStudentUploadRows(
+  rows: ExcelParsedRow[],
+): NormalizedStudentUploadRow[] {
+  return rows.map((row) => {
+    const record = row as ExcelParsedRow;
+
+    let full_name: string | null = null;
+
+    if (typeof record["Name"] === "string") {
+      full_name = record["Name"].trim();
+    } else if (typeof record["full_name"] === "string") {
+      full_name = record["full_name"].trim().toLowerCase();
+    } else if (typeof record["fullname"] === "string") {
+      full_name = record["fullname"].trim().toLowerCase();
+    } else if (typeof record["name"] === "string") {
+      full_name = record["name"].trim().toLowerCase();
+    }
+
+    let reg_number: string | null = null;
+
+    if (typeof record["RegNo"] === "string") {
+      reg_number = record["RegNo"].trim();
+    } else if (record["regNo"] === "string") {
+      reg_number = record["regNo"].trim();
+    } else if (typeof record["reg_number"] === "string") {
+      reg_number = record["reg_number"].trim();
+    } else if (typeof record["regno"] === "string") {
+      reg_number = record["regno"].trim();
+    } else if (typeof record["regNo"] === "string") {
+      reg_number = record["regNo"].trim();
+    } else if (typeof record["RegNo"] === "number") {
+      reg_number = record["RegNo"].toString().trim();
+    }
+
+    let email: string | null = null;
+
+    if (typeof record["Email"] === "string") {
+      email = record["Email"].trim().toLowerCase();
+    } else if (typeof record["email"] === "string") {
+      email = record["email"].trim().toLowerCase();
+    }
+
+    return {
+      reg_number,
+      email,
+    };
+  });
+
+}
+// VERY IMPORTANT MESSAGE:
+// DO NOT DELETE THIS COMMENT
+// Tell course advisors that the heading of the escel files should be exactly as follows:
+// Name, RegNo, Email
+
 // ============================================================================
 // React Hook for Next.js
 // ============================================================================
 
-import { useState, useCallback, SetStateAction } from "react";
-import {
-  ExcelInput,
-  ExcelMetadata,
-  ExcelParseOptions,
-  ExcelParseResult,
-  ExcelRawType,
-} from "@/app/types/resultsUpload";
-
-export interface UseExcelParserReturn<T = Record<string, unknown>> {
+export interface UseExcelParserReturn {
   /** Parsed data */
-  data: T[];
+  data: ExcelRawType[];
   /** Metadata about parsed file */
   metadata: ExcelMetadata | null;
   /** Loading state */
@@ -236,7 +366,7 @@ export interface UseExcelParserReturn<T = Record<string, unknown>> {
   parseFile: (
     file: File,
     options?: ExcelParseOptions,
-  ) => Promise<ExcelParseResult<T>>;
+  ) => Promise<ExcelParseResult<ExcelRawType>>;
   /** Get available sheets */
   getSheets: (file: File) => Promise<string[]>;
   /** Reset state */
@@ -248,7 +378,7 @@ export interface UseExcelParserReturn<T = Record<string, unknown>> {
  *
  * @example
  * function MyComponent() {
- *   const { data, isLoading, error, parseFile } = useExcelParser<StudentGrade>();
+ *   const { data, isLoading, error, parseFile } = useExcelParser();
  *
  *   const handleUpload = async (file: File) => {
  *     const result = await parseFile(file);
@@ -261,8 +391,8 @@ export interface UseExcelParserReturn<T = Record<string, unknown>> {
  * }
  */
 
-export function useExcelParser<T = 1>(): UseExcelParserReturn<T> {
-  const [data, setData] = useState<T[]>([]);
+export function useExcelParser(): UseExcelParserReturn {
+  const [data, setData] = useState<ExcelRawType[]>([]);
   const [metadata, setMetadata] = useState<ExcelMetadata | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -271,15 +401,15 @@ export function useExcelParser<T = 1>(): UseExcelParserReturn<T> {
     async (
       file: File,
       options?: ExcelParseOptions,
-    ): Promise<ExcelParseResult<T>> => {
+    ): Promise<ExcelParseResult<ExcelRawType>> => {
       setIsLoading(true);
       setError(null);
 
       try {
-        const result = await excelToJson<T>(file, options);
+        const result = await excelToJson(file, "results", options);
 
         if (result.success) {
-          setData(result.data as SetStateAction<T[]>);
+          setData(result.data);
           setMetadata(result.metadata);
         } else {
           setError(result.error || "Failed to parse file");

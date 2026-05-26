@@ -1,41 +1,64 @@
 "use client";
 
-import { AdvisorStudent } from "@/app/types/advisor";
+import {  AdvisorStudentUpload } from "@/app/types/advisor";
 import { addStudentSchema } from "@/utils/addStudentSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useForm, FormProvider } from "react-hook-form";
 import { Form, SelectField, TextField } from "./reusables";
 import { ModalForm } from "../secondary/common";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { NormalizedStudentsData } from "@/app/types/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import { errorToastHandler } from "@/helpers/errorHandler";
+import { useUploadAdvisorStudents } from "@/lib/hooks/useAdvisorStudents";
 
 const today = new Date();
 today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
 const localToday = today.toISOString().split("T")[0];
 
 export function AddStudentForm({ toggleModal }: { toggleModal: () => void }) {
-  const methods = useForm<AdvisorStudent>({
+  const [isUploading, setIsUploading] = useState(false);
+  const uploadStudentsMutation = useUploadAdvisorStudents();
+  const { advisorData } = useAuth();
+
+  const methods = useForm<AdvisorStudentUpload>({
     resolver: zodResolver(addStudentSchema),
     defaultValues: {
       name: "",
       regNumber: "",
       email: "",
-      status: "verified",
-      joinDate: localToday,
     },
   });
 
-  const studentStatus = [
-    { label: "Verified", value: "verified" },
-    { label: "Pending", value: "pending" },
-    { label: "Flagged", value: "flagged" },
-  ];
+  const onSubmit = async (data: AdvisorStudentUpload) => {
+    if (!advisorData) {
+      toast.error("No advisor data found.");
+      return;
+    }
+    toast.loading("Adding student...");
+    setIsUploading(true);
+    const uploadData: NormalizedStudentsData = {
+      reg_number: data.regNumber,
+      email: data.email,
+      created_by: advisorData?.id,
+      admission_year: advisorData?.advisor_assignments[0].admission_year,
+      department_id: advisorData?.advisor_assignments[0].departments.id,
+    };
 
-  const onSubmit = async (data: AdvisorStudent) => {
-    console.log(data);
-    //simulate backend call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    // toast.success("login success");
-    methods.reset();
+    uploadStudentsMutation.mutate([uploadData], {
+      onSuccess: () => {
+        setIsUploading(false);
+        toast.success("Student added successfully!");
+        methods.reset();
+        toggleModal();
+      },
+      onError: (error) => {
+        setIsUploading(false);
+        errorToastHandler(error, "Failed to add student. Please try again.");
+      },
+    });
   };
 
   return (
@@ -56,14 +79,14 @@ export function AddStudentForm({ toggleModal }: { toggleModal: () => void }) {
             label="Email Address"
             placeholder="eg: emmanuelokafor@gmail.com"
           />
-          <SelectField name="status" label="Status" options={studentStatus} />
+          {/* <SelectField name="status" label="Status" options={studentStatus} /> */}
           {/* Join Date */}
-          <TextField
+          {/* <TextField
             name="joinDate"
             type="date"
             label="Join Date"
             placeholder="eg: 2023-01-01"
-          />
+          /> */}
         </ModalForm>
 
         {/* CTA's */}
@@ -71,7 +94,11 @@ export function AddStudentForm({ toggleModal }: { toggleModal: () => void }) {
           <button type="button" className="cancel-btn" onClick={toggleModal}>
             Cancel
           </button>
-          <button type="submit" className={`button-primary `}>
+          <button
+            disabled={isUploading}
+            type="submit"
+            className={`button-primary ${isUploading && "opacity-30"}`}
+          >
             Add Student
           </button>
         </div>

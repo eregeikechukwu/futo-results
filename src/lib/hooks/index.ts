@@ -26,7 +26,6 @@ export {
   useCourseOfferingsByTerm,
   useAllCourses,
   useActiveTerms,
-  advisorDashboardKeys,
 } from "./useAdvisorDashboard";
 
 // ============================================================================

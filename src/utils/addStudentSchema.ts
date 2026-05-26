@@ -19,7 +19,4 @@ export const addStudentSchema = z.object({
       return year <= currentYear;
     }, "Admission year cannot be in the future"),
   email: z.string().email("invalid email address"),
-  status: z
-    .enum(["verified", "pending", "flagged"], "Status must be either verified, pending or flagged"),
-  joinDate: z.string().min(2, "Join date must be at least 2 characters"),
 });

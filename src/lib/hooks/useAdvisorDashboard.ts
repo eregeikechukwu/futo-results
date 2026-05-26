@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   fetchAdvisorDashboardStats,
   fetchUploadActivity,
@@ -13,39 +9,7 @@ import {
   fetchAllCourses,
   fetchActiveTerms,
 } from "../queries/advisorDashboard";
-import { errorToastHandler } from "@/helpers/errorHandler";
-
-// ============================================================================
-// QUERY KEYS
-// ============================================================================
-/**
- * Factory object for creating consistent query keys across the app.
- * Follows TanStack Query best practices for key structure.
- * Enables proper cache invalidation and dependency management.
- *
- * Structure: [domain, category, ...specifics]
- * This ensures related queries can be invalidated together.
- */
-export const advisorDashboardKeys = {
-  all: ["advisor", "dashboard"] as const,
-  stats: () => [...advisorDashboardKeys.all, "stats"] as const,
-  statsDetail: (advisorProfileId: string, advisorId: string, departmentId: string, admissionYear: number) =>
-    [
-      ...advisorDashboardKeys.stats(),
-      {advisorProfileId, advisorId, departmentId, admissionYear },
-    ] as const,
-  uploadActivity: () => [...advisorDashboardKeys.all, "uploadActivity"] as const,
-  uploadActivityDetail: (advisorId: string) =>
-    [...advisorDashboardKeys.uploadActivity(), { advisorId }] as const,
-  recentBatches: () => [...advisorDashboardKeys.all, "recentBatches"] as const,
-  recentBatchesDetail: (advisorId: string, limit?: number) =>
-    [...advisorDashboardKeys.recentBatches(), { advisorId, limit }] as const,
-  courseOfferings: () => [...advisorDashboardKeys.all, "courseOfferings"] as const,
-  courseOfferingsDetail: (termId: string, advisorId?: string) =>
-    [...advisorDashboardKeys.courseOfferings(), { termId, advisorId }] as const,
-  allCourses: () => [...advisorDashboardKeys.all, "allCourses"] as const,
-  activeTerms: () => [...advisorDashboardKeys.all, "activeTerms"] as const,
-};
+import { advisorDashboardKeys, gcTimeUni, staleTimeUni } from "./utils";
 
 // ============================================================================
 // DASHBOARD STATS HOOK
@@ -87,9 +51,14 @@ export function useAdvisorDashboardStats(
       admissionYear,
     ),
     queryFn: () =>
-      fetchAdvisorDashboardStats(advisorProfileId, advisorId, departmentId, admissionYear),
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 30 * 60 * 1000, // 30 minutes (formerly cacheTime)
+      fetchAdvisorDashboardStats(
+        advisorProfileId,
+        advisorId,
+        departmentId,
+        admissionYear,
+      ),
+    staleTime: staleTimeUni,
+    gcTime: gcTimeUni,
     refetchOnWindowFocus: true,
     enabled: !!advisorId && !!departmentId && !!admissionYear,
     retry: 2,
@@ -160,7 +129,7 @@ export function useRecentBatches(advisorProfileId: string, limit: number = 5) {
   return useQuery({
     queryKey: advisorDashboardKeys.recentBatchesDetail(advisorProfileId, limit),
     queryFn: () => fetchRecentBatches(advisorProfileId, limit),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: staleTimeUni, // 5 minutes
     gcTime: 30 * 60 * 1000, // 30 minutes
     refetchOnWindowFocus: true,
     enabled: !!advisorProfileId,
