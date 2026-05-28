@@ -1,4 +1,3 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createSupabaseClient } from "../supabase/client";
 import { NormalizedStudentsData } from "@/app/types/utils";
 import { AdvisorStudent } from "@/app/types/advisor";

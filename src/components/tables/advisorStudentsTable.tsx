@@ -15,13 +15,15 @@ import { ArrowUpDown, Flag, FlagOff, Trash2 } from "lucide-react";
 import { colorMap } from "@/utils/colorMaps";
 import { TableControls } from "./common";
 import { TableTemplate } from "./table";
-import { Overlay } from "../modals/overlay";
 import {
   useDeleteStudentRecord,
   useUpdateStudentStatus,
 } from "@/lib/hooks/useAdvisorStudents";
 import toast from "react-hot-toast";
 import { errorToastHandler } from "@/helpers/errorHandler";
+import ConfirmModal from "../secondary/confirmationModal";
+import { StudentStatus } from "@/utils/systemUtils";
+import { CoverLoader } from "../secondary/loaders/coverLoader";
 
 export function AdvisorStudentsTable({
   advisorStudents,
@@ -41,48 +43,54 @@ export function AdvisorStudentsTable({
   ]);
   const [columnFilters, setColumnFilters] = useState<ColumnFilter[]>([]);
   const [isMutating, setIsMutating] = useState(false);
+  const [idToBeDeleted, setIdToBeDeleted] = useState<{
+    id: string;
+    status: StudentStatus;
+  } | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Mutation for deletimg student
-  const {
-    mutate: deleteStudentMutation,
-    isPending: isDeleting,
-    error: deletingError,
-  } = useDeleteStudentRecord();
+  const { mutate: deleteStudentMutation } = useDeleteStudentRecord();
 
   // Mutation for deletimg student
-  const {
-    mutate: updateStudentMutation,
-    isPending: isUpdating,
-    error: updatingError,
-  } = useUpdateStudentStatus();
+  const { mutate: updateStudentMutation } = useUpdateStudentStatus();
 
-  const handleDeleteStudent = (studentId) => {
+  const handleDeleteStudent = (studentId, status) => {
+    console.log("Deleting student:", studentId, status);
     setIsMutating(true);
-    deleteStudentMutation({studentId}, {
-      onSuccess: () => {
-        toast.loading("Deleting student...");
-        toast.success("Student deleted successfully");
-        setIsMutating(false);
+    deleteStudentMutation(
+      { studentId, status },
+      {
+        onSuccess: () => {
+          toast.success("Student deleted successfully");
+          setIsMutating(false);
+          setIsModalOpen(false);
+          setIdToBeDeleted(null);
+        },
+        onError: (error) => {
+          setIsModalOpen(false);
+          errorToastHandler(error);
+          setIsMutating(false);
+        },
       },
-      onError: (error) => {
-        errorToastHandler(error);
-        setIsMutating(false);
-      },
-    });
+    );
   };
 
   const updateStatus = (studentId, status) => {
-    updateStudentMutation({studentId: studentId, status: status}, {
-      onSuccess: () => {
-        toast.loading("Updating student...");
-        setIsMutating(false);
-        toast.success("Status updated successfully");
+    setIsMutating(true);
+    updateStudentMutation(
+      { studentId: studentId, status: status },
+      {
+        onSuccess: () => {
+          setIsMutating(false);
+          toast.success("Status updated successfully");
+        },
+        onError: (error) => {
+          errorToastHandler(error);
+          setIsMutating(false);
+        },
       },
-      onError: (error) => {
-        errorToastHandler(error);
-        setIsMutating(false);
-      },
-    });
+    );
   };
 
   const columns: ColumnDef<AdvisorStudent>[] = [
@@ -146,17 +154,18 @@ export function AdvisorStudentsTable({
       accessorKey: "actions",
       cell: ({ row }) => {
         const handleDelete = () => {
-          console.log("Deleting student:", row.original.id);
-          handleDeleteStudent(row.original.id);
+          setIsModalOpen(true);
+          setIdToBeDeleted({
+            id: row.original.id,
+            status: row.original.status,
+          });
         };
 
         const handleFlag = () => {
           if (row.original.status === "flagged") {
-            updateStatus(row.original.id, "verified")
-            row.original.status = "verified";
+            updateStatus(row.original.id, "verified");
           } else {
-            updateStatus(row.original.id, "flagged")
-            row.original.status = "flagged";
+            updateStatus(row.original.id, "flagged");
           }
           console.log("Flagging student:", row.original.regNumber);
         };
@@ -183,6 +192,8 @@ export function AdvisorStudentsTable({
       },
     },
   ];
+
+  console.log(isMutating, " Sometign si muaiaekdjo");
 
   //Creating table instance
   const table = useReactTable({
@@ -220,9 +231,8 @@ export function AdvisorStudentsTable({
       { value: "pending", title: "Pending" },
     ],
   };
-
   return (
-    <div>
+    <div className="relative">
       {/* controls */}
       <TableControls
         table={table}
@@ -234,6 +244,23 @@ export function AdvisorStudentsTable({
 
       {/* Table */}
       <TableTemplate table={table} />
+
+      {/* Delete confirmatin modal */}
+      <ConfirmModal
+        open={isModalOpen}
+        onConfirm={() =>
+          handleDeleteStudent(idToBeDeleted?.id, idToBeDeleted?.status)
+        }
+        variant="danger"
+        confirmLabel="Delete"
+        message="delete this student from your records"
+        onCancel={() => {
+          setIdToBeDeleted(null);
+          setIsModalOpen(false);
+        }}
+      />
+      {/* Loader for general mutating state */}
+      {isMutating && <CoverLoader />}
     </div>
   );
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import { AdvisorStudentsTable } from "@/components/tables/advisorStudentsTable";
-import { advisorStudents } from "@/mock/advisorStudents";
 import { AdvisorStudentsStatsCards } from "@/components/statsCards/statsCards";
 import { Header } from "@/components/secondary/header";
 import { DashboardContainer } from "@/components/secondary/common";
@@ -14,8 +13,6 @@ import { excelToJson, useExcelParser } from "@/lib/excelToJson";
 import toast from "react-hot-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { errorToastHandler } from "@/helpers/errorHandler";
-import { fetchAdvisorStudents } from "@/lib/queries/advisorStudents";
-import { fetchAdvisorStudentList } from "@/lib/queries/students";
 import {
   useFetchStudentsStats,
   useUploadAdvisorStudents,
@@ -25,7 +22,6 @@ import { AdvisorStudent } from "@/app/types/advisor";
 
 export default function ManageStudents() {
   const [uploading, setUploading] = useState(false);
-  // const [file, setFile] = useState<File | null>(null);
   const { toggleModal, ModalTemplate } = useModalTemplate();
   const { advisorData } = useAuth();
 

@@ -18,7 +18,7 @@ export function AuthCTABtn({
       onClick={CTA as () => void}
     >
       <p className=" flex items-center">{children}</p>
-      {isSubmitting && <LoaderSpinner3 />}
+      {isSubmitting && <LoaderSpinner3 size={15} />}
     </button>
   );
 }

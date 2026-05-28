@@ -4,7 +4,6 @@ import { CourseData } from "@/app/types/advisor";
 import { advisorCourseSchema } from "@/utils/advisorDashboardSchemas";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import toast from "react-hot-toast";
 import { AdvisorCourseFields, Form } from "../forms/reusables";
 import { LoaderSpinner1 } from "../secondary/loaders/loaders";
 

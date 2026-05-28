@@ -6,6 +6,7 @@ import {
 } from "../queries/advisorStudents";
 import { createSupabaseClient } from "../supabase/client";
 import { errorThrowHandler } from "@/helpers/errorHandler";
+import { StudentStatus } from "@/utils/systemUtils";
 
 // Upload students to students_preregistration from advisor Google Form
 export function useUploadAdvisorStudents() {
@@ -74,12 +75,26 @@ export function useDeleteStudentRecord() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ studentId }: { studentId: string }) => {
+    mutationFn: async ({
+      studentId,
+      status,
+    }: {
+      studentId: string;
+      status: StudentStatus;
+    }) => {
       const supabase = createSupabaseClient();
-      const { error } = await supabase.rpc("soft_delete_student", {
-        student_id: studentId,
-      });
-      if (error) errorThrowHandler(error);
+
+      if (status === "verified" || status === "flagged") {
+        const { error } = await supabase.rpc("soft_delete_student", {
+          student_id: studentId,
+        });
+        if (error) errorThrowHandler(error);
+      } else {
+        const { error } = await supabase.rpc("delete_preregistration", {
+          prereg_id: studentId,
+        });
+        if (error) errorThrowHandler(error);
+      }
     },
     onSuccess: () => {
       // Invalidate students cache — triggers automatic refetch

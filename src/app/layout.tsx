@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "./styles/globals.scss";
 import { Providers } from "./providers";
+import "@aejkatappaja/phantom-ui/ssr.css";
 
 const inter = Inter({
   variable: "--font-inter",

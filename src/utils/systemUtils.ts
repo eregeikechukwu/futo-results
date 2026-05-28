@@ -4,6 +4,8 @@ export const semesters = ["Harmattan", "Rain"];
 
 // Strict grade letters used across result rendering and CGPA calculations.
 export type GradeLetter = "A" | "B" | "C" | "D" | "E" | "F";
+// Student status
+export type StudentStatus = "flagged" | "verified" | "pending";
 
 // Visual tones for grade badges.
 export type GradeTone = {
@@ -23,7 +25,10 @@ export const gradePointMap: Record<GradeLetter, number> = {
 
 // Shared grade color system used in student pages.
 export const gradeToneMap: Record<GradeLetter, GradeTone> = {
-  A: { bg: "var(--color-green-background)", text: "var(--color-text-green-dark)" },
+  A: {
+    bg: "var(--color-green-background)",
+    text: "var(--color-text-green-dark)",
+  },
   B: { bg: "var(--color-blue-background)", text: "var(--color-text-blue)" },
   C: { bg: "var(--color-brown-background)", text: "var(--color-text-brown)" },
   D: { bg: "var(--color-purple-background)", text: "var(--color-white)" },
@@ -164,4 +169,4 @@ export const editCourseFields = [
 ];
 
 // Universal password length
-export const passwordLength = 6
+export const passwordLength = 6;

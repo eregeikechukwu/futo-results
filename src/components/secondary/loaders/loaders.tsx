@@ -17,10 +17,35 @@ export function LoaderSpinner2({ size = 30 }) {
   );
 }
 
-export function LoaderSpinner3({ size = 30 }) {
+interface LoaderSpinner3Props {
+  size?: number;
+  color?: string;
+  thickness?: number;
+}
+
+export function LoaderSpinner3({
+  size = 20,
+  color = "#ffffff",
+  thickness = 2,
+}: LoaderSpinner3Props) {
   return (
     <span className="center-child">
-      <span className="w-[1.2rem] h-[1.2rem] border-solid border-[2px] rounded-full bg-transparent border-[rgba(255,255,255,0.3)] border-r-white   border-t-white rotate  inline-block" />
+      <span
+        className="rotate inline-block rounded-full bg-transparent"
+        style={{
+          width: `${size}px`,
+          height: `${size}px`,
+          borderWidth: `${thickness}px`,
+          borderStyle: "solid",
+
+          // faded ring
+          borderColor: `${color}33`,
+
+          // highlighted spinning edges
+          borderTopColor: color,
+          borderRightColor: color,
+        }}
+      />
     </span>
   );
 }
