@@ -25,8 +25,13 @@
   },
   "include": [
     "next-env.d.ts",
+    "src/**/*.ts",
+    "src/**/*",
+    "src/**/*.ts",
+    "src/**/*.tsx",
     "**/*.ts",
     "**/*.tsx",
+    "**/*.d.ts",
     ".next/types/**/*.ts",
     "src/components/forms/resultEditTable.tsx"
   ],

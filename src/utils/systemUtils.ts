@@ -85,11 +85,13 @@ export const ocrUploadFormats = ["application/pdf", "image/jpeg", "image/png"];
 
 // keep unit values as numbers if schema expects number
 export const unitsOptions = units.map((unit) => ({
+  id: unit.toString(),
   label: `${unit} ${unit > 1 ? "units" : "unit"}`,
   value: unit,
 }));
 
 export const semesterOptions = semesters.map((semester) => ({
+  id: semester.toLowerCase(), // string, matches schema, but the real one is UUID generated on backend, this is just for form handling
   label: semester[0].toUpperCase() + semester.slice(1),
   value: semester, // string, matches schema
 }));

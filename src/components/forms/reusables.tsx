@@ -7,6 +7,7 @@ import {
   CourseData,
   type TextFieldProps,
   SelectFieldProps,
+  SelectOptions,
 } from "@/app/types/advisor";
 import { Error, ModalForm } from "../secondary/common";
 import {
@@ -133,7 +134,15 @@ export function SelectField({
   );
 }
 
-export function AdvisorCourseFields() {
+export function AdvisorCourseFields({
+  termOptions = semesterOptions,
+  loading = true,
+  error,
+}: {
+  termOptions?: SelectOptions[];
+  loading?: boolean;
+  error?: Error;
+}) {
   return (
     <ModalForm>
       {/*abeg o names must match your schema keys exactly */}
@@ -156,18 +165,17 @@ export function AdvisorCourseFields() {
         // If your SelectField needs to register with valueAsNumber,
         // it can accept a prop like numeric={true} and call register(name, { valueAsNumber: true })
       />
-      <SelectField
-        name="semester" // <-- changed
-        label="Semester"
-        options={semesterOptions}
-      />
-      <TextField
-        name="session" // <-- matches schema
-        label="Session"
-        required
-        onChange={formatSessionInput}
-        placeholder="eg. 2024/2025"
-      />
+      {loading ? (
+        <p>Loading terms...</p>
+      ) : error ? (
+        <Error>Error loading terms: {error.message}</Error>
+      ) : (
+        <SelectField
+          name="term" // <-- changed
+          label="Term"
+          options={termOptions}
+        />
+      )}
     </ModalForm>
   );
 }

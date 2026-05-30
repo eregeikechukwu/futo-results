@@ -19,6 +19,8 @@ import {
 } from "@/lib/hooks/useAdvisorStudents";
 import SomethingWentWrong from "@/components/secondary/error/somethingWentWrong";
 import { AdvisorStudent } from "@/app/types/advisor";
+import "@aejkatappaja/phantom-ui";
+import { AdvisorTablesSkeleton } from "@/components/skeletons/advisorSkeletons";
 
 export default function ManageStudents() {
   const [uploading, setUploading] = useState(false);
@@ -114,17 +116,14 @@ export default function ManageStudents() {
     );
   }
   // Add skeleton loader here
-  if (studentsIsPending) return <div>Skeleton</div>;
+  // if (studentsIsPending) return <div>Skeleton</div>;
 
-  const verifiedStudents = students?.filter(
-    (student) => student.status === "verified",
-  ).length;
-  const pendingStudents = students.filter(
-    (student) => student.status === "pending",
-  ).length;
-  const flaggedStudents = students.filter(
-    (student) => student.status === "flagged",
-  ).length;
+  const verifiedStudents =
+    students?.filter((student) => student.status === "verified").length || 0;
+  const pendingStudents =
+    students?.filter((student) => student.status === "pending").length || 0;
+  const flaggedStudents =
+    students?.filter((student) => student.status === "flagged").length || 0;
 
   return (
     <DashboardContainer>
@@ -147,14 +146,22 @@ export default function ManageStudents() {
         onChange={handleFileInput}
       />
       {/* Stats card */}
-      <AdvisorStudentsStatsCards
-        totalStudents={students.length}
-        verified={verifiedStudents || 0}
-        flagged={flaggedStudents}
-        pending={pendingStudents}
-      />
-      {/* Students table */}
-      <AdvisorStudentsTable advisorStudents={students as AdvisorStudent[]} />
+      {/* Add skeleton loader here */}
+      {studentsIsPending ? (
+<AdvisorTablesSkeleton />      ) : (
+        <>
+          <AdvisorStudentsStatsCards
+            totalStudents={students?.length || 0}
+            verified={verifiedStudents || 0}
+            flagged={flaggedStudents}
+            pending={pendingStudents}
+          />
+          {/* Students table */}
+          <AdvisorStudentsTable
+            advisorStudents={students as AdvisorStudent[]}
+          />
+        </>
+      )}
 
       {/* Type in Student thruogh form */}
       <ModalTemplate title={"Add New Student"}>

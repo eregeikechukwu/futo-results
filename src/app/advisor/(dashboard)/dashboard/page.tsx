@@ -6,7 +6,7 @@ import { ReportCards } from "@/components/statsCards/reportsCards";
 import { AdvisorStatsCards } from "@/components/statsCards/statsCards";
 import { Heading2 } from "@/components/secondary/typography";
 import { Calendar, UserCheck2Icon } from "lucide-react";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   useAdvisorDashboardStats,
   useRecentBatches,
@@ -17,10 +17,14 @@ import toast from "react-hot-toast";
 import "@aejkatappaja/phantom-ui";
 import SomethingWentWrong from "@/components/secondary/error/somethingWentWrong";
 import { LoaderSpinner3 } from "@/components/secondary/loaders/loaders";
-import { PhantomUi } from "@aejkatappaja/phantom-ui";
+// import "@aejkatappaja/phantom-cui";
 
 export default function AdvisorDashboard() {
   const { loading, profile, advisorData } = useAuth();
+
+  useEffect(() => {
+    import("@aejkatappaja/phantom-ui");
+  }, []);
 
   console.log(advisorData, profile, " advisor Data it is");
   if ((!advisorData || !profile) && !loading) {
@@ -74,37 +78,42 @@ export default function AdvisorDashboard() {
 
   return (
     <>
-      <phantom-ui loading={loading}>
-        <div className="dashboard-main-container">
-          <div className="flex justify-between  items-center bg-gradient-to-r from-[#effff8] to-[var(--color-white)] border border-[var(--color-blue-background)] rounded-[16px] lh-24 p-24">
-            <div>
-              <h1 className="text-24 lh-32 font-bold mb-8">
-                Welcome back, {advisorData?.title} {profile?.full_name || ""}
-              </h1>
-              <h2 className="text-[var(--color-text-link)]">
-                {advisorData?.advisor_assignments[0].departments.name}{" "}
-                Department • Academic Session {statsData?.activeTerm.session}
-              </h2>
-            </div>
-
-            {/* Badge */}
-            <div className="h-64 w-64 rounded-[16px] center-child bg-[var(--color-primary)]">
-              <UserCheck2Icon size={26} stroke="var(--color-white)" />
-            </div>
+      <div className="dashboard-main-container">
+        <div className="flex justify-between  items-center bg-gradient-to-r from-[#effff8] to-[var(--color-white)] border border-[var(--color-blue-background)] rounded-[16px] lh-24 p-24">
+          <div>
+            <h1 className="text-24 lh-32 font-bold mb-8">
+              Welcome back, {advisorData?.title || "Advisor"}{" "}
+              {profile?.full_name || "User"}
+            </h1>
+            <h2 className="text-[var(--color-text-link)]">
+              {advisorData?.advisor_assignments[0].departments.name ||
+                "Department"}{" "}
+              Department • Academic Session{" "}
+              {statsData?.activeTerm.session || "N/A"}
+            </h2>
           </div>
 
-          {/* Stats Cards */}
+          {/* Badge */}
+          <div className="h-64 w-64 rounded-[16px] center-child bg-[var(--color-primary)]">
+            <UserCheck2Icon size={26} stroke="var(--color-white)" />
+          </div>
+        </div>
+
+        {/* Stats Cards */}
+        <phantom-ui loading={isLoading ? true : undefined}>
           <AdvisorStatsCards
-            totalStudents={statsData?.totalStudents}
-            newStudents={statsData?.newStudents}
-            uploadedResults={statsData?.uploadedResults}
-            recentResults={statsData?.recentResults}
+            totalStudents={statsData?.totalStudents || 0}
+            newStudents={statsData?.newStudents || 0}
+            uploadedResults={statsData?.uploadedResults || 0}
+            recentResults={statsData?.recentResults || 0}
             classLevel={statsData?.targetLevel || 0}
             pendingReviews={statsData?.pendingReviews}
           />
+        </phantom-ui>
 
-          {/* Progress bars and upload summary */}
-          <div className="grid grid-cols-[repeat(2,minmax(400px,1fr))] gap-32">
+        {/* Progress bars and upload summary */}
+        <div className="grid grid-cols-[repeat(2,minmax(400px,1fr))] gap-32">
+          <phantom-ui loading={uploadActivityLoading ? true : undefined}>
             <div className="dashboard-container">
               {/* Heading */}
               <div className="flex justify-between mb-30">
@@ -119,35 +128,37 @@ export default function AdvisorDashboard() {
                 {uploadActivityError ? (
                   <div>Error fetching upload report</div>
                 ) : (
-                  uploadActivity!.map((activity) => (
+                  uploadActivity?.map((activity) => (
                     <ProgressBar
-                      key={activity.month}
-                      title={activity.month.slice(0, 3)}
-                      progress={activity.uploaded}
-                      total={activity.total}
+                      key={activity.month || ""}
+                      title={activity.month ? activity.month.slice(0, 3) : ""}
+                      progress={activity.uploaded || 0}
+                      total={activity.total || 0}
                     />
                   ))
                 )}
               </div>
             </div>
-            {/* Last Uploads summary */}
+          </phantom-ui>
+          {/* Last Uploads summary */}
+          <phantom-ui loading={uploadSummaryLoading ? true : undefined}>
             <div className="dashboard-container ">
               <div className="mb-24">
                 <Heading2>Last Upload Summary</Heading2>
               </div>
               <ReportCards reports={uploadSummary} />
             </div>
-          </div>
-
-          <div className="dashboard-container">
-            <div className="mb-24">
-              <Heading2>Quick Actions</Heading2>
-            </div>
-
-            <AdvisorQuickActions />
-          </div>
+          </phantom-ui>
         </div>
-      </phantom-ui>
+
+        <div className="dashboard-container">
+          <div className="mb-24">
+            <Heading2>Quick Actions</Heading2>
+          </div>
+
+          <AdvisorQuickActions />
+        </div>
+      </div>
       <div>
         {/* Our Lady of Fatima, St. Gregory, Orapronobis.🙏🏽🙏🏽 Mementori Mori ✝️⛪ */}
       </div>

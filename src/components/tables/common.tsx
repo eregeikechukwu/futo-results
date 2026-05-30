@@ -8,6 +8,8 @@ type ControlProps = {
   globalFilter: string;
   setGlobalFilter: React.Dispatch<React.SetStateAction<string>>;
   resetFilters: () => void;
+  loading?: boolean;
+  error?: string;
   utils: {
     searchTitle: string;
     placeholder: string;
@@ -24,6 +26,8 @@ export function TableControls({
   globalFilter,
   setGlobalFilter,
   resetFilters,
+  loading,
+  error,
   utils,
 }: ControlProps) {
   //style consistency varibles
@@ -108,11 +112,17 @@ export function TableControls({
             }
             className="w-full mt-8 py-12 pl-12 pr-12 border-light secondary-heading input"
           >
-            {utils.options.map((option) => (
-              <option key={option.value} value={`${option.value}`}>
-                {option.title}
-              </option>
-            ))}
+           {loading ? (
+              <option>Loading...</option>
+            ) : error ? (
+              <option>Error loading options</option>
+            ) : (
+              utils.options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.title}
+                </option>
+              ))
+            )}
           </select>
         </div>
       </div>

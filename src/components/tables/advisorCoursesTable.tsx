@@ -14,16 +14,19 @@ import {
 } from "@tanstack/react-table";
 import { AdvisorCourse } from "@/app/types/advisor";
 import { advisorCourses } from "@/mock/advisorCourses";
-import { ArrowUpDown, Edit3, Flag, FlagOff, Trash2, X } from "lucide-react";
+import { ArrowUpDown, Edit3, Trash2, X } from "lucide-react";
 import { TableControls } from "./common";
 import { TableTemplate } from "./table";
 import { useModalTemplate } from "../modals/overlay";
 import { EditCourse } from "../forms/advisorEditCourse";
+import { useAcademicTerms } from "@/lib/hooks/useAcademicTerms";
 
 export function AdvisorCoursesTable({
-  activeSesson,
+  advisorOfferings,
+  activeSession,
 }: {
-  activeSesson: string;
+  advisorOfferings: AdvisorCourse[];
+  activeSession: string;
 }) {
   const [globalFilter, setGlobalFilter] = useState("");
   const [sorting, setSorting] = useState<SortingState>([
@@ -40,13 +43,16 @@ export function AdvisorCoursesTable({
   const [columnFilters, setColumnFilters] = useState<ColumnFilter[]>([
     {
       id: "session",
-      value: activeSesson,
+      value: activeSession,
     },
   ]);
+  const { ModalTemplate, toggleModal: toggleEditModal } = useModalTemplate();
+  // Table session options
   const {
-    ModalTemplate,
-    toggleModal: toggleEditModal,
-  } = useModalTemplate();
+    data: sessionOptions,
+    isPending: sessionOptionsPending,
+    error: sessionOptionsError,
+  } = useAcademicTerms();
 
   // ID change test
   const idRef = useRef<AdvisorCourse>({
@@ -144,7 +150,7 @@ export function AdvisorCoursesTable({
 
   //Ceating table instance
   const table: Table<AdvisorCourse> = useReactTable<AdvisorCourse>({
-    data: advisorCourses as AdvisorCourse[],
+    data: advisorOfferings as AdvisorCourse[],
     columns,
     state: {
       pagination,
@@ -167,7 +173,7 @@ export function AdvisorCoursesTable({
     setColumnFilters([
       {
         id: "session",
-        value: activeSesson,
+        value: activeSession,
       },
     ]);
   };
@@ -176,13 +182,16 @@ export function AdvisorCoursesTable({
     searchTitle: "Search Courses",
     placeholder: "Title, code, or semester",
     optionTilte: "Session",
-    options: [
-      { value: activeSesson, title: activeSesson },
-      { value: "2023/2024", title: "2023/2024" },
-      { value: "2022/2023", title: "2022/2023" },
-      { value: "2021/2022", title: "2021/2022" },
-    ],
+    options: sessionOptions ? [
+      { value: activeSession, title: activeSession },
+      ...sessionOptions
+        .filter((option, index, arr) =>{ index === arr.findIndex((o) => o.session === option.session) && option.session !== activeSession})
+        .map((option) => ({ value: option.session, title: option.session })),
+    ] : []
+    // options: [],
   };
+
+  console.log(sessionOptions, "session options it is");
 
   return (
     <div>
@@ -192,6 +201,10 @@ export function AdvisorCoursesTable({
         globalFilter={globalFilter}
         setGlobalFilter={setGlobalFilter}
         resetFilters={resetFilters}
+        loading={sessionOptionsPending}
+        error={
+          sessionOptionsError?.message ? "Failed to load sessions" : undefined
+        }
         utils={utils}
       />
 

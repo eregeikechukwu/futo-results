@@ -7,9 +7,9 @@ import styles from "./styles.module.scss";
 import { Check, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { ModalForm } from "@/components/secondary/common";
 import { useModalTemplate } from "@/components/modals/overlay";
 import { CustomBtn } from "@/components/secondary/buttons";
+import ConfirmModal from "@/components/secondary/confirmationModal";
 
 type dashboardLinksType = {
   name: string;
@@ -29,7 +29,7 @@ export function DashboardLayout({
 }) {
   const url = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { ModalTemplate, toggleModal } = useModalTemplate(false);
+  const { isModalOpen, toggleModal } = useModalTemplate(false);
 
   // Get the logout function
   const { signOut } = useAuth();
@@ -107,25 +107,13 @@ export function DashboardLayout({
       </main>
 
       {/* Logout confirmation modal */}
-      <ModalTemplate>
-        <div className="flex flex-col gap-20 text-center">
-          <h2 className="font-semibold">Are you sure you want to logout?</h2>
-          <div className="flex justify-between">
-            <CustomBtn
-              className="bg-red-500  h-50 w-[48%] center-child !p-0 rounded-full"
-              onClick={() => signOut()}
-            >
-              <Check stroke="white" />
-            </CustomBtn>
-            <CustomBtn
-              onClick={toggleModal}
-              className="bg-gray-400 h-50 w-[48%] center-child !p-0 rounded-full"
-            >
-              <X stroke="Black" />
-            </CustomBtn>
-          </div>
-        </div>
-      </ModalTemplate>
+      <ConfirmModal
+        message=""
+        open={isModalOpen}
+        onConfirm={() => signOut()}
+        onCancel={toggleModal}
+        title="Logout"
+      />
     </div>
   );
 }

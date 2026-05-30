@@ -17,6 +17,22 @@ export interface AdvisorStudentUpload {
   // joinDate: string;
 }
 
+export interface AdvisorCourseDB {
+  id: string;
+  unit: number;
+  courses: {
+    id: string;
+    course_code: string;
+    course_title: string;
+  };
+  academic_terms: {
+    id: string;
+    session: string;
+    semester: string;
+    admission_year: number;
+  };
+}
+
 export interface AdvisorCourse {
   courseTitle: string;
   courseCode: string;
@@ -25,7 +41,12 @@ export interface AdvisorCourse {
   session: string;
 }
 
-export type CourseData = z.infer<typeof advisorCourseSchema>;
+export type CourseData = {
+  courseTitle: string;
+  courseCode: string;
+  unit: string;
+  term: string;
+};
 
 export type TextFieldProps = {
   name: keyof CourseData | (string & {}); //still keeping chekc for key of types, but allos custom stings when needed
@@ -48,7 +69,11 @@ export type TextFieldProps = {
     | undefined;
 };
 
-export type SelectOptions = { value: string | number; label: string };
+export type SelectOptions = {
+  id: string;
+  value: string | number;
+  label: string;
+};
 
 export type SelectFieldProps = {
   name: keyof CourseData | (string & {}); //still keeping chekc for key of types, but allos custom stings when needed
