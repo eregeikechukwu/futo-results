@@ -1,0 +1,611 @@
+@use "../../app/styles/sass/abstracts/mixins.scss" as *;
+@use "../../app/styles/sass/functions/toRem.scss" as *;
+
+// ============================================================================
+// PAGE LEVEL STYLES
+// ============================================================================
+
+.selectorsContainer {
+  display: flex;
+  gap: toRem(24);
+  flex-wrap: wrap;
+  padding: toRem(20);
+  background: var(--color-background-mild);
+  border-radius: toRem(12);
+}
+
+.selectorGroup {
+  display: flex;
+  flex-direction: column;
+  gap: toRem(8);
+  flex: 1;
+  min-width: toRem(200);
+}
+
+.label {
+  font-size: toRem(14);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.select {
+  padding: toRem(10) toRem(12);
+  border: toRem(1) solid var(--color-border-light);
+  border-radius: toRem(8);
+  background: var(--color-white);
+  color: var(--color-text);
+  font-size: toRem(14);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    border-color: var(--color-primary);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 toRem(3) var(--color-blue-background-light);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: var(--color-background-mild);
+  }
+}
+
+.emptyState {
+  padding: toRem(60) toRem(20);
+  text-align: center;
+  color: var(--color-text-passive);
+  font-size: toRem(16);
+  background: var(--color-background-mild);
+  border-radius: toRem(12);
+}
+
+.loadingState {
+  padding: toRem(40);
+  text-align: center;
+  color: var(--color-text-passive);
+}
+
+// ============================================================================
+// TABLE CONTROLS & FILTERS
+// ============================================================================
+
+.controlsSection {
+  display: flex;
+  flex-direction: column;
+  gap: toRem(16);
+  padding: toRem(16);
+  background: var(--color-background-secondary);
+  border-radius: toRem(12);
+  margin-bottom: toRem(16);
+}
+
+.batchStatusInfo {
+  display: flex;
+  align-items: center;
+  gap: toRem(12);
+  flex-wrap: wrap;
+
+  .label {
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+  }
+}
+
+.statusBadge {
+  padding: toRem(6) toRem(12);
+  border-radius: toRem(6);
+  font-size: toRem(12);
+  font-weight: 600;
+  text-transform: uppercase;
+
+  &.statusDraft {
+    background: var(--color-background-mild);
+    color: var(--color-text-dark);
+    border: toRem(1) solid var(--color-border-light);
+  }
+
+  &.statusReviewed {
+    background: var(--color-blue-background);
+    color: var(--color-text-blue);
+  }
+
+  &.statusPublished {
+    background: var(--color-green-background);
+    color: var(--color-text-green);
+  }
+
+  &.statusArchived {
+    background: var(--color-brown-background);
+    color: var(--color-text-brown);
+  }
+}
+
+.publishBtn {
+  padding: toRem(8) toRem(16);
+  background: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  border-radius: toRem(6);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--color-primary-hover);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.lockMessage {
+  display: flex;
+  align-items: center;
+  gap: toRem(8);
+  font-size: toRem(13);
+  color: var(--color-text-green);
+  font-weight: 500;
+  padding: toRem(6) toRem(12);
+  background: var(--color-green-background);
+  border-radius: toRem(6);
+}
+
+.filtersContainer {
+  display: flex;
+  gap: toRem(12);
+  flex-wrap: wrap;
+}
+
+.searchBox {
+  flex: 1;
+  min-width: toRem(250);
+}
+
+.searchInput {
+  width: 100%;
+  padding: toRem(10) toRem(12);
+  border: toRem(1) solid var(--color-border-light);
+  border-radius: toRem(6);
+  font-size: toRem(14);
+  background: var(--color-white);
+  color: var(--color-text);
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 toRem(3) var(--color-blue-background-light);
+  }
+
+  &::placeholder {
+    color: var(--color-text-passive);
+  }
+}
+
+.filterSelect {
+  padding: toRem(10) toRem(12);
+  border: toRem(1) solid var(--color-border-light);
+  border-radius: toRem(6);
+  background: var(--color-white);
+  color: var(--color-text);
+  font-size: toRem(13);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--color-primary);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 toRem(3) var(--color-blue-background-light);
+  }
+}
+
+.remarkToggle {
+  display: flex;
+  gap: toRem(6);
+}
+
+.toggleBtn {
+  padding: toRem(8) toRem(12);
+  border: toRem(1) solid var(--color-border-light);
+  border-radius: toRem(6);
+  background: var(--color-white);
+  color: var(--color-text);
+  font-weight: 600;
+  font-size: toRem(12);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--color-primary);
+  }
+
+  &.toggleActive {
+    background: var(--color-primary);
+    color: var(--color-white);
+    border-color: var(--color-primary);
+  }
+}
+
+// ============================================================================
+// TABLE STYLES
+// ============================================================================
+
+.tableContainer {
+  overflow-x: auto;
+  border-radius: toRem(12);
+  border: toRem(1) solid var(--color-border-light);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-white);
+  font-size: toRem(13);
+}
+
+.thead {
+  background: var(--color-background-mild);
+}
+
+.th {
+  padding: toRem(14) toRem(16);
+  text-align: left;
+  font-weight: 600;
+  color: var(--color-text-dark);
+  border-bottom: toRem(2) solid var(--color-border-light);
+  white-space: nowrap;
+}
+
+.tbody {
+  tr:hover {
+    background: var(--color-background-mild);
+  }
+}
+
+.tr {
+  border-bottom: toRem(1) solid var(--color-border-light);
+  transition: background 0.15s ease;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &.editingRow {
+    background: var(--color-blue-background-light);
+  }
+}
+
+.td {
+  padding: toRem(12) toRem(16);
+  color: var(--color-text);
+  vertical-align: middle;
+}
+
+.cellValue {
+  display: inline-block;
+  max-width: toRem(150);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scoreValue {
+  font-weight: 500;
+  color: var(--color-text);
+  font-family: monospace;
+}
+
+.editInput {
+  width: 100%;
+  padding: toRem(6) toRem(8);
+  border: toRem(1) solid var(--color-primary);
+  border-radius: toRem(4);
+  background: var(--color-white);
+  color: var(--color-text);
+  font-weight: 500;
+  font-family: monospace;
+  font-size: toRem(13);
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 toRem(2) var(--color-blue-background);
+  }
+
+  &:invalid {
+    border-color: var(--color-red);
+  }
+}
+
+.totalValue {
+  font-weight: 600;
+  color: var(--color-primary);
+  font-family: monospace;
+}
+
+// ============================================================================
+// BADGES
+// ============================================================================
+
+.gradeBadge {
+  display: inline-block;
+  padding: toRem(4) toRem(8);
+  border-radius: toRem(4);
+  font-weight: 600;
+  font-size: toRem(12);
+  text-align: center;
+  min-width: toRem(28);
+  background: var(--color-background-mild);
+  color: var(--color-text-dark);
+}
+
+.remarkBadge {
+  display: inline-block;
+  padding: toRem(4) toRem(10);
+  border-radius: toRem(4);
+  font-weight: 600;
+  font-size: toRem(12);
+  text-align: center;
+
+  &.remarkPass {
+    background: var(--color-green-background);
+    color: var(--color-text-green);
+  }
+
+  &.remarkFail {
+    background: var(--color-red-background);
+    color: var(--color-text-red);
+  }
+}
+
+// ============================================================================
+// ACTION BUTTONS
+// ============================================================================
+
+.actionButtons {
+  display: flex;
+  gap: toRem(8);
+  align-items: center;
+}
+
+.editBtn,
+.deleteBtn,
+.saveBtn,
+.cancelBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: toRem(32);
+  height: toRem(32);
+  border: none;
+  border-radius: toRem(6);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--color-white);
+  font-size: toRem(13);
+
+  svg {
+    width: toRem(16);
+    height: toRem(16);
+  }
+}
+
+.editBtn {
+  background: var(--color-primary);
+
+  &:hover {
+    background: var(--color-primary-hover);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.deleteBtn {
+  background: var(--color-red);
+
+  &:hover {
+    background: darken(var(--color-red), 10%);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.saveBtn {
+  background: var(--color-green);
+
+  &:hover {
+    background: darken(var(--color-green), 10%);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.cancelBtn {
+  background: var(--color-text-passive);
+
+  &:hover {
+    background: darken(var(--color-text-passive), 10%);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.lockedCell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: toRem(32);
+  height: toRem(32);
+  color: var(--color-text-passive);
+  opacity: 0.6;
+}
+
+// ============================================================================
+// PAGINATION
+// ============================================================================
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: toRem(16);
+  background: var(--color-background-secondary);
+  border-radius: toRem(12);
+  margin-top: toRem(16);
+  font-size: toRem(13);
+}
+
+.paginationInfo {
+  color: var(--color-text-passive);
+  font-weight: 500;
+}
+
+.paginationButtons {
+  display: flex;
+  gap: toRem(8);
+}
+
+.paginationBtn {
+  padding: toRem(8) toRem(16);
+  border: toRem(1) solid var(--color-border-light);
+  background: var(--color-white);
+  color: var(--color-text);
+  border-radius: toRem(6);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--color-primary);
+    color: var(--color-white);
+    border-color: var(--color-primary);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+// ============================================================================
+// DELETE CONFIRMATION MODAL
+// ============================================================================
+
+.deleteConfirmContent {
+  display: flex;
+  flex-direction: column;
+  gap: toRem(12);
+
+  p {
+    margin: 0;
+    font-size: toRem(14);
+    color: var(--color-text);
+    line-height: toRem(20);
+
+    strong {
+      font-weight: 600;
+      color: var(--color-text-dark);
+    }
+  }
+}
+
+.confirmInput {
+  padding: toRem(10) toRem(12);
+  border: toRem(1) solid var(--color-border-light);
+  border-radius: toRem(6);
+  background: var(--color-white);
+  color: var(--color-text);
+  font-size: toRem(14);
+  font-family: monospace;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 toRem(3) var(--color-blue-background-light);
+  }
+
+  &::placeholder {
+    color: var(--color-text-passive);
+  }
+}
+
+.errorText {
+  margin: 0;
+  font-size: toRem(12);
+  color: var(--color-red);
+  font-weight: 500;
+}
+
+// ============================================================================
+// RESPONSIVE
+// ============================================================================
+
+@include mobile-compact {
+  .selectorsContainer {
+    flex-direction: column;
+    gap: toRem(16);
+  }
+
+  .selectorGroup {
+    width: 100%;
+  }
+
+  .filtersContainer {
+    flex-direction: column;
+  }
+
+  .searchBox {
+    width: 100%;
+  }
+
+  .tableContainer {
+    font-size: toRem(12);
+  }
+
+  .th,
+  .td {
+    padding: toRem(10) toRem(12);
+  }
+
+  .cellValue {
+    max-width: toRem(100);
+  }
+
+  .actionButtons {
+    gap: toRem(4);
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: toRem(12);
+    align-items: flex-start;
+  }
+
+  .paginationButtons {
+    width: 100%;
+
+    button {
+      flex: 1;
+    }
+  }
+}
