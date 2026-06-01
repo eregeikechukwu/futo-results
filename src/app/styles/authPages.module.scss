@@ -17,7 +17,10 @@
   line-height: toRem(24);
   padding: toRem(12) toRem(16);
   font-weight: 500;
-  transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    box-shadow 0.2s;
 }
 
 .modeButtonActive {

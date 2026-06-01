@@ -51,6 +51,8 @@ export default function ResultsManagementPage() {
     error: resultsError,
   } = useResultsForOffering(selectedOfferingId || "");
 
+  console.log(selectedOfferingId, "   results in page component");
+
   const {
     data: batchInfo,
     isLoading: batchLoading,
@@ -59,20 +61,24 @@ export default function ResultsManagementPage() {
 
   // Error handling
   if (termsError) {
+    console.log(termsError, "---terms error");
     errorToastHandler(termsError, "Failed to load academic terms");
     return <SomethingWentWrong message="Failed to load academic terms" />;
   }
 
   if (offeringsError) {
+    console.log(offeringsError, "   offerings error");
     errorToastHandler(offeringsError, "Failed to load course offerings");
     return <SomethingWentWrong message="Failed to load course offerings" />;
   }
 
   if (resultsError) {
+    console.log(resultsError, "   results error");
     errorToastHandler(resultsError, "Failed to load results");
   }
 
   if (batchError) {
+    console.log(batchError, "   batch error");
     errorToastHandler(batchError, "Failed to load batch information");
   }
 
