@@ -9,7 +9,11 @@ import { redirect } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-export function SetPasswordForm({ role }: { role: "student" | "advisor" }) {
+export function SetPasswordForm({
+  role,
+}: {
+  role: "student" | "advisor" | "admin";
+}) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -103,7 +107,13 @@ export function SetPasswordForm({ role }: { role: "student" | "advisor" }) {
 
       // Redirect to login after a short delay to allow toast to show
       setTimeout(() => {
-        redirect(role === "advisor" ? "/advisor/auth" : "/student/auth");
+        redirect(
+          role === "advisor"
+            ? "/advisor/auth"
+            : role === "admin"
+              ? "/admin/auth"
+              : "/student/auth",
+        );
       }, 1500);
     },
     [password, confirmPassword, errors],

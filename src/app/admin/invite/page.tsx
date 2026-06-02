@@ -1,6 +1,8 @@
 "use client";
 
+import { protectDashboardAccess } from "@/helpers/protectDashboardAccess";
 import { ScifiBackground } from "@/helpers/scifiBackground";
+import { fetchDepartments } from "@/lib/queries/departments";
 import { createSupabaseClient } from "@/lib/supabase/client";
 import { useState, useEffect, useCallback } from "react";
 
@@ -139,7 +141,7 @@ const inputStyle: React.CSSProperties = {
 // MAIN PAGE COMPONENT
 // ─────────────────────────────────────────────────────────────────────────────
 
-export default function InviteAdvisorPage() {
+export default  function InviteAdvisorPage() {
   // ── Form state ──────────────────────────────────────────────────────────────
   const [form, setForm] = useState<AdvisorInviteData>({
     fullName: "",
@@ -160,32 +162,30 @@ export default function InviteAdvisorPage() {
   const [error, setError] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
+  // Check if the user is an admin; if not, redirect to unauthorized page
+  protectDashboardAccess("admin");
+
   // Fetch departments from Supabase on mount
   useEffect(() => {
-    async function fetchDepartments() {
-      const supabase = createSupabaseClient();
-
-      const { data, error } = await supabase
-        .from("departments")
-        .select("id, name, code")
-        .order("name");
-
-      if (error) {
+    async function loadDepartments() {
+      try {
+        const data = await fetchDepartments();
+        setDepartments(data as Department[]);
+        console.log("Fetched departments:", data);
+      } catch (err) {
+        setError(true);
         setToast({
-          msg: "Failed to load departments: " + error.message,
+          msg: "Failed to load departments.",
           type: "error",
         });
         setIsFetching(false);
-        setError(true);
-        return;
+      } finally {
+        setIsFetching(false);
+        setError(false);
       }
-
-      setDepartments(data);
-      setIsFetching(false);
-      setError(false);
     }
 
-    fetchDepartments();
+    loadDepartments();
   }, []);
 
   const closeToast = useCallback(() => setToast({ msg: "", type: null }), []);

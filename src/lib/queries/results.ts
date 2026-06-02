@@ -47,11 +47,12 @@ export async function fetchResultsForOffering(offeringId: string) {
   if (!batches || batches.length === 0) return [];
 
   const batchIds = batches.map((b) => b.id);
-  
 
   // Step 2: Fetch result entries filtered by those batch IDs
-  const { data, error } = await supabase.from("result_entries").select(
-    `
+  const { data, error } = await supabase
+    .from("result_entries")
+    .select(
+      `
       id,
       test_score,
       lab_score,
@@ -74,13 +75,14 @@ export async function fetchResultsForOffering(offeringId: string) {
         offering_id
       )
     `,
-  )
-  // .in("batch_id", batchIds)
+    )
+    .in("batch_id", batchIds);
   // .order("students(reg_number)");
 
   if (error) throw error;
   return data || [];
 }
+
 /**
  * Fetch batch metadata for a specific offering
  * Used to get current batch status and publishing info

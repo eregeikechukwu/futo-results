@@ -1,0 +1,24 @@
+"use client";
+
+import { AuthCard, AuthHeading } from "@/components/utilities";
+import AuthLayout from "@/layouts/authLayout/AuthLayout";
+import { SetPasswordForm } from "@/components/forms/setPassword";
+
+export default function SetPasswordPage() {
+  return (
+    <div>
+      <AuthLayout type="advisor">
+        <AuthCard>
+          {/* Header */}
+          <AuthHeading
+            heading="Set your password"
+            subHeading="Set your new password for accessing your dashboard"
+          />
+
+          {/* Form */}
+          <SetPasswordForm role="admin" />
+        </AuthCard>
+      </AuthLayout>
+    </div>
+  );
+}

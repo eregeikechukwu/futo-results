@@ -3,8 +3,10 @@ import {
   Calendar,
   Check,
   Clock3,
+  CloudRain,
   FileUp,
   Flag,
+  SunMedium,
   Users2,
 } from "lucide-react";
 import styles from "./styles.module.scss";
@@ -235,7 +237,7 @@ export function AdvisorCoursesStats({
         theme="var(--color-purple)"
         bg="var(--color-purple-background)"
       >
-        <Check size={iconSize} />
+        <CloudRain size={iconSize} />
       </CardTemplate>
       {/* Card 4 */}
       <CardTemplate
@@ -244,7 +246,7 @@ export function AdvisorCoursesStats({
         theme="var(--color-brown)"
         bg="var(--color-brown-background)"
       >
-        <Check size={iconSize} />
+        <SunMedium size={iconSize} />
       </CardTemplate>
     </div>
   );

@@ -17,6 +17,12 @@ import toast from "react-hot-toast";
 import "@aejkatappaja/phantom-ui";
 import SomethingWentWrong from "@/components/secondary/error/somethingWentWrong";
 import { LoaderSpinner3 } from "@/components/secondary/loaders/loaders";
+import { errorToastHandler } from "@/helpers/errorHandler";
+import {
+  AdvisorProgressBarsSkeleton,
+  AdvisorStatsSkeleton,
+  AdvisorUUploadSummarySkeleton,
+} from "@/components/skeletons/advisorSkeletons";
 // import "@aejkatappaja/phantom-cui";
 
 export default function AdvisorDashboard() {
@@ -59,6 +65,8 @@ export default function AdvisorDashboard() {
     error: uploadSummaryError,
   } = useRecentBatches(profile!.id);
 
+  console.log(uploadSummaryData + " upload summary data in dashboard");
+
   const uploadSummary = uploadSummaryData?.map((batch) => {
     return {
       title: batch?.title,
@@ -73,6 +81,17 @@ export default function AdvisorDashboard() {
   //   return <div>Skeleton</div>;
 
   console.log("statsData.new: ", statsData?.totalStudents);
+
+  // Error handling professionlayy
+  if (uploadActivityError || uploadSummaryError || error) {
+    errorToastHandler(
+      uploadActivityError?.message ||
+        uploadSummaryError?.message ||
+        error?.message ||
+        "Failed to load dashboard data, please reload the page. If the problem persists, contact support.",
+    );
+    // return <SomethingWentWrong me/ssage="Failed to load dashboard data" />;
+  }
 
   console.log(statsData?.targetLevel);
 
@@ -100,7 +119,9 @@ export default function AdvisorDashboard() {
         </div>
 
         {/* Stats Cards */}
-        <phantom-ui loading={isLoading ? true : undefined}>
+        {isLoading ? (
+          <AdvisorStatsSkeleton />
+        ) : (
           <AdvisorStatsCards
             totalStudents={statsData?.totalStudents || 0}
             newStudents={statsData?.newStudents || 0}
@@ -109,11 +130,13 @@ export default function AdvisorDashboard() {
             classLevel={statsData?.targetLevel || 0}
             pendingReviews={statsData?.pendingReviews}
           />
-        </phantom-ui>
+        )}
 
         {/* Progress bars and upload summary */}
         <div className="grid grid-cols-[repeat(2,minmax(400px,1fr))] gap-32">
-          <phantom-ui loading={uploadActivityLoading ? true : undefined}>
+          {uploadActivityLoading ? (
+            <AdvisorProgressBarsSkeleton />
+          ) : (
             <div className="dashboard-container">
               {/* Heading */}
               <div className="flex justify-between mb-30">
@@ -139,16 +162,19 @@ export default function AdvisorDashboard() {
                 )}
               </div>
             </div>
-          </phantom-ui>
+          )}
+
           {/* Last Uploads summary */}
-          <phantom-ui loading={uploadSummaryLoading ? true : undefined}>
+          {uploadSummaryLoading ? (
+            <AdvisorUUploadSummarySkeleton />
+          ) : (
             <div className="dashboard-container ">
               <div className="mb-24">
                 <Heading2>Last Upload Summary</Heading2>
               </div>
               <ReportCards reports={uploadSummary} />
             </div>
-          </phantom-ui>
+          )}
         </div>
 
         <div className="dashboard-container">

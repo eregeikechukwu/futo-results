@@ -23,6 +23,7 @@ export const iconMap: { [key: string]: React.ComponentType<LucideProps> } = {
   Book: Book,
   Upload: Upload,
   Calendar: Calendar,
+  FileBarChart2: FileBarChart2,
   File: FileBarChart2,
   Settings: Settings,
   Logout: LogOut,

@@ -115,8 +115,6 @@ export default function ManageStudents() {
       <SomethingWentWrong message="Something went wrong fetching students data" />
     );
   }
-  // Add skeleton loader here
-  // if (studentsIsPending) return <div>Skeleton</div>;
 
   const verifiedStudents =
     students?.filter((student) => student.status === "verified").length || 0;
@@ -148,7 +146,8 @@ export default function ManageStudents() {
       {/* Stats card */}
       {/* Add skeleton loader here */}
       {studentsIsPending ? (
-<AdvisorTablesSkeleton />      ) : (
+        <AdvisorTablesSkeleton />
+      ) : (
         <>
           <AdvisorStudentsStatsCards
             totalStudents={students?.length || 0}

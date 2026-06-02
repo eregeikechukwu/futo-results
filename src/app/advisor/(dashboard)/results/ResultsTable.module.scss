@@ -1,5 +1,6 @@
 @use "../../../../app/styles/sass/functions/toRem.scss" as *;
 @use "../../../../app/styles/sass/abstracts/mixins.scss" as *;
+@use "../../../../app/styles/sass/utilities/reusables.scss" as *;
 @use "../../../../app/styles/sass/abstracts/variables.scss" as *;
 // ============================================================================
 // PAGE LEVEL STYLES
@@ -179,9 +180,9 @@
   color: var(--color-text);
   transition: all 0.2s ease;
 
+  @extend .input-border;
+
   &:focus {
-    outline: none;
-    border-color: var(--color-primary);
     box-shadow: 0 0 0 toRem(3) var(--color-blue-background-light);
   }
 
@@ -318,8 +319,10 @@
   font-family: monospace;
   font-size: toRem(13);
 
+  @extend .input-border;
+
+
   &:focus {
-    outline: none;
     box-shadow: 0 0 0 toRem(2) var(--color-blue-background);
   }
 
@@ -538,8 +541,9 @@
   font-family: monospace;
   transition: all 0.2s ease;
 
+  @extend .input-border;
+
   &:focus {
-    outline: none;
     border-color: var(--color-primary);
     box-shadow: 0 0 0 toRem(3) var(--color-blue-background-light);
   }

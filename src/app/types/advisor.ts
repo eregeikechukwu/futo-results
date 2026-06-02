@@ -34,6 +34,7 @@ export interface AdvisorCourseDB {
 }
 
 export interface AdvisorCourse {
+  id: string;
   courseTitle: string;
   courseCode: string;
   unit: string;

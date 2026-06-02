@@ -108,7 +108,7 @@ export function DashboardLayout({
 
       {/* Logout confirmation modal */}
       <ConfirmModal
-        message=""
+        message="logout"
         open={isModalOpen}
         onConfirm={() => signOut()}
         onCancel={toggleModal}

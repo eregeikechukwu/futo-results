@@ -1,3 +1,4 @@
+import { EmptyState } from "../secondary/EmptyState";
 import ReportBar from "../secondary/reportBar";
 
 /**
@@ -11,6 +12,30 @@ type ReportCardProps = {
   date: string;
   status: string;
 };
+
+export const defaultReports: ReportCardProps[] = [
+  {
+    title: "2023/2024 - Harmattan",
+    color: "green",
+    coursecode: "GET203",
+    date: "2024-01-17",
+    status: "Completed",
+  },
+  {
+    title: "2023/2024 - Rain",
+    color: "brown",
+    coursecode: "GET207",
+    date: "2024-07-10",
+    status: "In Progress",
+  },
+  {
+    title: "2024/2025 - Harmattan",
+    color: "red",
+    coursecode: "GET210",
+    date: "2025-01-22",
+    status: "Failed",
+  },
+];
 
 /**
  * Displays a list of report cards (recent uploads, batches, submissions, etc.)
@@ -42,40 +67,19 @@ type ReportCardProps = {
  */
 export function ReportCards({ reports = [] }: { reports?: ReportCardProps[] }) {
   // Fallback default reports if empty (for UI consistency during loading)
-  const defaultReports: ReportCardProps[] = [
-    {
-      title: "2023/2024 - Harmattan",
-      color: "green",
-      coursecode: "GET203",
-      date: "2024-01-17",
-      status: "Completed",
-    },
-    {
-      title: "2023/2024 - Rain",
-      color: "brown",
-      coursecode: "GET207",
-      date: "2024-07-10",
-      status: "In Progress",
-    },
-    {
-      title: "2024/2025 - Harmattan",
-      color: "red",
-      coursecode: "GET210",
-      date: "2025-01-22",
-      status: "Failed",
-    },
-  ];
 
   console.log(reports, "reports");
 
   // Use provided reports if available, otherwise use defaults
-  const displayReports = reports.length > 0 ? reports : defaultReports;
+  const displayReports = reports.length > 0 ? reports : [];
 
-  return (
+  return displayReports.length > 0 ? (
     <div className="flex flex-col  gap-16">
       {displayReports.map((report, index) => (
         <ReportBar {...report} key={index} />
       ))}
     </div>
+  ) : (
+    <EmptyState item="uploads" />
   );
 }

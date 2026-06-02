@@ -262,7 +262,8 @@ export async function fetchRecentBatches(
         id,
         course_id,
         term_id,
-        courses!inner (course_title, course_code, unit),
+        unit,
+        courses!inner (course_title, course_code),
         academic_terms!inner (session, semester)
       )
     `,

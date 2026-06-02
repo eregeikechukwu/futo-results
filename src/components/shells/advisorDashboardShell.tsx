@@ -13,12 +13,13 @@ const links = [
   { name: "Manage Students", href: "/advisor/students", icon: "Users" },
   { name: "Manage Courses", href: "/advisor/courses", icon: "Book" },
   { name: "Upload Results", href: "/advisor/upload-results", icon: "Upload" },
-  {
-    name: "Sessions & Levels",
-    href: "/advisor/under-construction",
-    icon: "Calendar",
-  },
-  // { name: "Reports", href: "/advisor/under-construction", icon: "File" },
+  { name: "Manage Results", href: "/advisor/results", icon: "FileBarChart2" },
+  // {
+  //   name: "Sessions & Levels",
+  //   href: "/advisor/under-construction",
+  //   icon: "Calendar",
+  // },
+  { name: "Reports", href: "/advisor/under-construction", icon: "File" },
   // { name: "Settings", href: "/advisor/under-construction", icon: "Settings" },
   { name: "Logout", href: "", icon: "Logout" },
 ];

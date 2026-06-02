@@ -29,10 +29,12 @@ type CredentialsFormData = z.infer<typeof credentialsSchema>;
 type AdvisorOtpFormData = z.infer<typeof advisorOtpSchema>;
 
 export function AdvisorOtpForm({
+  role = "advisor",
   email,
   onBack,
   credentials,
 }: {
+  role?: "advisor" | "admin";
   email: string;
   onBack: () => void;
   credentials?: LoginFormData | null;
@@ -94,7 +96,9 @@ export function AdvisorOtpForm({
 
     toast.success("Verified successfully!");
     // Redirect to dashboard after successful verification
-    router.replace("/advisor/dashboard");
+    router.replace(
+      role === "advisor" ? "/advisor/dashboard" : "/admin/dashboard", //confuse your enemies by redirecting to the wrong dashboard, only you know the real one
+    );
   };
 
   //   Resendng for new email function
@@ -109,7 +113,7 @@ export function AdvisorOtpForm({
         toast.error("Email not found, go back and sign in again.");
         return;
       }
-      await handleCredentials(credentials);
+      await handleCredentials({ ...credentials, role: role });
       toast.success("Check your email for new OTP");
       setSecondsLeft(60);
     } catch (error: any) {

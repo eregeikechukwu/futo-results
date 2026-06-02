@@ -30,6 +30,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [studentData, setStudentData] = useState<StudentsData | null>(null);
+  const [adminData, setAdminData] = useState<StudentsData | null>(null);
   const [advisorData, setAdvisorData] = useState<AdvisorData | null>(null);
   const [loading, setLoading] = useState(true);
   const [authInitialized, setAuthInitialized] = useState(false);
@@ -59,6 +60,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const supabase = createSupabaseClient();
     const { data, error } = await supabase
       .from("advisors")
+      .select(
+        "id, title, advisor_assignments (id, admission_year, departments!inner (id, name, code))",
+      )
+      .eq("profile_id", profileId)
+      .single();
+    if (error) errorToastHandler(error);
+    if (error) errorThrowHandler(error);
+    if (data) setAdvisorData(data as unknown as AdvisorData);
+  };
+
+  const fetchAdminData = async (profileId: string) => {
+    const supabase = createSupabaseClient();
+    const { data, error } = await supabase
+      .from("admins")
       .select(
         "id, title, advisor_assignments (id, admission_year, departments!inner (id, name, code))",
       )

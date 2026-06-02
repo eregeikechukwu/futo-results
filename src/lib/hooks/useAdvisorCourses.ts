@@ -1,6 +1,5 @@
 // lib/hooks/useCourses.ts
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-// import { addCourseOffering } from "@/lib/queries/courses";
 import { createSupabaseClient } from "@/lib/supabase/client";
 import { addCourseOffering } from "../queries/courseOfferings";
 

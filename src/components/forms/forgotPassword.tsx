@@ -1,12 +1,12 @@
 import toast from "react-hot-toast";
 import { AuthCTABtn } from "../secondary/buttons";
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { createSupabaseClient } from "@/lib/supabase/client";
-import { errorThrowHandler, errorToastHandler } from "@/helpers/errorHandler";
+import { errorToastHandler } from "@/helpers/errorHandler";
 import { set } from "zod";
 
 type forgotPasswordProps = {
-  role: "student" | "advisor";
+  role: "student" | "advisor" | "admin";
   setForgotPasswordMode: React.Dispatch<React.SetStateAction<boolean>>;
   forgotPasswordMode: boolean;
 };
@@ -39,8 +39,6 @@ export function ForgotPaasswordForm({
     setIsLoading(true);
     e.preventDefault();
 
-    console.log(email, "  Goood boy is hwere");
-
     if (!validateEmail(email)) {
       setEmailError("Please enter a valid email address");
       setIsLoading(false);
@@ -51,7 +49,7 @@ export function ForgotPaasswordForm({
     const supabase = createSupabaseClient();
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/advisor/set-password`,
+      redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/${role}/set-password`,
     });
 
     if (error) {

@@ -52,7 +52,7 @@ export function AdvisorStudentsTable({
   // Mutation for deletimg student
   const { mutate: deleteStudentMutation } = useDeleteStudentRecord();
 
-  // Mutation for deletimg student
+  // Mutation for updating student
   const { mutate: updateStudentMutation } = useUpdateStudentStatus();
 
   const handleDeleteStudent = (studentId, status) => {

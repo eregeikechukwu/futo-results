@@ -14,7 +14,8 @@ export default function ProgressBar({
   title: string;
   withPercentage?: boolean;
 }) {
-  const percentage = Math.min(progress / total) * 100;
+  const percentage =
+    Math.min(progress / total) * 100 > 0 ? Math.min(progress / total) * 100 : 0;
   const barColor = color || "var(--color-primary)";
 
   return (

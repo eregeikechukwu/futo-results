@@ -16,6 +16,7 @@ import { handleCredentials } from "@/lib/auth/advisorLogin";
 type AdvisorLoginFormData = z.infer<typeof advisorLoginSchema>;
 
 export default function AdvisorLoginForm({
+  role = "advisor",
   onOtpSent,
   setCredentials,
 }: AdvisorLoginFormProps) {
@@ -37,7 +38,7 @@ export default function AdvisorLoginForm({
   const onSubmit = async (data: AdvisorLoginFormData) => {
     try {
       setIsloading(true);
-      await handleCredentials(data);
+      await handleCredentials({ ...data, role }); // Pass role to the login handler to differentiate between advisor and admin login
       setCredentials(data);
       onOtpSent(data.email);
     } catch (error: any) {

@@ -20,6 +20,11 @@ import { TableTemplate } from "./table";
 import { useModalTemplate } from "../modals/overlay";
 import { EditCourse } from "../forms/advisorEditCourse";
 import { useAcademicTerms } from "@/lib/hooks/useAcademicTerms";
+import { useRemoveCourseOffering } from "@/lib/hooks/useAdvisorCourses";
+import { errorToastHandler } from "@/helpers/errorHandler";
+import toast from "react-hot-toast";
+import ConfirmationModal from "../secondary/confirmationModal";
+import { CoverLoader } from "../secondary/loaders/coverLoader";
 
 export function AdvisorCoursesTable({
   advisorOfferings,
@@ -29,6 +34,12 @@ export function AdvisorCoursesTable({
   activeSession: string;
 }) {
   const [globalFilter, setGlobalFilter] = useState("");
+  const [idToBeDeleted, setIdToBeDeleted] = useState<string | null>(null);
+  const [isMutating, setIsMutating] = useState(false);
+
+  // Dlete  mutation hander here
+  const { mutate: deleteMutation } = useRemoveCourseOffering();
+
   const [sorting, setSorting] = useState<SortingState>([
     {
       id: "semester",
@@ -56,12 +67,34 @@ export function AdvisorCoursesTable({
 
   // ID change test
   const idRef = useRef<AdvisorCourse>({
+    id: "",
     courseCode: "",
     courseTitle: "",
     unit: "0",
     semester: "Rain",
     session: "",
   });
+
+  // Delete handler
+  const handleRemoveCourseOffering = (offeringId: string) => {
+    // Call delete mutation here with offeringId
+    setIsMutating(true);
+    deleteMutation(offeringId, {
+
+      onSuccess: () => {
+        setIsMutating(false);
+        toast.success("Course offering deleted successfully");
+        setIdToBeDeleted(null);
+      },
+      onError: (error) => {
+        errorToastHandler(error);
+        setIsMutating(false);
+        setIdToBeDeleted(null);
+      },
+    });
+    console.log("Deleting course offering with ID:", offeringId);
+    // Example: removeCourseOfferingMutation.mutate(offeringId);
+  };
 
   const columns: ColumnDef<AdvisorCourse>[] = [
     {
@@ -121,7 +154,8 @@ export function AdvisorCoursesTable({
       accessorKey: "actions",
       cell: ({ row }) => {
         const handleDelete = () => {
-          console.log("Deleting student:", row.original.courseTitle);
+          setIdToBeDeleted(row.original.id);
+          console.log("Deleting course offering:", row);
         };
         const toggleModal = () => {
           idRef.current = row.original;
@@ -182,12 +216,20 @@ export function AdvisorCoursesTable({
     searchTitle: "Search Courses",
     placeholder: "Title, code, or semester",
     optionTilte: "Session",
-    options: sessionOptions ? [
-      { value: activeSession, title: activeSession },
-      ...sessionOptions
-        .filter((option, index, arr) =>{ index === arr.findIndex((o) => o.session === option.session) && option.session !== activeSession})
-        .map((option) => ({ value: option.session, title: option.session })),
-    ] : []
+    options: sessionOptions
+      ? [
+          { value: activeSession, title: activeSession },
+          ...sessionOptions
+            .filter((option, index, arr) => {
+              index === arr.findIndex((o) => o.session === option.session) &&
+                option.session !== activeSession;
+            })
+            .map((option) => ({
+              value: option.session,
+              title: option.session,
+            })),
+        ]
+      : [],
     // options: [],
   };
 
@@ -214,6 +256,20 @@ export function AdvisorCoursesTable({
         title={`${table.getColumn("session")?.getFilterValue()} Courses`}
       />
 
+      {/* Confirmation modal */}
+      <ConfirmationModal
+        message="Delete course offering?"
+        open={!!idToBeDeleted}
+        variant="danger"
+        confirmLabel="Delete"
+        onCancel={() => setIdToBeDeleted(null)}
+        onConfirm={() => handleRemoveCourseOffering(idToBeDeleted || '')}
+      />
+
+      {/* Table ,utatio odaing state
+       */}
+       {isMutating && <CoverLoader />
+}
       {/* Modal */}
       <ModalTemplate title="Edit Course">
         <EditCourse toggleModal={toggleEditModal} course={idRef.current} />
