@@ -19,6 +19,8 @@ import {
 } from "@/lib/hooks/useResults";
 import styles from "./ResultsTable.module.scss";
 import ConfirmModal from "@/components/secondary/confirmationModal";
+import { CoverLoader } from "@/components/secondary/loaders/coverLoader";
+import { ConfirmInput } from "@/components/secondary/confirmInput";
 
 // Type for result entry with nested data
 interface ResultEntry {
@@ -97,6 +99,7 @@ export default function ResultsTable({
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [deleteConfirmRegNo, setDeleteConfirmRegNo] = useState("");
   const [deleteConfirmInput, setDeleteConfirmInput] = useState("");
+  const [isMutating, setIsMutating] = useState(false);
   const [sorting, setSorting] = useState<SortingState>([
     { id: "regNumber", desc: false },
   ]);
@@ -107,8 +110,13 @@ export default function ResultsTable({
   const publishMutation = usePublishBatch(offeringId);
 
   // Check if batch is editable (draft or reviewed)
-  const isEditable =
-    batchInfo?.status === "draft" || batchInfo?.status === "reviewed";
+  const isEditable = (row) => {
+    if (!row) return false;
+    return (
+      row.result_batches?.status === "draft" ||
+      row?.result_batches?.status === "reviewed"
+    );
+  };
 
   // Filter results client-side
   const filteredResults = useMemo(() => {
@@ -160,7 +168,7 @@ export default function ResultsTable({
       accessorKey: "testScore",
       header: "Test (30)",
       cell: ({ row }) => {
-        if (editingRowId === row.original.id && isEditable) {
+        if (editingRowId === row.original.id && isEditable(row.original)) {
           return (
             <input
               type="number"
@@ -186,7 +194,7 @@ export default function ResultsTable({
       accessorKey: "labScore",
       header: "Lab (30)",
       cell: ({ row }) => {
-        if (editingRowId === row.original.id && isEditable) {
+        if (editingRowId === row.original.id && isEditable(row.original)) {
           return (
             <input
               type="number"
@@ -212,7 +220,7 @@ export default function ResultsTable({
       accessorKey: "examScore",
       header: "Exam (70)",
       cell: ({ row }) => {
-        if (editingRowId === row.original.id && isEditable) {
+        if (editingRowId === row.original.id && isEditable(row.original)) {
           return (
             <input
               type="number"
@@ -239,7 +247,7 @@ export default function ResultsTable({
       header: "Total",
       cell: ({ row }) => {
         // Calculate total if in edit mode, otherwise show stored value
-        if (editingRowId === row.original.id && isEditable) {
+        if (editingRowId === row.original.id && isEditable(row.original)) {
           const test = parseFloat(editValues.test_score) || 0;
           const lab = parseFloat(editValues.lab_score) || 0;
           const exam = parseFloat(editValues.exam_score) || 0;
@@ -277,7 +285,7 @@ export default function ResultsTable({
       accessorKey: "actions",
       header: "Actions",
       cell: ({ row }) => {
-        if (editingRowId === row.original.id && isEditable) {
+        if (editingRowId === row.original.id && isEditable(row.original)) {
           // Show save/cancel buttons
           return (
             <div className={styles.actionButtons}>
@@ -306,7 +314,7 @@ export default function ResultsTable({
           );
         }
 
-        if (!isEditable) {
+        if (!isEditable(row.original)) {
           // Show lock icon for published/archived
           return (
             <div className={styles.lockedCell}>
@@ -370,6 +378,7 @@ export default function ResultsTable({
   };
 
   const handleSave = async (row: ResultEntry) => {
+    setIsMutating(true);
     const test = parseFloat(editValues.test_score);
     const lab = parseFloat(editValues.lab_score);
     const exam = parseFloat(editValues.exam_score);
@@ -413,14 +422,21 @@ export default function ResultsTable({
             lab_score: "",
             exam_score: "",
           });
+          setIsMutating(false);
+        },
+        onError: (error) => {
+          toast.error(`Failed to update scores: ${error.message}`);
+          setIsMutating(false);
         },
       },
     );
   };
 
   const handleDelete = () => {
+    setIsMutating(true);
     if (deleteConfirmInput !== deleteConfirmRegNo) {
       toast.error("Reg number doesn't match. Try again.");
+      setIsMutating(false);
       return;
     }
 
@@ -430,14 +446,21 @@ export default function ResultsTable({
           setDeleteConfirmId(null);
           setDeleteConfirmRegNo("");
           setDeleteConfirmInput("");
+          setIsMutating(false);
+        },
+        onError: (error) => {
+          toast.error(`Failed to delete entry: ${error.message}`);
+          setIsMutating(false);
         },
       });
     }
   };
 
   const handlePublish = () => {
+    setIsMutating(true);
     if (!batchInfo?.id) {
       toast.error("Batch information not available");
+      setIsMutating(false);
       return;
     }
 
@@ -461,7 +484,7 @@ export default function ResultsTable({
   };
 
   return (
-    <>
+    <div className="relative">
       {/* Batch Status and Filters Section */}
       <div className={styles.controlsSection}>
         {/* Batch Status Info */}
@@ -607,39 +630,32 @@ export default function ResultsTable({
         </div>
       </div>
 
+      {/* LOader to cover the table during mutations */}
+      {isMutating && <CoverLoader />}
+
       {/* Delete Confirmation Modal */}
       {deleteConfirmId && (
         <ConfirmModal
           title="Delete Result Entry"
-          isOpen={!!deleteConfirmId}
+          message="delete this result entry permanently"
+          open={!!deleteConfirmId}
           onCancel={() => {
             setDeleteConfirmId(null);
             setDeleteConfirmRegNo("");
             setDeleteConfirmInput("");
           }}
           onConfirm={handleDelete}
-          confirmText="Delete"
-          cancelText="Cancel"
+          confirmLabel="Delete"
+          cancelLabel="Cancel"
         >
-          <div className={styles.deleteConfirmContent}>
-            <p>
-              To confirm deletion of <strong>{deleteConfirmRegNo}</strong>'s
-              result entry, please type their registration number below:
-            </p>
-            <input
-              type="text"
-              value={deleteConfirmInput}
-              onChange={(e) => setDeleteConfirmInput(e.target.value)}
-              placeholder="Enter registration number"
-              className={styles.confirmInput}
-            />
-            {deleteConfirmInput &&
-              deleteConfirmInput !== deleteConfirmRegNo && (
-                <p className={styles.errorText}>Reg number doesn't match</p>
-              )}
-          </div>
+          <ConfirmInput
+            value="result"
+            deleteConfirmInput={deleteConfirmInput}
+            deleteConfirmValue={deleteConfirmRegNo}
+            setDeleteConfirmInput={setDeleteConfirmInput}
+          />
         </ConfirmModal>
       )}
-    </>
+    </div>
   );
 }

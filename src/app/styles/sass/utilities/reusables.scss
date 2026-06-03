@@ -414,3 +414,16 @@
     border: 2px solid var(--color-primary);
   }
 }
+
+.readonly-input {
+  color: var(--color-text-passive);
+  background-color: var(--color-background-mild);
+  border-color: var(--color-border-light);
+  color: var(--color-text-passive);
+  cursor: not-allowed;
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-border-light);
+  }
+}

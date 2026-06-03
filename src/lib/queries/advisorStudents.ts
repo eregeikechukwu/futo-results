@@ -1,16 +1,23 @@
 import { createSupabaseClient } from "../supabase/client";
 import { NormalizedStudentsData } from "@/app/types/utils";
 import { AdvisorStudent } from "@/app/types/advisor";
+import { timeout } from "@/app/advisor/functions/students";
 
 export async function uploadPreregistrations(
   newStudentsList: NormalizedStudentsData[],
 ) {
   const supabase = createSupabaseClient();
 
-  const { error } = await supabase
-    .from("student_preregistrations")
-    .insert(newStudentsList);
+  const { data: uploaded, error } = await Promise.race([
+    supabase.from("student_preregistrations").upsert(newStudentsList, {
+      onConflict: "reg_number",
+      ignoreDuplicates: true,
+    }),
+    timeout(5000),
+  ]);
   if (error) throw error;
+
+  return;
 }
 
 export async function fetchAdvisorStudents(
@@ -23,22 +30,30 @@ export async function fetchAdvisorStudents(
   console.log(departmentId);
 
   // Fetch advsr students data,  from the students data
-  const { data: studentsFromData, error: errorFromStudents } = await supabase
-    .from("students")
-    .select(
-      "id, profile_id, reg_number, join_date, admission_year, status, profiles!students_profile_id_fkey (full_name, email)",
-    )
-    .order("reg_number", { ascending: true })
-    .eq("admission_year", admissionYear)
-    .eq("department_id", departmentId)
-    .is("deleted_at", null);
+  const { data: studentsFromData, error: errorFromStudents } =
+    await Promise.race([
+      supabase
+        .from("students")
+        .select(
+          "id, profile_id, reg_number, join_date, admission_year, status, profiles!students_profile_id_fkey (full_name, email)",
+        )
+        .order("reg_number", { ascending: true })
+        .eq("admission_year", admissionYear)
+        .eq("department_id", departmentId)
+        .is("deleted_at", null),
+      timeout(5000),
+    ]);
 
-  const { data: studentsFromPrereg, error: errorFromPrereg } = await supabase
-    .from("student_preregistrations")
-    .select("id, reg_number, admission_year, email, claimed")
-    .eq("claimed", false)
-    .order("reg_number", { ascending: true })
-    .eq("created_by", advisorId);
+  const { data: studentsFromPrereg, error: errorFromPrereg } =
+    await Promise.race([
+      supabase
+        .from("student_preregistrations")
+        .select("id, reg_number, admission_year, email, claimed")
+        .eq("claimed", false)
+        .order("reg_number", { ascending: true })
+        .eq("created_by", advisorId),
+      timeout(5000),
+    ]);
 
   if (errorFromPrereg) throw errorFromPrereg;
   if (errorFromStudents) throw errorFromStudents;

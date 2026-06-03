@@ -13,6 +13,16 @@ import styles from "./styles.module.scss";
 import { TextLink } from "../secondary/typography";
 import CountUp from "@/utils/countUp";
 
+function Tooltip({ text }: { text: string }) {
+  return (
+    <div
+      className={`hidden group-hover:flex opacity-0 group-hover:opacity-100 transition-opacity ${styles.tooltip}`}
+    >
+      <p>{text}</p>
+    </div>
+  );
+}
+
 export function AdvisorStatsCards({
   totalStudents,
   newStudents,
@@ -35,7 +45,7 @@ export function AdvisorStatsCards({
         {/* Stata cards */}
 
         {/* Card 1 */}
-        <div className={`dashboard-container ${styles.advisorStatsCard}`}>
+        <div className={`dashboard-container ${styles.advisorStatsCard} group`}>
           <div>
             <div>
               <TextLink>Total Students</TextLink>
@@ -55,10 +65,12 @@ export function AdvisorStatsCards({
               this session
             </p>
           )}
+
+          <Tooltip text="Total number of students assigned to you for this academic session" />
         </div>
 
         {/* Card 2 */}
-        <div className={`dashboard-container ${styles.advisorStatsCard}`}>
+        <div className={`dashboard-container ${styles.advisorStatsCard} group`}>
           <div>
             <div>
               <TextLink>Uploaded Results</TextLink>
@@ -78,10 +90,11 @@ export function AdvisorStatsCards({
               this month
             </p>
           )}
+          <Tooltip text="Number of total uploaded results batches" />
         </div>
 
         {/* Card 3 */}
-        <div className={`dashboard-container ${styles.advisorStatsCard}`}>
+        <div className={`dashboard-container ${styles.advisorStatsCard} group`}>
           <div>
             <div>
               <TextLink>Pending Reviews</TextLink>
@@ -94,10 +107,11 @@ export function AdvisorStatsCards({
             </div>
           </div>
           <p className="text-[var(--color-brown)]">Review needed</p>
+          <Tooltip text="Number of pending result batches for review" />
         </div>
 
         {/* Card 4 */}
-        <div className={`dashboard-container ${styles.advisorStatsCard}`}>
+        <div className={`dashboard-container ${styles.advisorStatsCard} group`}>
           <div>
             <div>
               <TextLink>Class level</TextLink>
@@ -110,6 +124,7 @@ export function AdvisorStatsCards({
             </div>
           </div>
           <p className="text-[var(--color-purple)]">Currently active</p>
+          <Tooltip text="Current class level" />
         </div>
       </div>
     </div>
@@ -122,15 +137,19 @@ function CardTemplate({
   count,
   theme,
   bg,
+  toolTipText = "",
 }: {
   children: React.ReactNode;
   title: string;
   count: number;
   theme: string;
   bg: string;
+  toolTipText?: string;
 }) {
   return (
-    <div className={`dashboard-container ${styles.advisorStudentsStatsCard}`}>
+    <div
+      className={`dashboard-container ${styles.advisorStudentsStatsCard} group`}
+    >
       <div>
         <TextLink>{title}</TextLink>
         <p style={{ color: theme }}>
@@ -138,6 +157,8 @@ function CardTemplate({
         </p>
       </div>
       <div style={{ color: theme, backgroundColor: bg }}>{children}</div>
+
+      <Tooltip text={toolTipText} />
     </div>
   );
 }
@@ -162,6 +183,7 @@ export function AdvisorStudentsStatsCards({
         count={totalStudents}
         theme="var(--color-primary)"
         bg="var(--color-blue-background)"
+        toolTipText="Total students in your class"
       >
         <Users2 size={iconSize} />
       </CardTemplate>
@@ -172,6 +194,7 @@ export function AdvisorStudentsStatsCards({
         count={verified}
         theme="var(--color-green)"
         bg="var(--color-green-background)"
+        toolTipText="Students that have signed up and registered"
       >
         <Check size={iconSize} />
       </CardTemplate>
@@ -182,6 +205,7 @@ export function AdvisorStudentsStatsCards({
         count={pending}
         theme="var(--color-brown)"
         bg="var(--color-brown-background)"
+        toolTipText="Students yet to sign up"
       >
         <Clock3 size={iconSize} />
       </CardTemplate>
@@ -192,6 +216,7 @@ export function AdvisorStudentsStatsCards({
         count={flagged}
         theme="var(--color-red)"
         bg="var(--color-red-background)"
+        toolTipText="Students flagged for review"
       >
         <Flag size={iconSize} />
       </CardTemplate>
@@ -218,6 +243,7 @@ export function AdvisorCoursesStats({
         count={totalCourses}
         theme="var(--color-primary)"
         bg="var(--color-blue-background)"
+        toolTipText="Total number of courses offered for the selected academic session"
       >
         <Book size={iconSize} />
       </CardTemplate>
@@ -227,6 +253,7 @@ export function AdvisorCoursesStats({
         count={totalCredits}
         theme="var(--color-green)"
         bg="var(--color-green-background)"
+        toolTipText="Total number of credits for the selected academic session"
       >
         <Check size={iconSize} />
       </CardTemplate>
@@ -236,6 +263,7 @@ export function AdvisorCoursesStats({
         count={rain}
         theme="var(--color-purple)"
         bg="var(--color-purple-background)"
+        toolTipText="Number of courses offered in the Rain semester"
       >
         <CloudRain size={iconSize} />
       </CardTemplate>
@@ -245,6 +273,7 @@ export function AdvisorCoursesStats({
         count={harmattan}
         theme="var(--color-brown)"
         bg="var(--color-brown-background)"
+        toolTipText="Number of courses offered in the Harmattan semester"
       >
         <SunMedium size={iconSize} />
       </CardTemplate>

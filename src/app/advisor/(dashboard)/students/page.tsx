@@ -21,13 +21,12 @@ import SomethingWentWrong from "@/components/secondary/error/somethingWentWrong"
 import { AdvisorStudent } from "@/app/types/advisor";
 import "@aejkatappaja/phantom-ui";
 import { AdvisorTablesSkeleton } from "@/components/skeletons/advisorSkeletons";
+import { CoverLoader } from "@/components/secondary/loaders/coverLoader";
 
 export default function ManageStudents() {
   const [uploading, setUploading] = useState(false);
   const { toggleModal, ModalTemplate } = useModalTemplate();
   const { advisorData } = useAuth();
-
-  if (!advisorData) return <SomethingWentWrong />;
 
   const { parseFile, isLoading: excelLoading } = useExcelParser();
 
@@ -36,23 +35,11 @@ export default function ManageStudents() {
     error: studentsError,
     isPending: studentsIsPending,
   } = useFetchStudentsStats(
-    advisorData?.advisor_assignments[0].admission_year,
-    advisorData?.advisor_assignments[0].departments.id,
-    advisorData?.id,
+    advisorData?.advisor_assignments[0].admission_year || 0,
+    advisorData?.advisor_assignments[0].departments.id || "",
+    advisorData?.id || "",
   );
   const uploadStudentsMutation = useUploadAdvisorStudents();
-
-  const TypeStudent = () => {
-    return (
-      <button
-        onClick={toggleModal}
-        className="button-primary flex gap-8 items-center"
-      >
-        Type in Student
-        <PlusIcon size={17} className="" />
-      </button>
-    );
-  };
 
   const handleFileInput = useCallback(
     async (e: ChangeEvent<HTMLInputElement>) => {
@@ -105,6 +92,8 @@ export default function ManageStudents() {
     [parseFile],
   );
 
+  if (!advisorData) return <SomethingWentWrong />;
+
   // Error loading students
   if (studentsError) {
     errorToastHandler(
@@ -115,6 +104,19 @@ export default function ManageStudents() {
       <SomethingWentWrong message="Something went wrong fetching students data" />
     );
   }
+
+  const TypeStudent = () => {
+    return (
+      <button
+        onClick={toggleModal}
+        disabled={uploading}
+        className={`button-primary flex gap-8 items-center ${uploading && "opacity-[70%] pointer-events-none"}`}
+      >
+        Type in Student
+        <PlusIcon size={17} className="" />
+      </button>
+    );
+  };
 
   const verifiedStudents =
     students?.filter((student) => student.status === "verified").length || 0;
@@ -161,6 +163,9 @@ export default function ManageStudents() {
           />
         </>
       )}
+
+      {/* Cover loader */}
+      {uploading && <CoverLoader />}
 
       {/* Type in Student thruogh form */}
       <ModalTemplate title={"Add New Student"}>

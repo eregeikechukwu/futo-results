@@ -4,6 +4,7 @@
   display: flex;
   flex-direction: column;
   line-height: toRem(24);
+  position: relative;
 
   & > div {
     display: flex;
@@ -41,6 +42,7 @@
 }
 
 .advisorStudentsStatsCard {
+  position: relative;
   display: flex;
   justify-content: space-between;
 
@@ -71,4 +73,19 @@
     width: toRem(40) !important;
     border-radius: toRem(12);
   }
+}
+
+// Tooltip styles
+.tooltip {
+  position: absolute;
+  top: 100%; /* Position below the card */
+  left: 50%;
+  background-color: #333;
+  color: #fff;
+  padding: toRem(8);
+  border-radius: toRem(4);
+  font-size: toRem(12);
+  line-height: toRem(16);
+  white-space: nowrap;
+  z-index: 1000;
 }

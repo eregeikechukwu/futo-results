@@ -1,4 +1,7 @@
-import { useEffect, useRef } from "react";
+import React, { Dispatch, useEffect, useRef, useState } from "react";
+import ConfirmInput from "./confirmInput";
+import { LoaderSpinner2, LoaderSpinner3 } from "./loaders/loaders";
+import toast from "react-hot-toast";
 
 type ConfirmModalVariant = "danger" | "warning" | "info";
 
@@ -6,11 +9,16 @@ interface ConfirmModalProps {
   open: boolean;
   title?: string;
   message: string;
+  children?: React.ReactNode;
   confirmLabel?: string;
   cancelLabel?: string;
   variant?: ConfirmModalVariant;
   onConfirm: () => void;
+  isMutating?: boolean;
   onCancel: () => void;
+  setConfirmAction?: Dispatch<React.SetStateAction<boolean>>;
+  actionConfirmValue?: string;
+  value?: "result" | "course" | "student" | null;
 }
 
 const variantStyles: Record<
@@ -50,16 +58,22 @@ const variantStyles: Record<
   },
 };
 
-export default function ConfirmModal({
+function ConfirmModal({
   open,
   title = "Confirm action",
   message,
   confirmLabel = "Confirm",
   cancelLabel = "Cancel",
+  children,
   variant = "danger",
+  isMutating = false,
   onConfirm,
   onCancel,
+  setConfirmAction,
+  actionConfirmValue,
+  value = null,
 }: ConfirmModalProps) {
+  const [actionConfirmInput, setActionConfirmInput] = useState("");
   const cancelRef = useRef<HTMLButtonElement>(null);
   const v = variantStyles[variant];
 
@@ -73,57 +87,64 @@ export default function ConfirmModal({
     return () => window.removeEventListener("keydown", handler);
   }, [open, onCancel]);
 
-  if (!open) return null;
+  // set the confirm action state
+  useEffect(() => {
+    if (!setConfirmAction) return;
+    if (actionConfirmInput === actionConfirmValue) {
+      setConfirmAction(true);
+    } else {
+      setConfirmAction(false);
+    }
+  }, [actionConfirmInput]);
+
+  // if (!open) return null;
+  const onConfirmFn = () => {
+    if (actionConfirmInput === actionConfirmValue) {
+      setActionConfirmInput("");
+      onConfirm();
+    } else
+      toast.error(
+        `${value === "result" || value === "student" ? "Reg Number" : "Course code"} doesnt match`,
+      );
+  };
 
   return (
     <div
       onClick={(e) => e.target === e.currentTarget && onCancel()}
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 50,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "rgba(0, 0, 0, 0.35)",
-        padding: "1rem",
-        animation: "fadeOverlay 0.15s ease",
-      }}
+      className={`fixed inset-0 z-50 items-center justify-center bg-black/35 p-[1rem] animate-[fadeOverlay_0.15s_ease] ${
+        open ? "flex" : "hidden"
+      }`}
       role="dialog"
       aria-modal="true"
       aria-labelledby="confirm-modal-title"
     >
       <div
-        style={{
-          backgroundColor: "#ffffff",
-          borderRadius: "16px",
-          border: "1px solid #E5E7EB",
-          padding: "1.75rem 1.5rem 1.25rem",
-          width: "100%",
-          maxWidth: "380px",
-          display: "flex",
-          flexDirection: "column",
-          gap: 0,
-          animation: "scaleIn 0.15s ease",
-        }}
+        className="
+    flex w-full max-w-[380px] flex-col
+    rounded-[16px]
+    border border-[#E5E7EB]
+    bg-white
+    px-[1.5rem]
+    pt-[1.75rem]
+    pb-[1.25rem]
+    animate-[scaleIn_0.15s_ease]
+  "
       >
         {/* Icon */}
         <div
           aria-hidden="true"
+          className="
+    mb-[1rem]
+    flex h-[44px] w-[44px]
+    select-none items-center justify-center
+    rounded-full
+    text-[18px]
+    font-bold
+  "
           style={{
-            width: 44,
-            height: 44,
-            borderRadius: "50%",
             backgroundColor: v.iconBg,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: "1rem",
-            fontSize: "18px",
-            fontWeight: 700,
             color: v.iconColor,
             fontFamily: "Georgia, serif",
-            userSelect: "none",
           }}
         >
           {v.icon}
@@ -132,109 +153,82 @@ export default function ConfirmModal({
         {/* Title */}
         <p
           id="confirm-modal-title"
-          style={{
-            margin: "0 0 6px",
-            fontSize: "16px",
-            fontWeight: 600,
-            color: "#111827",
-          }}
+          className="
+    mb-[0.375rem]
+    text-[16px]
+    font-semibold
+    text-gray-900
+  "
         >
           {title}
         </p>
-
         {/* Message */}
         <p
-          style={{
-            margin: "0 0 1.5rem",
-            fontSize: "14px",
-            color: "#6B7280",
-            lineHeight: 1.6,
-          }}
+          className="
+    mb-[1.5rem]
+    text-[14px]
+    leading-[1.6]
+    text-gray-500
+  "
         >
           Are you sure you want to{" "}
-          <strong style={{ color: "#374151", fontWeight: 500 }}>
-            {message}
-          </strong>
-          ? This action cannot be undone.
+          <strong className="font-medium text-gray-700">{message}</strong>? This
+          action cannot be undone.
         </p>
 
         {/* Divider */}
         <div
-          style={{
-            height: "1px",
-            backgroundColor: "#F3F4F6",
-            marginBottom: "1.25rem",
-          }}
+          className="
+    mb-[1.25rem]
+    h-px
+    bg-gray-100
+  "
         />
+        {/* Confirmation Input */}
+        {actionConfirmValue && (
+          <ConfirmInput
+            value={value || ""}
+            deleteConfirmValue={actionConfirmValue}
+            deleteConfirmInput={actionConfirmInput}
+            setDeleteConfirmInput={setActionConfirmInput}
+          />
+        )}
 
         {/* Actions */}
-        <div
-          style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}
-        >
+        <div className="flex justify-end gap-[0.5rem]">
           <button
             ref={cancelRef}
             onClick={onCancel}
-            style={{
-              fontSize: "13px",
-              fontWeight: 500,
-              padding: "8px 18px",
-              borderRadius: "8px",
-              border: "1px solid #E5E7EB",
-              cursor: "pointer",
-              backgroundColor: "#ffffff",
-              color: "#374151",
-              transition: "background 0.12s, transform 0.1s",
-            }}
-            onMouseOver={(e) =>
-              ((e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                "#F9FAFB")
-            }
-            onMouseOut={(e) =>
-              ((e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                "#ffffff")
-            }
-            onMouseDown={(e) =>
-              ((e.currentTarget as HTMLButtonElement).style.transform =
-                "scale(0.98)")
-            }
-            onMouseUp={(e) =>
-              ((e.currentTarget as HTMLButtonElement).style.transform =
-                "scale(1)")
-            }
+            className="
+    rounded-[8px]
+    border border-[#E5E7EB]
+    bg-white
+    px-[1.125rem]
+    py-[0.5rem]
+    text-[13px]
+    font-medium
+    text-gray-700
+    transition-all
+    hover:bg-gray-50
+    active:scale-[0.98]
+  "
           >
             {cancelLabel}
           </button>
+          {/* Confirm btn */}
           <button
-            onClick={onConfirm}
+            onClick={onConfirmFn}
+            disabled={isMutating}
+            className="flex gap-8 items-center
+rounded-[8px] border-0 px-[1.125rem] py-[0.5rem] text-[13px] font-medium transition-all active:scale-[0.98]
+    disabled:opacity-50  disabled:cursor-not-allowed "
             style={{
-              fontSize: "13px",
-              fontWeight: 500,
-              padding: "8px 18px",
-              borderRadius: "8px",
-              border: "none",
-              cursor: "pointer",
               backgroundColor: v.confirmBg,
               color: v.confirmText,
-              transition: "background 0.12s, transform 0.1s",
             }}
-            onMouseOver={(e) =>
-              ((e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                v.confirmHover)
-            }
-            onMouseOut={(e) =>
-              ((e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                v.confirmBg)
-            }
-            onMouseDown={(e) =>
-              ((e.currentTarget as HTMLButtonElement).style.transform =
-                "scale(0.98)")
-            }
-            onMouseUp={(e) =>
-              ((e.currentTarget as HTMLButtonElement).style.transform =
-                "scale(1)")
-            }
           >
             {confirmLabel}
+            {isMutating && <LoaderSpinner3 size={10} />}
           </button>
         </div>
       </div>
@@ -252,6 +246,8 @@ export default function ConfirmModal({
     </div>
   );
 }
+
+export default React.memo(ConfirmModal);
 
 /* ─── Usage example ───────────────────────────────────────────────────────────
 

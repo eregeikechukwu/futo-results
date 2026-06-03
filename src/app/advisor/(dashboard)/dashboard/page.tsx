@@ -28,44 +28,46 @@ import {
 export default function AdvisorDashboard() {
   const { loading, profile, advisorData } = useAuth();
 
-  useEffect(() => {
-    import("@aejkatappaja/phantom-ui");
-  }, []);
-
-  console.log(advisorData, profile, " advisor Data it is");
-  if ((!advisorData || !profile) && !loading) {
-    toast.error(
-      "Something went wrong getting asvisor data, please reload and try again.",
-    );
-    return <SomethingWentWrong />;
-  }
-
-  if (loading) return <LoaderSpinner3 />;
-
   const {
     data: statsData,
     isLoading,
     error,
   } = useAdvisorDashboardStats(
-    profile!.id,
-    advisorData!.id,
-    advisorData?.advisor_assignments[0].departments.id!,
-    advisorData?.advisor_assignments[0].admission_year!,
+    profile?.id || "",
+    advisorData?.id || "",
+    advisorData?.advisor_assignments[0].departments.id || "",
+    advisorData?.advisor_assignments[0].admission_year || 0,
   );
   const {
     data: uploadActivity,
     isLoading: uploadActivityLoading,
     error: uploadActivityError,
-  } = useUploadActivity(profile!.id);
+  } = useUploadActivity(profile?.id || "");
 
   // Ftehc report for report cards
   const {
     data: uploadSummaryData,
     isLoading: uploadSummaryLoading,
     error: uploadSummaryError,
-  } = useRecentBatches(profile!.id);
+  } = useRecentBatches(profile?.id || "");
 
-  console.log(uploadSummaryData + " upload summary data in dashboard");
+  useEffect(() => {
+    import("@aejkatappaja/phantom-ui");
+
+    if ((!advisorData || !profile) && !loading) {
+      toast.error(
+        "Something went wrong getting avisor data, please reload and try again.",
+      );
+    }
+  }, []);
+
+  if ((!advisorData || !profile) && !loading) {
+    return <SomethingWentWrong />;
+  }
+
+  if (loading) return <LoaderSpinner3 />;
+
+  console.log(uploadSummaryData, " upload summary data in dashboard");
 
   const uploadSummary = uploadSummaryData?.map((batch) => {
     return {
@@ -80,7 +82,7 @@ export default function AdvisorDashboard() {
   // if (isLoading || uploadActivityLoading || uploadSummaryLoading)
   //   return <div>Skeleton</div>;
 
-  console.log("statsData.new: ", statsData?.totalStudents);
+  console.log("statsData.new: ", uploadSummary);
 
   // Error handling professionlayy
   if (uploadActivityError || uploadSummaryError || error) {

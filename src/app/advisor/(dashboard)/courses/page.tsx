@@ -7,21 +7,23 @@ import { Header } from "@/components/secondary/header";
 import { AdvisorCoursesStats } from "@/components/statsCards/statsCards";
 import { AdvisorCoursesTable } from "@/components/tables/advisorCoursesTable";
 import { useAuth } from "@/contexts/AuthContext";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { errorToastHandler } from "@/helpers/errorHandler";
 import { useActiveTerm } from "@/lib/hooks/useAcademicTerms";
 import { useAdvisorOfferings } from "@/lib/hooks/useAdvisorCourses";
 import toast from "react-hot-toast";
 import "@aejkatappaja/phantom-ui";
 import { AdvisorTablesSkeleton } from "@/components/skeletons/advisorSkeletons";
+import { ColumnFilter } from "@tanstack/react-table";
 
 export default function AdvisorCourses() {
+  const [sessionFilters, setSessionFilters] = useState<ColumnFilter[]>([
+    {
+      id: "session",
+      value: "",
+    },
+  ]);
   const { advisorData } = useAuth();
-
-  if (!advisorData) {
-    toast.error("Advisor data is missing. Please reload and try again.");
-    return;
-  }
 
   const {
     data: activeSession,
@@ -32,15 +34,19 @@ export default function AdvisorCourses() {
     data: advisorOffering,
     isPending: advisorOfferingPending,
     error: advisorOfferingError,
-  } = useAdvisorOfferings(advisorData.id);
+  } = useAdvisorOfferings(advisorData?.id || "");
 
-  if (activeTermError || advisorOfferingError) {
-    // errorT
-    errorToastHandler(
-      activeTermError || advisorOfferingError,
-      "Failed to load data. Please try again.",
-    );
-  }
+  // Set selected session to active session once it's loaded
+  useMemo(() => {
+    if (activeSession && !sessionFilters[0].value) {
+      setSessionFilters([
+        {
+          id: "session",
+          value: activeSession.session,
+        },
+      ]);
+    }
+  }, [activeSession, sessionFilters]);
 
   const advisorOfferings = useMemo(() => {
     if (!advisorOffering) return [];
@@ -54,21 +60,44 @@ export default function AdvisorCourses() {
     }));
   }, [advisorOffering]);
 
-  advisorOffering
-    ? console.log(advisorOffering, activeSession, "academic terms it is")
-    : null;
-
   const activeSessionMock = "2024/2025";
 
-  const totalCoursesCount = advisorOffering?.length || 0;
-  const totalCredits: number = advisorOffering?.reduce(
+  // academic courses offerings for selected session filter
+  const filteredOfferings = useMemo(() => {
+    if (!advisorOffering) return [];
+    if (!sessionFilters[0].value) return advisorOffering;
+
+    return advisorOffering.filter(
+      (offering) =>
+        offering.academic_terms?.session === sessionFilters[0]?.value,
+    );
+  }, [advisorOffering, sessionFilters]);
+
+  useEffect(() => {
+    if (!advisorData) {
+      toast.error("Advisor data is missing. Please reload and try again.");
+      return;
+    }
+  }, []);
+
+  if (activeTermError || advisorOfferingError) {
+    // errorT
+    errorToastHandler(
+      activeTermError || advisorOfferingError,
+      "Failed to load data. Please try again.",
+    );
+  }
+
+  // Metrics calculations
+  const totalCoursesCount = filteredOfferings.length || 0;
+  const totalCredits: number = filteredOfferings.reduce(
     (acc, course) => acc + Number(course.unit),
     0,
   );
-  const harmattan = advisorOffering?.filter(
+  const harmattan = filteredOfferings.filter(
     (course) => course.academic_terms?.semester === "Harmattan",
   ).length;
-  const rain = advisorOffering?.filter(
+  const rain = filteredOfferings.filter(
     (course) => course.academic_terms?.semester === "Rain",
   ).length;
 
@@ -85,26 +114,27 @@ export default function AdvisorCourses() {
         onClick={toggleModal}
       />
 
-     
-       {
-         advisorOfferingPending || activeTermPending ? (
-           <AdvisorTablesSkeleton />) : (
-          // {/* Stats card */}
-    <>
-        <AdvisorCoursesStats
-          totalCourses={totalCoursesCount || 0}
-          totalCredits={totalCredits || 0}
-          harmattan={harmattan || 0}
-          rain={rain || 0}
-        />
+      {advisorOfferingPending || activeTermPending ? (
+        <AdvisorTablesSkeleton />
+      ) : (
+        // {/* Stats card */}
+        <>
+          <AdvisorCoursesStats
+            totalCourses={totalCoursesCount}
+            totalCredits={totalCredits}
+            harmattan={harmattan}
+            rain={rain}
+          />
 
-       {/* Add courses table */}
-      <AdvisorCoursesTable
-        advisorOfferings={advisorOfferings || []}
-        activeSession={activeSession?.session || activeSessionMock}
-      /></>
-        )
-       }
+          {/* Add courses table */}
+          <AdvisorCoursesTable
+            sessionFilters={sessionFilters}
+            setSessionFilters={setSessionFilters}
+            advisorOfferings={advisorOfferings || []}
+            activeSession={activeSession?.session || activeSessionMock}
+          />
+        </>
+      )}
 
       {/* Add course modal */}
       <ModalTemplate title={"Add New Course"}>

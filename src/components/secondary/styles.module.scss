@@ -1,5 +1,7 @@
-@use "../../app/styles/sass/abstracts/mixins.scss" as *;
 @use "../../app/styles/sass/functions/toRem.scss" as *;
+@use "../../app/styles/sass/abstracts/mixins.scss" as *;
+@use "../../app/styles/sass/utilities/reusables.scss" as *;
+@use "../../app/styles/sass/abstracts/variables.scss" as *;
 
 .quickAction {
   border-radius: toRem(12);
@@ -34,4 +36,55 @@
     margin-top: toRem(4);
     color: var(--color-text-link);
   }
+}
+
+// ============================================================================
+// DELETE CONFIRMATION MODAL
+// ============================================================================
+
+.deleteConfirmContent {
+  display: flex;
+  flex-direction: column;
+  gap: toRem(12);
+  margin-bottom: 1rem;
+
+  p {
+    margin: 0;
+    font-size: toRem(14);
+    color: var(--color-text);
+    line-height: toRem(20);
+
+    strong {
+      font-weight: 600;
+      color: var(--color-text-dark);
+    }
+  }
+}
+
+.confirmInput {
+  padding: toRem(10) toRem(12);
+  border: toRem(1) solid var(--color-border-light);
+  background: var(--color-white);
+  color: var(--color-text);
+  font-size: toRem(14);
+  font-family: monospace;
+  transition: all 0.2s ease;
+
+  @extend .input;
+
+  &:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 toRem(3) var(--color-blue-background-light);
+  }
+
+  &::placeholder {
+    color: var(--color-text-passive);
+  }
+}
+
+.errorText {
+  margin: 0;
+  font-size: toRem(8);
+  color: var(--color-red) !important;
+  font-weight: 500;
 }

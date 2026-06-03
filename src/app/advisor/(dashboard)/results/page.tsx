@@ -154,7 +154,12 @@ export default function ResultsManagementPage() {
           {isLoading ? (
             <div className={styles.loadingState}>Loading results...</div>
           ) : results && results.length > 0 ? (
-            <div>somethijng's here</div>
+            <ResultsTable
+              results={results}
+              batchInfo={batchInfo}
+              offeringId={selectedOfferingId}
+              selectedOffering={selectedOffering}
+            />
           ) : (
             <div className={styles.emptyState}>
               <p>No results uploaded for this course yet.</p>

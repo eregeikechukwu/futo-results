@@ -2,6 +2,7 @@
 
 import React, { RefAttributes } from "react";
 import styles from "./header.module.scss";
+import { LoaderSpinner3 } from "./loaders/loaders";
 
 type HeaderProps = {
   heading: string;
@@ -33,12 +34,13 @@ export function Header({
           <button
             onClick={onClick}
             disabled={buttonLoading}
-            className={`button-primary ${styles.actionButton} ${buttonLoading && "opacity-30"}`}
+            className={`button-primary ${styles.actionButton} ${buttonLoading && "opacity-30 pointer-events-none"}`}
           >
             {React.createElement(require("../../utils/iconMap").iconMap[icon], {
               size: 17,
             } as RefAttributes<SVGElement>)}{" "}
             {button}
+            {buttonLoading && <LoaderSpinner3 size={15}/>}
           </button>
         )}
 

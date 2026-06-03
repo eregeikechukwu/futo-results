@@ -55,6 +55,7 @@ export type TextFieldProps = {
   required?: boolean;
   type?: string;
   id?: string;
+  readOnly?: boolean;
   onChange?: (input: string) => number | string | undefined;
   placeholder?: string;
   maxLength?: number;
@@ -125,3 +126,16 @@ export type ResultRowType = {
   grade: unknown | null;
   remark: unknown | null;
 };
+
+export interface AddCourseInput {
+  course_code: string;
+  course_title: string;
+  unit: number;
+  term_id: string;
+  advisor_id: string;
+}
+
+export interface UpdateCourseInput {
+  unit?: number;
+  term_id?: string;
+}

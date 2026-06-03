@@ -1,7 +1,13 @@
 // lib/hooks/useCourses.ts
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createSupabaseClient } from "@/lib/supabase/client";
-import { addCourseOffering } from "../queries/courseOfferings";
+import {
+  addCourseOffering,
+  deleteCourseOffering,
+  updateCourseOffering,
+} from "../queries/advisorCourses";
+import { UpdateCourseInput, AddCourseInput } from "@/app/types/advisor";
+import { timeout } from "@/app/advisor/functions/students";
 
 // ── Fetch all offerings for an advisor in a specific term ──
 export function useAdvisorOfferings(advisorId: string) {
@@ -37,7 +43,7 @@ export function useAddCourseOffering() {
 
   return useMutation({
     mutationFn: addCourseOffering,
-    onSuccess: (data) => {
+    onSuccess: () => {
       // Invalidate the offerings list for this advisor + term
       queryClient.invalidateQueries({
         queryKey: ["offerings"],
@@ -50,21 +56,52 @@ export function useAddCourseOffering() {
   });
 }
 
-// ── Remove a course offering ──
 export function useRemoveCourseOffering() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (offeringId: string) => {
+    mutationFn: deleteCourseOffering,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["offerings"] });
+    },
+  });
+}
+
+export function useUpdateCourseOffering() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      offeringId,
+      input,
+    }: {
+      offeringId: string;
+      input: UpdateCourseInput;
+    }) => {
       const supabase = createSupabaseClient();
 
-      const { error } = await supabase
-        .from("course_offerings")
-        .delete()
-        .eq("id", offeringId);
+      // console.log(1, "before", input);
+
+      const { error } = await Promise.race([
+        supabase
+          .from("course_offerings")
+          .update({
+            unit: input.unit,
+            term_id: input.term_id,
+          })
+          .eq("id", offeringId),
+        timeout(10000),
+      ]);
+      // console.log(2, "after");
+
+      // const result = await Promise.race([query, timeout(500)]);
 
       if (error) throw error;
+      console.log("No error was called");
+
+      // return updatedOffering;
     },
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["offerings"] });
     },

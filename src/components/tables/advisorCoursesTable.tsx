@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useCallback } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -12,33 +12,43 @@ import {
   Table,
   getPaginationRowModel,
 } from "@tanstack/react-table";
-import { AdvisorCourse } from "@/app/types/advisor";
-import { advisorCourses } from "@/mock/advisorCourses";
+import { AdvisorCourse, CourseData } from "@/app/types/advisor";
 import { ArrowUpDown, Edit3, Trash2, X } from "lucide-react";
 import { TableControls } from "./common";
 import { TableTemplate } from "./table";
 import { useModalTemplate } from "../modals/overlay";
-import { EditCourse } from "../forms/advisorEditCourse";
-import { useAcademicTerms } from "@/lib/hooks/useAcademicTerms";
-import { useRemoveCourseOffering } from "@/lib/hooks/useAdvisorCourses";
+import EditCourse from "../forms/advisorEditCourse";
+import {
+  useRemoveCourseOffering,
+  useUpdateCourseOffering,
+} from "@/lib/hooks/useAdvisorCourses";
 import { errorToastHandler } from "@/helpers/errorHandler";
 import toast from "react-hot-toast";
 import ConfirmationModal from "../secondary/confirmationModal";
 import { CoverLoader } from "../secondary/loaders/coverLoader";
+import ConfirmInput from "../secondary/confirmInput";
 
 export function AdvisorCoursesTable({
+  sessionFilters,
+  setSessionFilters,
   advisorOfferings,
   activeSession,
 }: {
+  sessionFilters: ColumnFilter[];
+  setSessionFilters: React.Dispatch<React.SetStateAction<ColumnFilter[]>>;
   advisorOfferings: AdvisorCourse[];
   activeSession: string;
 }) {
   const [globalFilter, setGlobalFilter] = useState("");
-  const [idToBeDeleted, setIdToBeDeleted] = useState<string | null>(null);
+  const [courseToBeDeleted, setCourseToBeDeleted] =
+    useState<AdvisorCourse | null>(null);
   const [isMutating, setIsMutating] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   // Dlete  mutation hander here
   const { mutate: deleteMutation } = useRemoveCourseOffering();
+  // Update Mutation handler
+  const { mutate } = useUpdateCourseOffering();
 
   const [sorting, setSorting] = useState<SortingState>([
     {
@@ -51,19 +61,14 @@ export function AdvisorCoursesTable({
     pageIndex: 0,
     pageSize: 10,
   });
-  const [columnFilters, setColumnFilters] = useState<ColumnFilter[]>([
-    {
-      id: "session",
-      value: activeSession,
-    },
-  ]);
+
   const { ModalTemplate, toggleModal: toggleEditModal } = useModalTemplate();
-  // Table session options
-  const {
-    data: sessionOptions,
-    isPending: sessionOptionsPending,
-    error: sessionOptionsError,
-  } = useAcademicTerms();
+
+  // Table session options derived from advisor offerings
+  const sessionOptions = advisorOfferings.map((offering) => ({
+    id: offering.session,
+    session: offering.session,
+  }));
 
   // ID change test
   const idRef = useRef<AdvisorCourse>({
@@ -74,27 +79,6 @@ export function AdvisorCoursesTable({
     semester: "Rain",
     session: "",
   });
-
-  // Delete handler
-  const handleRemoveCourseOffering = (offeringId: string) => {
-    // Call delete mutation here with offeringId
-    setIsMutating(true);
-    deleteMutation(offeringId, {
-
-      onSuccess: () => {
-        setIsMutating(false);
-        toast.success("Course offering deleted successfully");
-        setIdToBeDeleted(null);
-      },
-      onError: (error) => {
-        errorToastHandler(error);
-        setIsMutating(false);
-        setIdToBeDeleted(null);
-      },
-    });
-    console.log("Deleting course offering with ID:", offeringId);
-    // Example: removeCourseOfferingMutation.mutate(offeringId);
-  };
 
   const columns: ColumnDef<AdvisorCourse>[] = [
     {
@@ -154,7 +138,7 @@ export function AdvisorCoursesTable({
       accessorKey: "actions",
       cell: ({ row }) => {
         const handleDelete = () => {
-          setIdToBeDeleted(row.original.id);
+          setCourseToBeDeleted(row.original);
           console.log("Deleting course offering:", row);
         };
         const toggleModal = () => {
@@ -182,6 +166,8 @@ export function AdvisorCoursesTable({
     },
   ];
 
+  console.log(isMutating, "isMutsting");
+
   //Ceating table instance
   const table: Table<AdvisorCourse> = useReactTable<AdvisorCourse>({
     data: advisorOfferings as AdvisorCourse[],
@@ -190,11 +176,11 @@ export function AdvisorCoursesTable({
       pagination,
       sorting,
       globalFilter,
-      columnFilters,
+      columnFilters: sessionFilters,
     },
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
-    onColumnFiltersChange: setColumnFilters,
+    onColumnFiltersChange: setSessionFilters,
     onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -204,7 +190,7 @@ export function AdvisorCoursesTable({
 
   const resetFilters = () => {
     setGlobalFilter("");
-    setColumnFilters([
+    setSessionFilters([
       {
         id: "session",
         value: activeSession,
@@ -221,8 +207,10 @@ export function AdvisorCoursesTable({
           { value: activeSession, title: activeSession },
           ...sessionOptions
             .filter((option, index, arr) => {
-              index === arr.findIndex((o) => o.session === option.session) &&
-                option.session !== activeSession;
+              return (
+                index === arr.findIndex((o) => o.session === option.session) &&
+                option.session !== activeSession
+              );
             })
             .map((option) => ({
               value: option.session,
@@ -233,20 +221,69 @@ export function AdvisorCoursesTable({
     // options: [],
   };
 
-  console.log(sessionOptions, "session options it is");
+  // FUnction for updating course
+  const updateCourseHandler = useCallback(async (data: CourseData) => {
+    setIsMutating(true);
+    console.log(data, "course to be edited");
+
+    const mutationData = {
+      offeringId: idRef.current.id,
+      input: {
+        unit: Number(data.unit),
+        term_id: data.term,
+      },
+    };
+
+    mutate(mutationData, {
+      onSuccess: () => {
+        setIsMutating(false);
+        toast.success("Course offering updated successfully");
+        toggleEditModal();
+        // methods.reset();
+      },
+      onError: (error: Error) => {
+        toast.error(`Failed to update course offering: ${error.message}`);
+        setIsMutating(false);
+      },
+    });
+  }, []);
+
+  // Delete handler
+  const handleRemoveCourseOffering = useCallback(
+    (offeringId: string) => {
+      if (!confirmDelete) {
+        toast.error("Course code doesnt match");
+        return;
+      } else {
+        // Call delete mutation here with offeringId
+        setIsMutating(true);
+        deleteMutation(offeringId, {
+          onSuccess: () => {
+            setIsMutating(false);
+            toast.success("Course offering deleted successfully");
+            setCourseToBeDeleted(null);
+          },
+          onError: (error) => {
+            errorToastHandler(error);
+            setIsMutating(false);
+            setCourseToBeDeleted(null);
+          },
+        });
+        console.log("Deleting course offering with ID:", offeringId);
+        // Example: removeCourseOfferingMutation.mutate(offeringId);
+      }
+    },
+    [confirmDelete, courseToBeDeleted],
+  );
 
   return (
-    <div>
+    <div className="relative">
       {/* controls */}
       <TableControls
         table={table}
         globalFilter={globalFilter}
         setGlobalFilter={setGlobalFilter}
         resetFilters={resetFilters}
-        loading={sessionOptionsPending}
-        error={
-          sessionOptionsError?.message ? "Failed to load sessions" : undefined
-        }
         utils={utils}
       />
 
@@ -258,21 +295,30 @@ export function AdvisorCoursesTable({
 
       {/* Confirmation modal */}
       <ConfirmationModal
+      isMutating={isMutating}
         message="Delete course offering?"
-        open={!!idToBeDeleted}
+        open={!!courseToBeDeleted}
         variant="danger"
         confirmLabel="Delete"
-        onCancel={() => setIdToBeDeleted(null)}
-        onConfirm={() => handleRemoveCourseOffering(idToBeDeleted || '')}
+        onCancel={() => setCourseToBeDeleted(null)}
+        onConfirm={() =>
+          handleRemoveCourseOffering(courseToBeDeleted?.id || "")
+        }
+        setConfirmAction={setConfirmDelete}
+        actionConfirmValue={courseToBeDeleted?.courseCode}
       />
 
       {/* Table ,utatio odaing state
        */}
-       {isMutating && <CoverLoader />
-}
+      {isMutating && <CoverLoader />}
       {/* Modal */}
       <ModalTemplate title="Edit Course">
-        <EditCourse toggleModal={toggleEditModal} course={idRef.current} />
+        <EditCourse
+          isMutating={isMutating}
+          updateCourse={updateCourseHandler}
+          course={idRef.current}
+          toggleModal={toggleEditModal}
+        />
       </ModalTemplate>
     </div>
   );

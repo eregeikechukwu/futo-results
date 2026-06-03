@@ -1,20 +1,24 @@
 "use client";
 
 import { AdvisorCourse, CourseData } from "@/app/types/advisor";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { advisorCourseSchema } from "@/utils/advisorDashboardSchemas";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import toast from "react-hot-toast";
 import { AdvisorCourseFields, Form } from "../forms/reusables";
 import { LoaderSpinner1 } from "../secondary/loaders/loaders";
+import { useAcademicTerms } from "@/lib/hooks/useAcademicTerms";
 
-export function EditCourse({
-  course,
+function EditCourse({
   toggleModal,
+  isMutating,
+  course,
+  updateCourse,
 }: {
-  course: AdvisorCourse;
   toggleModal: () => void;
+  isMutating?: boolean;
+  course: AdvisorCourse;
+  updateCourse: (data: CourseData) => Promise<void>;
 }) {
   const methods = useForm<CourseData>({
     resolver: zodResolver(advisorCourseSchema),
@@ -27,41 +31,58 @@ export function EditCourse({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [course]);
 
-  const onSubmit = async (data: CourseData) => {
-    console.log(data);
+  // Sessions and semesters options for select fields
+  const {
+    data: academicTerms,
+    isPending: academicTermsPending,
+    error: academicTermsError,
+  } = useAcademicTerms();
 
-    // simulate backend call
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    toggleModal();
-    toast.success("Edit success");
-    methods.reset();
-  };
-
-  //submittin state
+  //submitting state
   const isSubmitting = methods.formState.isSubmitting;
 
   return (
-    <FormProvider {...methods}>
-      <Form onSubmit={methods.handleSubmit(onSubmit)}>
-        {/* //All the fields in one componenent */}
-        <AdvisorCourseFields />
+    <>
+      <FormProvider {...methods}>
+        <Form onSubmit={methods.handleSubmit(updateCourse)}>
+          {/* //All the fields in one componenent */}
+          <AdvisorCourseFields
+            termOptions={
+              academicTermsPending
+                ? []
+                : academicTerms.map((term) => ({
+                    id: term.id,
+                    label: `${term.session} - ${term.semester}`,
+                    value: term.id,
+                  }))
+            }
+            loading={academicTermsPending}
+            readOnly={true}
+            error={academicTermsError as Error | undefined}
+          />
 
-        <div className="justify-end w-full flex gap-8 basis-auto">
-          <button type="button" className="cancel-btn" onClick={toggleModal}>
-            Cancel
-          </button>
-          <button
-            disabled={isSubmitting}
-            type="submit"
-            className={`${
-              isSubmitting && "pointer-events-none opacity-60"
-            } button-primary `}
-          >
-            Update Course
-            {isSubmitting && <LoaderSpinner1 />}
-          </button>
-        </div>
-      </Form>
-    </FormProvider>
+          <div className="justify-end w-full flex gap-8 basis-auto">
+            <button type="button" className="cancel-btn" onClick={toggleModal}>
+              Cancel
+            </button>
+            <button
+              disabled={isSubmitting || isMutating}
+              type="submit"
+              className={`${
+                (isSubmitting || isMutating) && "pointer-events-none opacity-60"
+              } button-primary `}
+            >
+              Update Course
+              {isMutating && <LoaderSpinner1 />}
+            </button>
+          </div>
+        </Form>
+      </FormProvider>
+
+      {/* Loader spinner taht covers entire table */}
+      {/* {isMutating && <CoverLoader />} */}
+    </>
   );
 }
+
+export default React.memo(EditCourse);

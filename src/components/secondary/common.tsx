@@ -19,5 +19,5 @@ export function DashboardContainer({
 }: {
   children: React.ReactNode;
 }) {
-  return <div className="flex flex-col gap-32">{children}</div>;
+  return <div className="relative flex flex-col gap-32">{children}</div>;
 }

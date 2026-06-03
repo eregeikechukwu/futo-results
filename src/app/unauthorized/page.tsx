@@ -8,7 +8,7 @@ export default function UnauthorizedPage() {
         <div className={styles.statusBadge}>Access denied</div>
         <h1 className={styles.title}>Unauthorized access</h1>
         <p className={styles.subtitle}>
-          You do not have permission to view this section of the advisor portal.
+          You do not have permission to view this section of the Results portal.
           Please return to the home page or sign in with the correct account.
         </p>
         <p className={styles.description}>

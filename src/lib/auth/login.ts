@@ -1,16 +1,9 @@
 "use client";
 
+import { timeout } from "@/app/advisor/functions/students";
 import { createSupabaseClient } from "../supabase/client";
 import { LoginFormData } from "@/app/types/auth";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-
-function timeout(ms) {
-  return new Promise((_, reject) => {
-    setTimeout(() => {
-      reject(new Error("Just shut the fuck up"));
-    }, ms);
-  });
-}
 
 export async function handleStudentLogin(
   data: LoginFormData,

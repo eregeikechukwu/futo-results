@@ -26,7 +26,7 @@ export function TableControls({
   globalFilter,
   setGlobalFilter,
   resetFilters,
-  loading,
+  loading = false,
   error,
   utils,
 }: ControlProps) {
@@ -91,7 +91,7 @@ export function TableControls({
       <div>
         <label
           htmlFor={`${utils.optionTilte.toLowerCase()}`}
-          className="secondary-heading text-[var(--color-text-dark)] mb-8"
+          className="secondary-heading text-[var(--color-text-dark)]"
         >
           {utils.optionTilte}
         </label>
@@ -112,7 +112,7 @@ export function TableControls({
             }
             className="w-full mt-8 py-12 pl-12 pr-12 border-light secondary-heading input"
           >
-           {loading ? (
+            {loading ? (
               <option>Loading...</option>
             ) : error ? (
               <option>Error loading options</option>

@@ -46,8 +46,10 @@ export function AdvisorStudentsTable({
   const [idToBeDeleted, setIdToBeDeleted] = useState<{
     id: string;
     status: StudentStatus;
+    regNumber: string;
   } | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   // Mutation for deletimg student
   const { mutate: deleteStudentMutation } = useDeleteStudentRecord();
@@ -57,23 +59,27 @@ export function AdvisorStudentsTable({
 
   const handleDeleteStudent = (studentId, status) => {
     console.log("Deleting student:", studentId, status);
-    setIsMutating(true);
-    deleteStudentMutation(
-      { studentId, status },
-      {
-        onSuccess: () => {
-          toast.success("Student deleted successfully");
-          setIsMutating(false);
-          setIsModalOpen(false);
-          setIdToBeDeleted(null);
+    if (!confirmDelete) {
+      toast.error("Reg Number doesn't match");
+    } else {
+      setIsMutating(true);
+      deleteStudentMutation(
+        { studentId, status },
+        {
+          onSuccess: () => {
+            toast.success("Student deleted successfully");
+            setIsMutating(false);
+            setIsModalOpen(false);
+            setIdToBeDeleted(null);
+          },
+          onError: (error) => {
+            setIsModalOpen(false);
+            errorToastHandler(error);
+            setIsMutating(false);
+          },
         },
-        onError: (error) => {
-          setIsModalOpen(false);
-          errorToastHandler(error);
-          setIsMutating(false);
-        },
-      },
-    );
+      );
+    }
   };
 
   const updateStatus = (studentId, status) => {
@@ -158,6 +164,7 @@ export function AdvisorStudentsTable({
           setIdToBeDeleted({
             id: row.original.id,
             status: row.original.status,
+            regNumber: row.original.regNumber,
           });
         };
 
@@ -258,6 +265,10 @@ export function AdvisorStudentsTable({
           setIdToBeDeleted(null);
           setIsModalOpen(false);
         }}
+        setConfirmAction={setConfirmDelete}
+        actionConfirmValue={idToBeDeleted?.regNumber}
+        value={"student"}
+        isMutating={isMutating}
       />
       {/* Loader for general mutating state */}
       {isMutating && <CoverLoader />}

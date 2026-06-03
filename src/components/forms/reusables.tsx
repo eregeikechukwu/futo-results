@@ -72,6 +72,7 @@ export function TextField({
   id,
   onChange,
   placeholder,
+  readOnly = false,
 }: TextFieldProps) {
   const { register, formState, setValue, watch } = useFormContext<CourseData>();
   const error = formState.errors[name as keyof CourseData]?.message as
@@ -96,6 +97,8 @@ export function TextField({
         }}
         placeholder={placeholder}
         aria-invalid={!!error}
+        readOnly={readOnly}
+        className={readOnly ? "readonly-input" : ""}
       />
       {!!error && <Error>{error}</Error>}
     </div>
@@ -138,28 +141,32 @@ export function AdvisorCourseFields({
   termOptions = semesterOptions,
   loading = true,
   error,
+  readOnly = false,
 }: {
   termOptions?: SelectOptions[];
   loading?: boolean;
   error?: Error;
+  readOnly?: boolean;
 }) {
   return (
     <ModalForm>
       {/*abeg o names must match your schema keys exactly */}
       <TextField
-        name="courseCode" // <-- changed
+        name="courseCode"
         label="Course code"
+        readOnly={readOnly}
         required
         placeholder="eg. GST101"
       />
       <TextField
-        name="courseTitle" // <-- changed
+        name="courseTitle"
         label="Course title"
+        readOnly={readOnly}
         required
         placeholder="eg. General Studies"
       />
       <SelectField
-        name="unit" // <-- changed
+        name="unit"
         label="Credit Units"
         options={unitsOptions}
         // If your SelectField needs to register with valueAsNumber,
@@ -170,11 +177,7 @@ export function AdvisorCourseFields({
       ) : error ? (
         <Error>Error loading terms: {error.message}</Error>
       ) : (
-        <SelectField
-          name="term" // <-- changed
-          label="Term"
-          options={termOptions}
-        />
+        <SelectField name="term" label="Term" options={termOptions} />
       )}
     </ModalForm>
   );

@@ -86,7 +86,8 @@ export async function fetchAdvisorDashboardStats(
       activeTerm
         ? new Date(activeTerm.session.split("/")[0]).toISOString()
         : "",
-    ).is("deleted_at", null)
+    )
+    .is("deleted_at", null);
 
   const newStudents = newStudentsCount || 0;
 
@@ -94,8 +95,7 @@ export async function fetchAdvisorDashboardStats(
   const { count: uploadedCount, error: uploadedError } = await supabase
     .from("result_batches")
     .select("id", { count: "exact", head: true })
-    .eq("uploaded_by", advisorProfileId)
-    .eq("status", "published");
+    .eq("uploaded_by", advisorProfileId);
 
   if (uploadedError) throw uploadedError;
   const uploadedResults = uploadedCount || 0;
@@ -132,7 +132,7 @@ export async function fetchAdvisorDashboardStats(
     .from("result_batches")
     .select("id", { count: "exact", head: true })
     .eq("status", "draft")
-    .eq("uploaded_by", advisorId);
+    .eq("uploaded_by", advisorProfileId);
 
   if (pendingError) throw pendingError;
   const pendingReviews = pendingCount || 0;
@@ -203,7 +203,7 @@ export async function fetchUploadActivity(advisorProfileId: string) {
     const monthKey = `${batchDate.getFullYear()}-${String(batchDate.getMonth() + 1).padStart(2, "0")}`;
 
     if (monthlyStats[monthKey]) {
-      if (batch.status === "published") {
+      if (batch.status === "published" || batch.status === "draft") {
         monthlyStats[monthKey].uploaded++;
 
         if (monthlyStats[monthKey].uploaded > totalUploaded) {
@@ -287,13 +287,13 @@ export async function fetchRecentBatches(
     statusLabel:
       batch.status === "published"
         ? "Completed"
-        : batch.status === "reviewed"
+        : batch.status === "draft"
           ? "In Progress"
           : "Failed",
     color:
       batch.status === "published"
         ? "green"
-        : batch.status === "reviewed"
+        : batch.status === "draft"
           ? "brown"
           : "red",
   }));
