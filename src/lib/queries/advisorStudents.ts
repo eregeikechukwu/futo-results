@@ -62,7 +62,6 @@ export async function fetchAdvisorStudents(
   if (errorFromStudents) throw errorFromStudents;
 
   const studentsRaw = [...studentsFromData, ...studentsFromPrereg];
-  console.log(studentsRaw, "   --  STudents rsaw");
 
   const students = studentsRaw.map((student) => {
     if (student.claimed == null) {

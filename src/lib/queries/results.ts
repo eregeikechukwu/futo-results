@@ -1,4 +1,5 @@
 import { createSupabaseClient } from "@/lib/supabase/client";
+import { timeout } from "@/app/advisor/functions/students";
 
 /**
  * Fetch course offerings for a specific advisor in a given term
@@ -171,4 +172,58 @@ export async function publishBatch(batchId: string) {
 
   if (error) throw error;
   return data;
+}
+
+export async function createResultBatch(
+  offeringId: string,
+  advisorProfileId: string,
+  sourceType: string,
+) {
+  const supabase = createSupabaseClient();
+
+  const { data: resultBatch, error } = await Promise.race([
+    supabase
+      .from("result_batches")
+      .insert({
+        offering_id: offeringId,
+        uploaded_by: advisorProfileId,
+        source_type: sourceType,
+      })
+      .select("id")
+      .single(),
+    timeout(30000),
+  ]);
+
+  if (error) throw error;
+  return resultBatch;
+}
+
+export async function deleteBatch(batchId) {
+  const supabase = createSupabaseClient();
+
+  // Check if any result entries exists for this batch
+  const { data: entries, error: checkError } = await Promise.race([
+    supabase
+      .from("result_entries")
+      .select("id")
+      .eq("batch_id", batchId)
+      .limit(1),
+    timeout(30000),
+  ]);
+
+  if (checkError) throw checkError;
+
+  if (entries && entries.length > 0) {
+    throw new Error(
+      "Cannot remove this batch — results have already been uploaded for it. Delete the result entries first.",
+    );
+  }
+
+  // Safe to delete as no entries exist
+  const { error } = await supabase
+    .from("result_batches")
+    .delete()
+    .eq("id", batchId);
+
+  if (error) throw error;
 }

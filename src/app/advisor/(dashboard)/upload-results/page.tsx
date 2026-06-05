@@ -1,5 +1,6 @@
 "use client";
 
+import { useWarnBeforeUnload } from "@/app/hooks/useWarnBeforeUnload";
 import { ParsedResult } from "@/app/types/resultsUpload";
 import { ResultEditTable } from "@/components/forms/resultEditTable";
 import { AdvisorUploadFileSelect } from "@/components/pages/AdvisorUploadFileSelect";
@@ -22,16 +23,7 @@ export default function UploadResult() {
   }, [parsedJson]);
 
   //Warn user before leaving before editing is complete
-  useEffect(() => {
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (!isEditing) return;
-      event.preventDefault();
-      event.returnValue = "";
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [isEditing]);
+  useWarnBeforeUnload(isEditing);
 
   return (
     <DashboardContainer>

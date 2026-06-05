@@ -96,6 +96,7 @@ export function AdvisorUploadFileSelect(
 
         if (job.status !== "done") {
           console.error("Job did not complete:", job.status, job.error);
+          toast.error("OCR Job failed: " + job.error);
           return;
         }
 
@@ -174,7 +175,6 @@ export function AdvisorUploadFileSelect(
 
   const FileSelectComponent = useMemo(
     function FileSelectComponent() {
-
       return (
         <>
           <div className="dashboard-container">
