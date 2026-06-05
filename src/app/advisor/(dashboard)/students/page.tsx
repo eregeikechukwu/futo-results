@@ -69,8 +69,12 @@ export default function ManageStudents() {
 
       if (enrichedData.length > 0) {
         uploadStudentsMutation.mutate(enrichedData, {
-          onSuccess: () => {
-            toast.success("File uploaded successfully!");
+          onSuccess: (result) => {
+            toast.success(
+              `File uploaded successfully! ${result.length} student${result.length > 1 && "s"} ${result.length > 1 ? "where" : "was"} added`,
+            );
+
+            console.log(result, " THe added students hereeeeeeeee");
             e.target.value = "";
             // setFile(null);
             setUploading(false);

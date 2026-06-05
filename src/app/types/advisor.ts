@@ -139,3 +139,62 @@ export interface UpdateCourseInput {
   unit?: number;
   term_id?: string;
 }
+
+// Type for result entry with nested data
+export interface ResultEntry {
+  id: string;
+  test_score: number;
+  lab_score: number;
+  exam_score: number;
+  total_score: number;
+  grade: string;
+  remark: string;
+  batch_id: string;
+  students: {
+    id: string;
+    reg_number: string;
+    profiles: {
+      id: string;
+      full_name: string;
+      email: string;
+    };
+  };
+  result_batches: {
+    id: string;
+    status: "draft" | "reviewed" | "published" | "archived";
+    source_type: string;
+    created_at: string;
+    published_at: string | null;
+    offering_id: string;
+  };
+}
+
+export interface BatchInfo {
+  id: string;
+  status: "draft" | "published";
+  source_type: string;
+  created_at: string;
+  published_at: string | null;
+  uploaded_by: string;
+}
+
+interface SelectedOffering {
+  id: string;
+  courses: {
+    id: string;
+    course_code: string;
+    course_title: string;
+  };
+  academic_terms: {
+    id: string;
+    session: string;
+    semester: string;
+  };
+}
+
+export interface ResultsTableProps {
+  results: ResultEntry[];
+  batches: BatchInfo[];
+  offeringId: string;
+  selectedOffering: SelectedOffering | undefined;
+}

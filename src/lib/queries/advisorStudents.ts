@@ -9,15 +9,18 @@ export async function uploadPreregistrations(
   const supabase = createSupabaseClient();
 
   const { data: uploaded, error } = await Promise.race([
-    supabase.from("student_preregistrations").upsert(newStudentsList, {
-      onConflict: "reg_number",
-      ignoreDuplicates: true,
-    }),
+    supabase
+      .from("student_preregistrations")
+      .upsert(newStudentsList, {
+        onConflict: "reg_number",
+        ignoreDuplicates: true,
+      })
+      .select(),
     timeout(5000),
   ]);
   if (error) throw error;
 
-  return;
+  return uploaded;
 }
 
 export async function fetchAdvisorStudents(

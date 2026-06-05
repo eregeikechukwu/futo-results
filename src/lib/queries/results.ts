@@ -94,10 +94,21 @@ export async function fetchBatchForOffering(offeringId: string) {
     .from("result_batches")
     .select("id, status, source_type, created_at, published_at, uploaded_by")
     .eq("offering_id", offeringId)
-    .single();
+    .order("created_at", { ascending: true });
 
-  if (error && error.code !== "PGRST116") throw error; // PGRST116 = no rows
-  return data || null;
+  if (error) throw error;
+  return data || [];
+}
+
+export async function publishAllDraftBatches(offeringId: string) {
+  const supabase = createSupabaseClient();
+
+  const { data, error } = await supabase.rpc("publish_all_draft_batches", {
+    p_offering_id: offeringId,
+  });
+
+  if (error) throw error;
+  return Number(data) || 0;
 }
 
 /**
@@ -109,7 +120,7 @@ export async function updateResultEntry(
   entryId: string,
   payload: {
     test_score?: number;
-    lab_score?: number;
+    lab_score?: number | null;
     exam_score?: number;
   },
 ) {

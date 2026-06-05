@@ -54,7 +54,7 @@ export default function ResultsManagementPage() {
   console.log(selectedOfferingId, "   results in page component");
 
   const {
-    data: batchInfo,
+    data: batches,
     isLoading: batchLoading,
     error: batchError,
   } = useBatchForOffering(selectedOfferingId || "");
@@ -156,7 +156,7 @@ export default function ResultsManagementPage() {
           ) : results && results.length > 0 ? (
             <ResultsTable
               results={results}
-              batchInfo={batchInfo}
+              batches={batches ?? []}
               offeringId={selectedOfferingId}
               selectedOffering={selectedOffering}
             />

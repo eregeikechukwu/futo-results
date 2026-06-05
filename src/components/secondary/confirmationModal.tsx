@@ -99,13 +99,17 @@ function ConfirmModal({
 
   // if (!open) return null;
   const onConfirmFn = () => {
-    if (actionConfirmInput === actionConfirmValue) {
+    if (actionConfirmValue) {
+      if (actionConfirmInput === actionConfirmValue) {
       setActionConfirmInput("");
       onConfirm();
     } else
       toast.error(
         `${value === "result" || value === "student" ? "Reg Number" : "Course code"} doesnt match`,
       );
+    } else {
+      onConfirm();
+    }
   };
 
   return (

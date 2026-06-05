@@ -148,6 +148,115 @@
   }
 }
 
+.publishAllRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: toRem(12);
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.publishAllSummary {
+  margin-top: toRem(6);
+  font-size: toRem(13);
+  color: var(--color-text-passive);
+}
+
+.publishAllBtn {
+  padding: toRem(10) toRem(18);
+  font-weight: 700;
+  border-radius: toRem(8);
+  background: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--color-primary-hover);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.batchSection {
+  margin-top: toRem(20);
+  border: toRem(1) solid var(--color-border-light);
+  border-radius: toRem(12);
+  overflow: hidden;
+  background: var(--color-white);
+}
+
+.batchHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: toRem(16);
+  padding: toRem(16);
+  background: var(--color-background-mild);
+  flex-wrap: wrap;
+}
+
+.batchMeta {
+  display: flex;
+  flex-direction: column;
+  gap: toRem(8);
+  min-width: 0;
+}
+
+.batchTitle {
+  font-size: toRem(15);
+  font-weight: 700;
+  color: var(--color-text-dark);
+}
+
+.batchDetails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: toRem(10);
+  color: var(--color-text-passive);
+  font-size: toRem(13);
+}
+
+.batchDetailItem {
+  display: inline-flex;
+  align-items: center;
+  gap: toRem(6);
+}
+
+.batchActions {
+  display: flex;
+  gap: toRem(10);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.batchPagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: toRem(12);
+  padding: toRem(16);
+  background: var(--color-background-secondary);
+  border-top: toRem(1) solid var(--color-border-light);
+}
+
+.batchPaginationInfo {
+  color: var(--color-text-passive);
+  font-size: toRem(13);
+  font-weight: 600;
+}
+
+.batchPaginationButtons {
+  display: flex;
+  gap: toRem(8);
+  flex-wrap: wrap;
+}
+
 .lockMessage {
   display: flex;
   align-items: center;

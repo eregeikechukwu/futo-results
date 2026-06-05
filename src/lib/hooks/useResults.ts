@@ -6,6 +6,7 @@ import {
   updateResultEntry,
   deleteResultEntry,
   publishBatch,
+  publishAllDraftBatches,
 } from "../queries/results";
 import { gcTimeUni, staleTimeUni } from "./utils";
 import { errorToastHandler } from "@/helpers/errorHandler";
@@ -73,7 +74,7 @@ export function useUpdateResultEntry(offeringId: string) {
       entryId: string;
       payload: {
         test_score?: number;
-        lab_score?: number;
+        lab_score?: number | null;
         exam_score?: number;
       };
     }) => {
@@ -126,13 +127,38 @@ export function usePublishBatch(offeringId: string) {
       return publishBatch(batchId);
     },
     onSuccess: () => {
-      toast.success("Batch published successfully! Results are now locked.");
+      toast.success("Batch published successfully!");
       // Invalidate both queries to refresh UI
       queryClient.invalidateQueries({ queryKey: ["batches", offeringId] });
       queryClient.invalidateQueries({ queryKey: ["results", offeringId] });
     },
     onError: (error) => {
       errorToastHandler(error, "Failed to publish batch. Please try again.");
+    },
+  });
+}
+
+/**
+ * Mutation to publish all draft batches for an offering
+ * Uses the publish_all_draft_batches RPC and invalidates both batch and result queries
+ */
+export function usePublishAllDraftBatches(offeringId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      return publishAllDraftBatches(offeringId);
+    },
+    onSuccess: (count: number) => {
+      toast.success(`${count} batches published successfully.`);
+      queryClient.invalidateQueries({ queryKey: ["batches", offeringId] });
+      queryClient.invalidateQueries({ queryKey: ["results", offeringId] });
+    },
+    onError: (error) => {
+      errorToastHandler(
+        error,
+        "Failed to publish draft batches. Please try again.",
+      );
     },
   });
 }

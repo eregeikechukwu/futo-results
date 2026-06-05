@@ -6,90 +6,36 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   getSortedRowModel,
-  getPaginationRowModel,
+  flexRender,
   ColumnDef,
   SortingState,
 } from "@tanstack/react-table";
-import { Lock, Edit2, Trash2, Check, X } from "lucide-react";
+import { Edit2, Trash2, Check, X } from "lucide-react";
 import toast from "react-hot-toast";
 import {
   useUpdateResultEntry,
   useDeleteResultEntry,
   usePublishBatch,
+  usePublishAllDraftBatches,
 } from "@/lib/hooks/useResults";
 import styles from "./ResultsTable.module.scss";
 import ConfirmModal from "@/components/secondary/confirmationModal";
 import { CoverLoader } from "@/components/secondary/loaders/coverLoader";
-import { ConfirmInput } from "@/components/secondary/confirmInput";
+import ConfirmInput from "@/components/secondary/confirmInput";
+import { ResultsTableProps, ResultEntry } from "@/app/types/advisor";
 
-// Type for result entry with nested data
-interface ResultEntry {
-  id: string;
-  test_score: number;
-  lab_score: number;
-  exam_score: number;
-  total_score: number;
-  grade: string;
-  remark: string;
-  batch_id: string;
-  students: {
-    id: string;
-    reg_number: string;
-    profiles: {
-      id: string;
-      full_name: string;
-      email: string;
-    };
-  };
-  result_batches: {
-    id: string;
-    status: "draft" | "reviewed" | "published" | "archived";
-    source_type: string;
-    created_at: string;
-    published_at: string | null;
-    offering_id: string;
-  };
-}
-
-interface BatchInfo {
-  id: string;
-  status: "draft" | "reviewed" | "published" | "archived";
-  source_type: string;
-  created_at: string;
-  published_at: string | null;
-  uploaded_by: string;
-}
-
-interface SelectedOffering {
-  id: string;
-  courses: {
-    id: string;
-    course_code: string;
-    course_title: string;
-  };
-  academic_terms: {
-    id: string;
-    session: string;
-    semester: string;
-  };
-}
-
-interface ResultsTableProps {
-  results: ResultEntry[];
-  batchInfo: BatchInfo | null;
-  offeringId: string;
-  selectedOffering: SelectedOffering | undefined;
-}
+const BATCH_PAGE_SIZE = 20;
 
 export default function ResultsTable({
   results,
-  batchInfo,
+  batches,
   offeringId,
   selectedOffering,
 }: ResultsTableProps) {
   const [globalFilter, setGlobalFilter] = useState("");
   const [gradeFilter, setGradeFilter] = useState("");
   const [remarkFilter, setRemarkFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
   const [editValues, setEditValues] = useState<{
     test_score: string;
@@ -99,26 +45,18 @@ export default function ResultsTable({
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [deleteConfirmRegNo, setDeleteConfirmRegNo] = useState("");
   const [deleteConfirmInput, setDeleteConfirmInput] = useState("");
-  const [isMutating, setIsMutating] = useState(false);
+  const [showPublishAllModal, setShowPublishAllModal] = useState(false);
+  const [batchPages, setBatchPages] = useState<Record<string, number>>({});
   const [sorting, setSorting] = useState<SortingState>([
     { id: "regNumber", desc: false },
   ]);
 
-  // Mutations
+  // Mutation hooks for result entry updates, deletes, and batch publishing
   const updateMutation = useUpdateResultEntry(offeringId);
   const deleteMutation = useDeleteResultEntry(offeringId);
   const publishMutation = usePublishBatch(offeringId);
 
-  // Check if batch is editable (draft or reviewed)
-  const isEditable = (row) => {
-    if (!row) return false;
-    return (
-      row.result_batches?.status === "draft" ||
-      row?.result_batches?.status === "reviewed"
-    );
-  };
-
-  // Filter results client-side
+  // Apply client-side search and filters before grouping by batch
   const filteredResults = useMemo(() => {
     return results.filter((result) => {
       // Search filter: reg number or full name
@@ -131,6 +69,10 @@ export default function ResultsTable({
       // Grade filter
       const matchesGrade = !gradeFilter || result.grade === gradeFilter;
 
+      // status filter
+      const matchesStatus =
+        !statusFilter || result.result_batches.status === statusFilter;
+
       // Remark filter
       const matchesRemark = !remarkFilter || result.remark === remarkFilter;
 
@@ -138,7 +80,7 @@ export default function ResultsTable({
     });
   }, [results, globalFilter, gradeFilter, remarkFilter]);
 
-  // Table columns definition
+  // Columns define how result entry fields render and support inline editing
   const columns: ColumnDef<ResultEntry>[] = [
     {
       accessorKey: "rowNumber",
@@ -168,7 +110,7 @@ export default function ResultsTable({
       accessorKey: "testScore",
       header: "Test (30)",
       cell: ({ row }) => {
-        if (editingRowId === row.original.id && isEditable(row.original)) {
+        if (editingRowId === row.original.id) {
           return (
             <input
               type="number"
@@ -194,7 +136,7 @@ export default function ResultsTable({
       accessorKey: "labScore",
       header: "Lab (30)",
       cell: ({ row }) => {
-        if (editingRowId === row.original.id && isEditable(row.original)) {
+        if (editingRowId === row.original.id) {
           return (
             <input
               type="number"
@@ -212,7 +154,9 @@ export default function ResultsTable({
           );
         }
         return (
-          <span className={styles.scoreValue}>{row.original.lab_score}</span>
+          <span className={styles.scoreValue}>
+            {row.original.lab_score ?? "-"}
+          </span>
         );
       },
     },
@@ -220,7 +164,7 @@ export default function ResultsTable({
       accessorKey: "examScore",
       header: "Exam (70)",
       cell: ({ row }) => {
-        if (editingRowId === row.original.id && isEditable(row.original)) {
+        if (editingRowId === row.original.id) {
           return (
             <input
               type="number"
@@ -246,8 +190,7 @@ export default function ResultsTable({
       accessorKey: "total",
       header: "Total",
       cell: ({ row }) => {
-        // Calculate total if in edit mode, otherwise show stored value
-        if (editingRowId === row.original.id && isEditable(row.original)) {
+        if (editingRowId === row.original.id) {
           const test = parseFloat(editValues.test_score) || 0;
           const lab = parseFloat(editValues.lab_score) || 0;
           const exam = parseFloat(editValues.exam_score) || 0;
@@ -285,8 +228,7 @@ export default function ResultsTable({
       accessorKey: "actions",
       header: "Actions",
       cell: ({ row }) => {
-        if (editingRowId === row.original.id && isEditable(row.original)) {
-          // Show save/cancel buttons
+        if (editingRowId === row.original.id) {
           return (
             <div className={styles.actionButtons}>
               <button
@@ -314,16 +256,6 @@ export default function ResultsTable({
           );
         }
 
-        if (!isEditable(row.original)) {
-          // Show lock icon for published/archived
-          return (
-            <div className={styles.lockedCell}>
-              <Lock size={16} />
-            </div>
-          );
-        }
-
-        // Show edit/delete buttons
         return (
           <div className={styles.actionButtons}>
             <button
@@ -350,41 +282,86 @@ export default function ResultsTable({
     },
   ];
 
-  // Table instance
+  // Create the table instance for sorting and row model access
   const table = useReactTable({
     data: filteredResults,
     columns,
     state: { sorting },
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    initialState: {
-      pagination: {
-        pageSize: 10,
-      },
-    },
+    getSortedRowModel: getSortedRowModel(),
   });
 
-  // Handlers
+  const rowModel = table.getRowModel();
+
+  // Group filtered entries by their batch ID for sectioned batch rendering
+  const batchGroups = useMemo(() => {
+    const groups: Record<
+      string,
+      { batch: ResultEntry["result_batches"]; rows: typeof rowModel.rows }
+    > = {};
+
+    rowModel.rows.forEach((row) => {
+      const batchId = row.original.batch_id;
+      if (!groups[batchId]) {
+        groups[batchId] = {
+          batch: row.original.result_batches,
+          rows: [],
+        };
+      }
+      groups[batchId].rows.push(row);
+    });
+
+    return Object.values(groups).sort(
+      (a, b) =>
+        a.batch.created_at.localeCompare(b.batch.created_at) ||
+        a.batch.id.localeCompare(b.batch.id),
+    );
+  }, [rowModel.rows]);
+
+  // Determine how many draft batches can be published in bulk
+  const draftBatchCount = batches.filter(
+    (batch) => batch.status === "draft",
+  ).length;
+
+  const publishAllMutation = usePublishAllDraftBatches(offeringId);
+
+  const isAnyMutating =
+    updateMutation.isPending ||
+    deleteMutation.isPending ||
+    publishMutation.isPending ||
+    publishAllMutation.isPending;
+
+  const formatBatchDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+
+  const shortenBatchId = (batchId: string) => batchId.slice(0, 8);
+
+  // Begin editing a single result row and populate the edit buffer
   const handleEditStart = (row: ResultEntry) => {
     setEditingRowId(row.id);
     setEditValues({
       test_score: row.test_score.toString(),
-      lab_score: row.lab_score.toString(),
+      lab_score: row.lab_score !== null ? row.lab_score.toString() : "",
       exam_score: row.exam_score.toString(),
     });
   };
 
+  // Validate and save edited score values for a result entry
   const handleSave = async (row: ResultEntry) => {
-    setIsMutating(true);
     const test = parseFloat(editValues.test_score);
-    const lab = parseFloat(editValues.lab_score);
+    const lab =
+      editValues.lab_score.trim() === ""
+        ? null
+        : parseFloat(editValues.lab_score);
     const exam = parseFloat(editValues.exam_score);
 
-    // Validate scores
-    if (isNaN(test) || isNaN(lab) || isNaN(exam)) {
+    if (isNaN(test) || isNaN(exam) || (lab !== null && isNaN(lab))) {
       toast.error("Please enter valid numbers for all scores");
       return;
     }
@@ -394,7 +371,7 @@ export default function ResultsTable({
       return;
     }
 
-    if (lab < 0 || lab > 30) {
+    if (lab !== null && (lab < 0 || lab > 30)) {
       toast.error("Lab score must be between 0 and 30");
       return;
     }
@@ -404,7 +381,6 @@ export default function ResultsTable({
       return;
     }
 
-    // Call mutation with only the editable fields
     updateMutation.mutate(
       {
         entryId: row.id,
@@ -417,26 +393,20 @@ export default function ResultsTable({
       {
         onSuccess: () => {
           setEditingRowId(null);
-          setEditValues({
-            test_score: "",
-            lab_score: "",
-            exam_score: "",
-          });
-          setIsMutating(false);
+          setEditValues({ test_score: "", lab_score: "", exam_score: "" });
+          toast.success("Scores updated successfully");
         },
         onError: (error) => {
           toast.error(`Failed to update scores: ${error.message}`);
-          setIsMutating(false);
         },
       },
     );
   };
 
+  // Confirm and execute deletion of a single result entry
   const handleDelete = () => {
-    setIsMutating(true);
     if (deleteConfirmInput !== deleteConfirmRegNo) {
       toast.error("Reg number doesn't match. Try again.");
-      setIsMutating(false);
       return;
     }
 
@@ -446,28 +416,30 @@ export default function ResultsTable({
           setDeleteConfirmId(null);
           setDeleteConfirmRegNo("");
           setDeleteConfirmInput("");
-          setIsMutating(false);
+          toast.success("Entry deleted successfully");
         },
         onError: (error) => {
           toast.error(`Failed to delete entry: ${error.message}`);
-          setIsMutating(false);
         },
       });
     }
   };
 
-  const handlePublish = () => {
-    setIsMutating(true);
-    if (!batchInfo?.id) {
-      toast.error("Batch information not available");
-      setIsMutating(false);
-      return;
-    }
-
-    publishMutation.mutate(batchInfo.id);
+  // Publish a single batch by ID
+  const handlePublish = (batchId: string) => {
+    publishMutation.mutate(batchId);
   };
 
-  // Get batch status badge styling
+  // Publish all draft batches for the current offering
+  const handlePublishAll = () => {
+    publishAllMutation.mutate(undefined, {
+      onSuccess: () => {
+        setShowPublishAllModal(false);
+      },
+    });
+  };
+
+  // Map batch status values to CSS badge styles
   const getBatchStatusStyle = (status: string) => {
     switch (status) {
       case "draft":
@@ -485,39 +457,30 @@ export default function ResultsTable({
 
   return (
     <div className="relative">
-      {/* Batch Status and Filters Section */}
       <div className={styles.controlsSection}>
-        {/* Batch Status Info */}
-        <div className={styles.batchStatusInfo}>
-          <span className={styles.label}>Batch Status:</span>
-          <span
-            className={`${styles.statusBadge} ${getBatchStatusStyle(batchInfo?.status || "draft")}`}
+        <div className={styles.publishAllRow}>
+          <div>
+            <span className={styles.label}>Batch actions</span>
+            <p className={styles.publishAllSummary}>
+              {draftBatchCount > 0
+                ? `${draftBatchCount} draft batch${
+                    draftBatchCount > 1 ? "es" : ""
+                  } ready to publish.`
+                : "No draft batches available."}
+            </p>
+          </div>
+          <button
+            onClick={() => setShowPublishAllModal(true)}
+            disabled={draftBatchCount === 0 || publishAllMutation.isPending}
+            className={styles.publishAllBtn}
           >
-            {batchInfo?.status.toUpperCase() || "DRAFT"}
-          </span>
-
-          {/* Publish button - only show if reviewed status */}
-          {batchInfo?.status === "reviewed" && (
-            <button
-              onClick={handlePublish}
-              className={styles.publishBtn}
-              disabled={publishMutation.isPending}
-            >
-              {publishMutation.isPending ? "Publishing..." : "Publish Batch"}
-            </button>
-          )}
-
-          {/* Lock message for published */}
-          {!isEditable && (
-            <span className={styles.lockMessage}>
-              📌 Results Published - Editing Disabled
-            </span>
-          )}
+            {publishAllMutation.isPending
+              ? "Publishing..."
+              : "Publish All Drafts"}
+          </button>
         </div>
 
-        {/* Filters */}
         <div className={styles.filtersContainer}>
-          {/* Search */}
           <div className={styles.searchBox}>
             <input
               type="text"
@@ -528,7 +491,6 @@ export default function ResultsTable({
             />
           </div>
 
-          {/* Grade Filter */}
           <select
             value={gradeFilter}
             onChange={(e) => setGradeFilter(e.target.value)}
@@ -543,7 +505,16 @@ export default function ResultsTable({
             <option value="F">Grade F</option>
           </select>
 
-          {/* Remark Filter */}
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className={styles.filterSelect}
+          >
+            <option value="">All entries</option>
+            <option value="published">Published</option>
+            <option value="draft">Draft</option>
+          </select>
+
           <div className={styles.remarkToggle}>
             <button
               className={`${styles.toggleBtn} ${
@@ -569,71 +540,147 @@ export default function ResultsTable({
         </div>
       </div>
 
-      {/* Results Table */}
-      <div className={styles.tableContainer}>
-        <table className={styles.table}>
-          <thead className={styles.thead}>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th key={header.id} className={styles.th}>
-                    {header.isPlaceholder
-                      ? null
-                      : header.column.columnDef.header}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody className={styles.tbody}>
-            {table.getRowModel().rows.map((row) => (
-              <tr
-                key={row.id}
-                className={`${styles.tr} ${
-                  editingRowId === row.original.id ? styles.editingRow : ""
-                }`}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className={styles.td}>
-                    {cell.column.columnDef.cell
-                      ? cell.column.columnDef.cell(cell.getContext())
-                      : cell.getValue()}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {batchGroups.length > 0 ? (
+        batchGroups.map(({ batch, rows }) => {
+          const pageCount = Math.max(
+            1,
+            Math.ceil(rows.length / BATCH_PAGE_SIZE),
+          );
+          const currentPage = Math.min(
+            batchPages[batch.id] ?? 0,
+            pageCount - 1,
+          );
+          const pageRows = rows.slice(
+            currentPage * BATCH_PAGE_SIZE,
+            currentPage * BATCH_PAGE_SIZE + BATCH_PAGE_SIZE,
+          );
 
-      {/* Pagination */}
-      <div className={styles.pagination}>
-        <div className={styles.paginationInfo}>
-          Page {table.getState().pagination.pageIndex + 1} of{" "}
-          {table.getPageCount()} ({filteredResults.length} total)
+          return (
+            <section className={styles.batchSection} key={batch.id}>
+              <div className={styles.batchHeader}>
+                <div className={styles.batchMeta}>
+                  <div className={styles.batchTitle}>
+                    Batch {shortenBatchId(batch.id)}
+                  </div>
+                  <div className={styles.batchDetails}>
+                    <span className={styles.batchDetailItem}>
+                      Uploaded {formatBatchDate(batch.created_at)}
+                    </span>
+                    <span className={styles.batchDetailItem}>
+                      {rows.length} entr{rows.length === 1 ? "y" : "ies"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className={styles.batchActions}>
+                  {batch.status === "draft" ? (
+                    <button
+                      onClick={() => handlePublish(batch.id)}
+                      disabled={publishMutation.isPending}
+                      className={styles.publishBtn}
+                    >
+                      {publishMutation.isPending
+                        ? "Publishing..."
+                        : "Publish Batch"}
+                    </button>
+                  ) : (
+                    <span
+                      className={`${styles.statusBadge} ${getBatchStatusStyle(
+                        batch.status,
+                      )}`}
+                    >
+                      {batch.status.toUpperCase()}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className={styles.tableContainer}>
+                <table className={styles.table}>
+                  <thead className={styles.thead}>
+                    {table.getHeaderGroups().map((headerGroup) => (
+                      <tr key={headerGroup.id}>
+                        {headerGroup.headers.map((header) => (
+                          <th key={header.id} className={styles.th}>
+                            {header.isPlaceholder
+                              ? null
+                              : flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext(),
+                                )}
+                          </th>
+                        ))}
+                      </tr>
+                    ))}
+                  </thead>
+                  <tbody className={styles.tbody}>
+                    {pageRows.map((row, rowIndex) => (
+                      <tr
+                        key={row.id}
+                        className={`${styles.tr} ${
+                          editingRowId === row.original.id
+                            ? styles.editingRow
+                            : ""
+                        }`}
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <td key={cell.id} className={styles.td}>
+                            {cell.column.id === "rowNumber"
+                              ? currentPage * BATCH_PAGE_SIZE + rowIndex + 1
+                              : flexRender(
+                                  cell.column.columnDef.cell,
+                                  cell.getContext(),
+                                )}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className={styles.batchPagination}>
+                <div className={styles.batchPaginationInfo}>
+                  Page {currentPage + 1} of {pageCount}
+                </div>
+                <div className={styles.batchPaginationButtons}>
+                  <button
+                    onClick={() =>
+                      setBatchPages((prev) => ({
+                        ...prev,
+                        [batch.id]: Math.max(currentPage - 1, 0),
+                      }))
+                    }
+                    disabled={currentPage === 0}
+                    className={styles.paginationBtn}
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={() =>
+                      setBatchPages((prev) => ({
+                        ...prev,
+                        [batch.id]: Math.min(currentPage + 1, pageCount - 1),
+                      }))
+                    }
+                    disabled={currentPage >= pageCount - 1}
+                    className={styles.paginationBtn}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            </section>
+          );
+        })
+      ) : (
+        <div className={styles.emptyState}>
+          <p>No result entries match the current filters.</p>
         </div>
-        <div className={styles.paginationButtons}>
-          <button
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-            className={styles.paginationBtn}
-          >
-            Previous
-          </button>
-          <button
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-            className={styles.paginationBtn}
-          >
-            Next
-          </button>
-        </div>
-      </div>
+      )}
 
-      {/* LOader to cover the table during mutations */}
-      {isMutating && <CoverLoader />}
+      {isAnyMutating && <CoverLoader />}
 
-      {/* Delete Confirmation Modal */}
       {deleteConfirmId && (
         <ConfirmModal
           title="Delete Result Entry"
@@ -655,6 +702,20 @@ export default function ResultsTable({
             setDeleteConfirmInput={setDeleteConfirmInput}
           />
         </ConfirmModal>
+      )}
+
+      {showPublishAllModal && (
+        <ConfirmModal
+          title="Publish All Draft Batches"
+          message="publish all draft batches for this offering"
+          open={showPublishAllModal}
+          onCancel={() => setShowPublishAllModal(false)}
+          onConfirm={handlePublishAll}
+          confirmLabel="Publish"
+          cancelLabel="Cancel"
+          variant="warning"
+          isMutating={publishAllMutation.isPending}
+        />
       )}
     </div>
   );
