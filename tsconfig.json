@@ -35,5 +35,5 @@
     ".next/types/**/*.ts",
     "src/components/forms/resultEditTable.tsx"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "worker/**/*"]
 }

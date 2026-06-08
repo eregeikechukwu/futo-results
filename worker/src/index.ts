@@ -3,6 +3,7 @@ import { preprocessImage } from "./preprocess";
 import { callVisionApi } from "./vision";
 import { parseSpatialTable } from "./parser";
 import { claimNextJob } from "./db";
+import { OcrJob } from "./types";
 
 const MAX_ATTEMPTS = 3;
 const POLL_INTERVAL_MS = 2000;
@@ -12,7 +13,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!, // service role — never expose to browser
 );
 
-async function processJob(job) {
+async function processJob(job: OcrJob) {
   try {
     alert("We got here");
     // 1. DOwnload image from supabase storage
