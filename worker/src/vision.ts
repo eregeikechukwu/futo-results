@@ -12,6 +12,9 @@ function getClient() {
 }
 
 export async function callVisionApi(imageBuffer: Buffer) {
+  alert("Google vison called");
+  return;
+
   const [result] = await getClient().annotateImage({
     image: { content: imageBuffer.toString("base64") },
     features: [{ type: "DOCUMENT_TEXT_DETECTION" }, { type: "TEXT_DETECTION" }],
