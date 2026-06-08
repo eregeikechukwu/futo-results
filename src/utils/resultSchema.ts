@@ -1,6 +1,6 @@
 import z from "zod";
 
-const convertScoresToNumber = (data: any) => {
+const convertScoresToNumber = (data) => {
   if (data === "" || data === null || data === undefined) {
     return 0;
   }

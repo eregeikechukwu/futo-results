@@ -18,8 +18,9 @@ export function RecentlyUploadedResults({
 
       <div className="grid gap-12 grid-cols-1">
         <RecentResultReportBar
-          title="2023/2024 - Harmattan - CSC301"
-          items="45 students"
+          title="2023/2024 - Harmattan"
+          coursecode="CSC301"
+          // items="45 students"
           date="2024-01-17"
           img="/images/clear.jpg"
         />

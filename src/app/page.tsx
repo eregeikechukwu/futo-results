@@ -88,10 +88,12 @@ export default function Home() {
             </p>
             <div className={styles.heroActions}>
               <Link href="/student/auth">
-                <button className={styles.btnPrimary}>I'm a Student</button>
+                <button className={styles.btnPrimary}>
+                  I&apos;m a Student
+                </button>
               </Link>
               <Link href="/advisor/auth">
-                <button className={styles.btnGhost}>I'm an Advisor</button>
+                <button className={styles.btnGhost}>I&apos;m an Advisor</button>
               </Link>
             </div>
           </div>
@@ -221,8 +223,8 @@ export default function Home() {
       <section id="about" className={styles.aboutTeaser}>
         <div className={styles.aboutTeaserInner}>
           <blockquote className={styles.atQuote}>
-            "Built with <em className={styles.atItalic}>integrity</em> — so your
-            records are always exactly as your advisor verified them."
+            &quot;Built with <em className={styles.atItalic}>integrity</em> — so
+            your records are always exactly as your advisor verified them.&quot;
           </blockquote>
           <div className={styles.atRight}>
             <p className={styles.atBody}>
@@ -232,8 +234,8 @@ export default function Home() {
               academic records in the Department of Mechatronics Engineering.
             </p>
             <p className={styles.atBody}>
-              Security, transparency and simplicity aren't trade-offs here —
-              they're the foundation the platform is built on.
+              Security, transparency and simplicity aren&apos;t trade-offs here
+              — they&apos;re the foundation the platform is built on.
             </p>
             <button
               className={styles.btnOutline}
@@ -319,15 +321,15 @@ export default function Home() {
               <p className={styles.modalSectionLabel}>The solution</p>
               <p className={styles.modalP}>
                 The portal creates a secure, end-to-end verified pipeline:
-                students pre-register via a class rep's Google Form, advisors
-                upload and authenticate results, and students sign in to view
-                their own verified records — privately and instantly.
+                students pre-register via a class rep&apos;s Google Form,
+                advisors upload and authenticate results, and students sign in
+                to view their own verified records — privately and instantly.
               </p>
               <p className={styles.modalP}>
                 Built on Next.js and Supabase, with row-level security ensuring
                 each student only ever sees their own data. Email confirmation
                 and OTP-based advisor authentication add layers of identity
-                assurance that informal systems simply can't offer.
+                assurance that informal systems simply can&apos;t offer.
               </p>
 
               <hr className={styles.modalDivider} />

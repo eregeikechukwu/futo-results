@@ -32,6 +32,7 @@ export default function AdvisorAuth() {
               subHeading="Secure access for departmental staff"
             />
             <AdvisorLoginForm
+              role="advisor"
               setCredentials={setCredentials}
               onOtpSent={() => setScreen("otp")}
             />

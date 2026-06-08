@@ -57,7 +57,7 @@ export function EditCourse({
             required
             className="modal-input"
             onChange={(e) =>
-              setCourseState({ ...courseState, unit: Number(e.target.value) })
+              setCourseState({ ...courseState, unit: e.target.value })
             }
           >
             {units.map((unit) => (

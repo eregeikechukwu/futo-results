@@ -40,7 +40,7 @@ export async function fetchAdvisorCourseOfferings(
   if (error) throw error;
 
   // Transform to include derived fields for easier UI consumption
-  return (data || []).map((offering: any) => ({
+  return (data || []).map((offering) => ({
     id: offering.id,
     courseId: offering.course_id,
     termId: offering.term_id,
@@ -53,11 +53,10 @@ export async function fetchAdvisorCourseOfferings(
     // Batch statistics
     totalBatches: offering.result_batches?.length || 0,
     publishedBatches:
-      offering.result_batches?.filter((b: any) => b.status === "published")
-        .length || 0,
+      offering.result_batches?.filter((b) => b.status === "published").length ||
+      0,
     draftBatches:
-      offering.result_batches?.filter((b: any) => b.status === "draft")
-        .length || 0,
+      offering.result_batches?.filter((b) => b.status === "draft").length || 0,
     lastBatchAt: offering.result_batches?.[0]?.created_at || null,
   }));
 }
@@ -218,7 +217,7 @@ export async function deleteCourseOffering(
 
   // Check if there are any published batches (soft validation, not enforced by DB)
   const publishedBatches = offering.result_batches?.filter(
-    (b: any) => b.status === "published",
+    (b) => b.status === "published",
   );
   if (publishedBatches && publishedBatches.length > 0) {
     throw new Error(
@@ -305,13 +304,13 @@ export async function fetchCourseOfferingsStats(termId: string) {
 
   const offerings = data || [];
   const totalUnits = offerings.reduce(
-    (sum, o: any) => sum + (o.courses.unit || 0),
+    (sum, o) => sum + (o.courses.unit || 0),
     0,
   );
 
   // Count offerings by advisor
   const byAdvisor: Record<string, number> = {};
-  offerings.forEach((o: any) => {
+  offerings.forEach((o) => {
     byAdvisor[o.advisor_id] = (byAdvisor[o.advisor_id] || 0) + 1;
   });
 

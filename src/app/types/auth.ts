@@ -13,7 +13,7 @@ export type SignupFormData = z.infer<typeof signupSchema>;
 export type LoginFormData = z.infer<typeof loginSchema>;
 
 export interface AdvisorLoginFormProps {
-  role: "advisor" | "admin"; //This is a temporal login passgae for admin login, we can remove the role prop when we have a separate admin login form
+  role?: "advisor" | "admin"; //This is a temporal login passgae for admin login, we can remove the role prop when we have a separate admin login form
   onOtpSent: (email: string) => void;
   setCredentials: Dispatch<SetStateAction<LoginFormData | null>>;
 }

@@ -6,7 +6,7 @@ import { ReportCards } from "@/components/statsCards/reportsCards";
 import { AdvisorStatsCards } from "@/components/statsCards/statsCards";
 import { Heading2 } from "@/components/secondary/typography";
 import { Calendar, UserCheck2Icon } from "lucide-react";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   useAdvisorDashboardStats,
   useRecentBatches,
@@ -27,6 +27,7 @@ import {
 
 export default function AdvisorDashboard() {
   const { loading, profile, advisorData } = useAuth();
+  const [truncated, setTruncated] = useState(true);
 
   const {
     data: statsData,
@@ -174,7 +175,19 @@ export default function AdvisorDashboard() {
               <div className="mb-24">
                 <Heading2>Last Upload Summary</Heading2>
               </div>
-              <ReportCards reports={uploadSummary} />
+              {truncated ? (
+                <ReportCards reports={uploadSummary.slice(0, 3)} />
+              ) : (
+                <ReportCards reports={uploadSummary} />
+              )}
+              {uploadSummary.length > 3 && (
+                <p
+                  onClick={() => setTruncated(!truncated)}
+                  className="text-[var(--color-text-link)] cursor-pointer"
+                >
+                  see {truncated ? "more" : "less"}
+                </p>
+              )}
             </div>
           )}
         </div>

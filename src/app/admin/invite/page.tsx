@@ -1,6 +1,6 @@
 "use client";
 
-import { protectDashboardAccess } from "@/helpers/protectDashboardAccess";
+import { useProtectDashboardAccess } from "@/helpers/useProtectDashboardAccess";
 import { ScifiBackground } from "@/helpers/scifiBackground";
 import { fetchDepartments } from "@/lib/queries/departments";
 import { createSupabaseClient } from "@/lib/supabase/client";
@@ -141,7 +141,7 @@ const inputStyle: React.CSSProperties = {
 // MAIN PAGE COMPONENT
 // ─────────────────────────────────────────────────────────────────────────────
 
-export default  function InviteAdvisorPage() {
+export default function InviteAdvisorPage() {
   // ── Form state ──────────────────────────────────────────────────────────────
   const [form, setForm] = useState<AdvisorInviteData>({
     fullName: "",
@@ -163,7 +163,7 @@ export default  function InviteAdvisorPage() {
   const [submitted, setSubmitted] = useState(false);
 
   // Check if the user is an admin; if not, redirect to unauthorized page
-  protectDashboardAccess("admin");
+  useProtectDashboardAccess("admin");
 
   // Fetch departments from Supabase on mount
   useEffect(() => {
@@ -233,8 +233,8 @@ export default  function InviteAdvisorPage() {
         admissionYear: CURRENT_YEAR,
       });
       setSubmitted(false);
-    } catch (err: any) {
-      setToast({ msg: err.message, type: "error" });
+    } catch (err: unknown) {
+      if (err instanceof Error) setToast({ msg: err.message, type: "error" });
     } finally {
       setLoading(false);
     }

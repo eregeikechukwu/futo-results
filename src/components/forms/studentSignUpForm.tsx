@@ -42,7 +42,7 @@ export default function StudentSignupForm({
       toast.success(
         "Signup successful! Please check your email for verification link.",
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
       errorToastHandler(error, "Signup failed. Please try again.");
       setLoading(false);
     } finally {

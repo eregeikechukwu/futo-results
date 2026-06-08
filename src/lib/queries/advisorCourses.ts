@@ -3,7 +3,6 @@ import { createSupabaseClient } from "../supabase/client";
 import { UpdateCourseInput, AddCourseInput } from "@/app/types/advisor";
 
 // lib/queries/courses.ts
-
 export async function addCourseOffering(input: AddCourseInput) {
   const supabase = createSupabaseClient();
 

@@ -8,16 +8,20 @@ const supabase = createClient(
 
 export async function GET(
   _: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
+  const { id } = await params;
+
+  alert("We got to the data first");
   const { data, error } = await supabase
     .from("ocr_jobs")
     .select("id, status, parsed_result, error_message")
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (error || !data)
     return NextResponse.json({ error: "Job not found" }, { status: 404 });
+  alert("We got to the data");
 
   return NextResponse.json({
     status: data.status,

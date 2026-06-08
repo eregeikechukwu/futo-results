@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "type-check": "tsc --noemit --watch"
   },
   "dependencies": {
     "@aejkatappaja/phantom-ui": "^0.10.1",

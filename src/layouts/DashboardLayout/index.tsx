@@ -8,8 +8,8 @@ import { Check, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useModalTemplate } from "@/components/modals/overlay";
-import { CustomBtn } from "@/components/secondary/buttons";
 import ConfirmModal from "@/components/secondary/confirmationModal";
+import { iconMap } from "@/utils/iconMap";
 
 type dashboardLinksType = {
   name: string;
@@ -90,11 +90,9 @@ export function DashboardLayout({
                   }`}
                 >
                   {/* Dynamically render icon based on string name */}
-                  {/* @ts-ignore */}
-                  {React.createElement(
-                    require("../../utils/iconMap").iconMap[link.icon],
-                    { size: 17 } as RefAttributes<SVGSVGElement>,
-                  )}
+                  {React.createElement(iconMap[link.icon], {
+                    size: 17,
+                  } as RefAttributes<SVGSVGElement>)}
                   <span className="capitalize">{link.name}</span>
                 </a>
               </li>

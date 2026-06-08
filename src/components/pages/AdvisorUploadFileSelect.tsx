@@ -3,19 +3,21 @@
 import { useFileDragDrop } from "@/app/hooks/useFileDragDrop";
 import { excelUploadFormats } from "@/utils/systemUtils";
 import { BrainCircuit, FileSpreadsheet } from "lucide-react";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { InfoCard } from "../utilities";
 import { uploadImageForOCR } from "../../lib/api";
 import { Modal } from "../modals/overlay";
 import { ProgressBar } from "../ocrProgress";
 import { OcrJob } from "@/app/types/advisor";
 import { useExcelParser } from "../../lib/excelToJson";
-import { parse } from "path";
-import { ExcelParseResult, ParsedResult } from "@/app/types/resultsUpload";
+import { ParsedResult } from "@/app/types/resultsUpload";
 import toast from "react-hot-toast";
+import { useOcrUpload } from "@/lib/hooks/useOcrUpload";
+import { useAuth } from "@/contexts/AuthContext";
 
-export function AdvisorUploadFileSelect(
+export function useAdvisorUploadFileSelect(
   setParsedJson: React.Dispatch<React.SetStateAction<ParsedResult[]>>,
+  course: string,
 ) {
   const [mode, setMode] = useState<"excel" | "ocr">("excel");
   const [dragging, setDragging] = useState(false);
@@ -27,6 +29,24 @@ export function AdvisorUploadFileSelect(
     message: "Ready to upload",
   });
   const fileRef = useRef<File | null>(null);
+  // Advisor info hook
+  const { profile } = useAuth();
+
+  // OCR processing hook
+  const {
+    upload,
+    status: ocrStatus,
+    result: ocrResult,
+    error: ocrError,
+    loading: ocrLoading,
+  } = useOcrUpload(setProgress);
+
+  useEffect(() => {
+    if (ocrError) {
+      setError(true);
+      setErrorMessage(ocrError);
+    }
+  }, [ocrError]);
 
   //Excel Processing hook
   const { isLoading, error: excelError, parseFile } = useExcelParser();
@@ -48,7 +68,7 @@ export function AdvisorUploadFileSelect(
     setErrorMessage(null);
   };
 
-  const onFileSelected = useCallback(async (file: File) => {
+  const onFileSelected = async (file: File) => {
     toggleLoader();
     fileRef.current = file;
     setErrorMessage(null);
@@ -88,32 +108,33 @@ export function AdvisorUploadFileSelect(
         }, 1000);
       } else {
         // OCR action
-
-        const job = await uploadImageForOCR(file, (progressUpdate) => {
-          setProgress(progressUpdate);
-          // console.log("Progress update:", progressUpdate); // Debug log
-        });
-
-        if (job.status !== "done") {
-          console.error("Job did not complete:", job.status, job.error);
-          toast.error("OCR Job failed: " + job.error);
+        if (!file) {
+          toast.error("Please select a file");
           return;
         }
+        // if (ocrError) {
+        //   alert("OCR ERRPR");
+        //   setErrorMessage(ocrError);
+        //   throw new Error("OCR processing error" + ocrError);
+        // }
+        await upload(file, course, profile?.id || "");
 
-        console.log("OCR Job completed successfully:", job);
-
-        setTimeout(() => {
-          //Make sure not to change ths order
-          console.log(
-            "Final results bbbbbbbbbbbooooooooooooooooooobbbbbbbbbbbbbbb:",
-            errorMessage,
-          );
-          setModalState(false);
-          setParsedJson(
-            (job?.result?.parsedJson as ParsedResult[]) ||
-              (job?.result?.parsedJson as ParsedResult[]),
-          );
-        }, 1000);
+        if (ocrStatus === "done") {
+          console.log("OCR Job completed successfully:", ocrResult);
+          setTimeout(() => {
+            //Make sure not to change ths order
+            console.log(
+              "Final results bbbbbbbbbbbooooooooooooooooooobbbbbbbbbbbbbbb:",
+              errorMessage,
+            );
+            setModalState(false);
+            // setParsedJson(
+            //   (job?.result?.parsedJson as ParsedResult[]) ||
+            //     (job?.result?.parsedJson as ParsedResult[]),
+            // );
+            if (ocrResult) setParsedJson(ocrResult);
+          }, 1000);
+        }
       }
     } catch (error) {
       toast.error(
@@ -126,7 +147,9 @@ export function AdvisorUploadFileSelect(
       // toggleLoader();
       fileRef.current = null;
     }
-  }, []);
+  };
+  // [course, fileRef, parseFile, ocrError, ocrResult, ocrStatus, profile?.id],
+  // );
 
   const { handleDragLeave, handleDragOver, handleDrop, handleFileInput } =
     useFileDragDrop(setDragging, onFileSelected, setError, mode, fileRef);
@@ -176,7 +199,7 @@ export function AdvisorUploadFileSelect(
   const FileSelectComponent = useMemo(
     function FileSelectComponent() {
       return (
-        <>
+        <div className="animateFadeIn">
           <div className="dashboard-container">
             {/* switch between OCR and Excel upload */}
             <div className="flex p-4 rounded-small bg-[var(--color-background-mild)]">
@@ -305,7 +328,7 @@ export function AdvisorUploadFileSelect(
               />
             </Modal>
           )}
-        </>
+        </div>
       );
     },
 

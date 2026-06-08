@@ -3,7 +3,7 @@
 import Notification from "@/components/secondary/notification";
 import { DashboardLayout } from "@/layouts/DashboardLayout";
 import styles from "./studentLayout.module.scss";
-import { protectDashboardAccess } from "@/helpers/protectDashboardAccess";
+import { useProtectDashboardAccess } from "@/helpers/useProtectDashboardAccess";
 import {
   BigLoader,
   LoaderSpinner1,
@@ -36,7 +36,7 @@ export function StudentsDashboardShell({
   console.log("WHhats even the poin to f all these");
 
   // Protect the dashboard
-  protectDashboardAccess("student");
+  useProtectDashboardAccess("student");
   const { loading } = useAuth();
 
   // Show nothing or loader  before profile is been fetched to prevent hydration mismatch

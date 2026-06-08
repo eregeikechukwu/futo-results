@@ -6,7 +6,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AuthCTABtn, CustomBtn } from "../secondary/buttons";
 import { ArrowLeft, KeyRound, Mail } from "lucide-react";
-import { Error } from "../secondary/common";
+import { Error as ErrorComponent } from "../secondary/common";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { createSupabaseClient } from "@/lib/supabase/client";
@@ -116,8 +116,9 @@ export function AdvisorOtpForm({
       await handleCredentials({ ...credentials, role: role });
       toast.success("Check your email for new OTP");
       setSecondsLeft(60);
-    } catch (error: any) {
-      toast.error(error.message || "Failed to resend OTP, please try again");
+    } catch (error: unknown) {
+      if (error instanceof Error)
+        toast.error(error.message || "Failed to resend OTP, please try again");
     } finally {
       setIsResendLoading(false);
     }
@@ -212,7 +213,7 @@ export function AdvisorOtpForm({
             ))}
           </div>
           <input type="hidden" {...register("otp")} />
-          {errors.otp && <Error>{errors.otp.message}</Error>}
+          {errors.otp && <ErrorComponent>{errors.otp.message}</ErrorComponent>}
         </div>
       </div>
 

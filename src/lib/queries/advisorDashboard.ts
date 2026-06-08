@@ -275,7 +275,7 @@ export async function fetchRecentBatches(
   if (error) throw error;
 
   // Transform and enrich the data for easier UI consumption
-  return (data || []).map((batch: any) => ({
+  return (data || []).map((batch) => ({
     id: batch.id,
     status: batch.status,
     createdAt: batch.created_at,

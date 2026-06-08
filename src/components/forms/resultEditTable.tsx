@@ -285,24 +285,34 @@ export function ResultEditTable({
     const input = document.createElement("input");
     input.type = "file";
     input.accept = ".xlsx,.xls";
-    input.onchange = async (e: any) => {
-      const file = e.target.files[0];
+    input.onchange = async (e: Event) => {
+      const target = e.target as HTMLInputElement;
+      const file = target.files?.[0];
+      if (!file) return;
+
       const reader = new FileReader();
-      reader.onload = (event: any) => {
+      reader.onload = (event: ProgressEvent<FileReader>) => {
         try {
-          const workbook = XLSX.read(event.target.result, { type: "array" });
+          const result = (event.target as FileReader).result as ArrayBuffer;
+          const workbook = XLSX.read(result, { type: "array" });
           const sheet = workbook.Sheets[workbook.SheetNames[0]];
-          const data: any[] = XLSX.utils.sheet_to_json(sheet);
+          const data = XLSX.utils.sheet_to_json(sheet) as Record<
+            string,
+            unknown
+          >[];
+
+          const asString = (v: unknown) =>
+            v === null || v === undefined ? null : String(v);
 
           const importedData: ParsedResult[] = data.map((row) => ({
-            name: row.Name || null,
-            regNo: row.RegNo || null,
-            test: String(row.Test || 0),
-            lab: String(row.Lab || 0),
-            exam: String(row.Exam || 0),
-            total: String(row.Total || 0),
-            grade: row.Grade || null,
-            remark: row.Remark || null,
+            name: asString(row["Name"]),
+            regNo: asString(row["RegNo"]),
+            test: String(row["Test"] ?? 0),
+            lab: String(row["Lab"] ?? 0),
+            exam: String(row["Exam"] ?? 0),
+            total: String(row["Total"] ?? 0),
+            grade: asString(row["Grade"]),
+            remark: asString(row["Remark"]),
           }));
 
           setParsedJson(importedData);
@@ -640,9 +650,9 @@ export function TableRow({
               <input
                 value={value}
                 maxLength={field.maxLength}
-                onChange={(e) => { handleChange(index, field.name, e.target.value);
+                onChange={(e) => {
+                  handleChange(index, field.name, e.target.value);
                   setTempValue({ ...tempValue, [field.name]: e.target.value });
-                 
                 }}
                 readOnly={field.readonly}
                 key={`${field.name}-${field_index}`}

@@ -68,7 +68,7 @@ export function SetPasswordForm({
 
   useEffect(() => {
     validateForm();
-  }, [listen, password, confirmPassword]);
+  }, [listen, password, validateForm, confirmPassword]);
 
   const handleSubmit = useCallback(
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -116,7 +116,7 @@ export function SetPasswordForm({
         );
       }, 1500);
     },
-    [password, confirmPassword, errors],
+    [password, confirmPassword, role, errors],
   );
 
   return (

@@ -4,9 +4,8 @@ import { createSupabaseClient } from "@/lib/supabase/client";
 import {
   addCourseOffering,
   deleteCourseOffering,
-  updateCourseOffering,
 } from "../queries/advisorCourses";
-import { UpdateCourseInput, AddCourseInput } from "@/app/types/advisor";
+import { UpdateCourseInput } from "@/app/types/advisor";
 import { timeout } from "@/app/advisor/functions/students";
 
 // ── Fetch all offerings for an advisor in a specific term ──

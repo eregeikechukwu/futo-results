@@ -3,6 +3,7 @@
 import React, { RefAttributes } from "react";
 import styles from "./header.module.scss";
 import { LoaderSpinner3 } from "./loaders/loaders";
+import { iconMap } from "@/utils/iconMap";
 
 type HeaderProps = {
   heading: string;
@@ -11,7 +12,7 @@ type HeaderProps = {
   icon?: string;
   onClick?: () => void;
   buttonLoading?: boolean;
-  extraButton?: React.ReactNode;
+  extraComponent?: React.ReactNode;
 };
 
 export function Header({
@@ -21,7 +22,7 @@ export function Header({
   icon,
   onClick,
   buttonLoading,
-  extraButton,
+  extraComponent,
 }: HeaderProps) {
   return (
     <div className={styles.root}>
@@ -36,16 +37,16 @@ export function Header({
             disabled={buttonLoading}
             className={`button-primary ${styles.actionButton} ${buttonLoading && "opacity-30 pointer-events-none"}`}
           >
-            {React.createElement(require("../../utils/iconMap").iconMap[icon], {
+            {React.createElement(iconMap[icon], {
               size: 17,
-            } as RefAttributes<SVGElement>)}{" "}
+            })}{" "}
             {button}
-            {buttonLoading && <LoaderSpinner3 size={15}/>}
+            {buttonLoading && <LoaderSpinner3 size={15} />}
           </button>
         )}
 
         {/* Extra button */}
-        {extraButton}
+        {extraComponent}
       </div>
     </div>
   );

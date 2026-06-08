@@ -5,8 +5,8 @@ import { CheckCircle, Loader2, X } from "lucide-react";
 
 export function ProgressBar({
   mode,
-  file,
-  retry,
+  // file,
+  // retry,
   progress,
   errorMessage,
 }: {
@@ -14,24 +14,16 @@ export function ProgressBar({
   file: React.RefObject<File | null>;
   retry: (file: File) => Promise<void>;
   progress: Progress;
-  errorMessage: unknown | null;
+  errorMessage: string | unknown | null;
 }) {
-  const getPhaseColor = (phase: string) => {
+  const getPhaseColor = (percent: number) => {
     if (errorMessage) return "#fb2c36";
-    switch (phase) {
-      case "queued":
-        return "#9CA3AF"; //GRAY-400
-      case "preprocessing":
-        return "#EAB308"; //YELOOW-500
-      case "ocr":
-        return "#3B82FD"; //BLUE-500
-      case "parsing":
-        return "#A855F7"; //PURPLE-500
-      case "done":
-        return "#22C55E"; //GREEN-500
-      default:
-        return "#A855F7"; //PURPLE-500
-    }
+    if (percent < 11) return "#9CA3AF"; // GRAY-400
+    if (percent < 21) return "#EAB308"; // YELLOW-500
+    if (percent < 41) return "#3B82FD"; // BLUE-500
+    if (percent < 61) return "#A855F7"; // PURPLE-500
+    if (percent > 80) return "#22C55E"; // GREEN-500
+    return "#A855F7"; // PURPLE-500
   };
 
   console.log(errorMessage);
@@ -40,14 +32,14 @@ export function ProgressBar({
     <div className="min-h-[calc(100vh-var(--nav-height)] min-w-screen bg-transparent flex items-center justify-center p-16">
       <div className="relative w-full max-w-2xl space-y-4 p-24 bg-white rounded-lg shadow-md border border-gray-100">
         {/* Retry button */}
-        {!!errorMessage && (
+        {/* {!!errorMessage && (
           <button
             className="!absolute button-primary -top-20 left-0 "
             onClick={() => retry(file.current as File)}
           >
             Try Again
           </button>
-        )}
+        )} */}
 
         {/* Header with spinner and title */}
         <div className="flex gap-16 items-start">
@@ -56,7 +48,7 @@ export function ProgressBar({
               progress.percent !== 100 ? (
                 <Loader2
                   className="w-32 h-32 animate-spin"
-                  style={{ color: `${getPhaseColor(progress.phase)}` }}
+                  style={{ color: `${getPhaseColor(progress.percent)}` }}
                 />
               ) : (
                 <CheckCircle className="w-32 h-32 text-green-500" />
@@ -76,7 +68,7 @@ export function ProgressBar({
                 } mt-[4px]`}
               >
                 {errorMessage
-                  ? "Error processing image"
+                  ? (errorMessage as string)
                   : " AI is extracting data from your scan..."}
               </p>
             </div>
@@ -93,7 +85,7 @@ export function ProgressBar({
               className={`h-full transition-all duration-500 ease-out `}
               style={{
                 width: `${progress.percent}%`,
-                backgroundColor: `${getPhaseColor(progress.phase)}`,
+                backgroundColor: `${getPhaseColor(progress.percent)}`,
               }}
             />
           </div>

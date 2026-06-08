@@ -17,8 +17,6 @@ export default function Home() {
     },
   ];
 
-
-
   return (
     <main>
       {/* Header */}
@@ -52,14 +50,14 @@ export default function Home() {
                   <button
                     className={`button-primary text-white hover:bg-[var(--color-blue-light)] bg-[var(--color-primary)] heroActionButton w-full md:w-auto`}
                   >
-                    I'm a Student
+                    I&apos;m a Student
                   </button>
                 </Link>
                 <Link href="/advisor/auth">
                   <button
                     className={`button-primary bg-[#f3f4f6] hover:bg-[#e2e8ec] heroActionButton w-full md:w-auto`}
                   >
-                    I'm an Advisor
+                    I&apos;m an Advisor
                   </button>
                 </Link>
               </div>

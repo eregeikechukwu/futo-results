@@ -23,7 +23,7 @@ export default async function StudentDashboard() {
             {/* Welcome back, {student?.profiles[0]?.full_name} */}
           </h1>
           <h3 className={styles.heroSubtitle}>
-            Here's an overview of your academic performance.
+            Here&apos;s an overview of your academic performance.
           </h3>
         </div>
 

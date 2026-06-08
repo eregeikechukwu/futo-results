@@ -15,7 +15,7 @@ function ConfirmInput({
   return (
     <div className={`${styles.deleteConfirmContent} field`}>
       <p>
-        To confirm deletion of <strong>{deleteConfirmValue}</strong>'s{" "}
+        To confirm deletion of <strong>{deleteConfirmValue}</strong>&apos;s{" "}
         {value === "result"
           ? "result entry"
           : value === "student"
@@ -37,7 +37,7 @@ function ConfirmInput({
       {deleteConfirmInput && deleteConfirmInput !== deleteConfirmValue && (
         <p
           className={styles.errorText}
-        >{`${value === "result" ? "Reg number" : "Course code"} doesn't match`}</p>
+        >{`${value === "result" ? "Reg number" : "Course code"} doesn&apos;t match`}</p>
       )}
     </div>
   );

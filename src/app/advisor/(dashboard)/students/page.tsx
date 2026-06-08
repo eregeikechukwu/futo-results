@@ -139,7 +139,7 @@ export default function ManageStudents() {
         button="Import from Excel"
         buttonLoading={uploading}
         onClick={() => document.getElementById("studentsFileInput")?.click()}
-        extraButton={<TypeStudent />}
+        extraComponent={<TypeStudent />}
       />
       <input
         type="file"

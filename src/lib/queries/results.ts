@@ -195,6 +195,7 @@ export async function createResultBatch(
   ]);
 
   if (error) throw error;
+
   return resultBatch;
 }
 
@@ -220,10 +221,12 @@ export async function deleteBatch(batchId) {
   }
 
   // Safe to delete as no entries exist
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("result_batches")
     .delete()
     .eq("id", batchId);
 
   if (error) throw error;
+
+  return data;
 }

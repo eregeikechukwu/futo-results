@@ -5,7 +5,7 @@ import Notification from "@/components/secondary/notification";
 import { DesktopOnly } from "@/components/pages/desktopOnly";
 import { BigLoader } from "@/components/secondary/loaders/loaders";
 import { useDesktopOnly } from "@/app/hooks/useDesktopOnly";
-import { protectDashboardAccess } from "@/helpers/protectDashboardAccess";
+import { useProtectDashboardAccess } from "@/helpers/useProtectDashboardAccess";
 import { useAuth } from "@/contexts/AuthContext";
 
 const links = [
@@ -31,7 +31,7 @@ export default function AdvisorDashboardShell({
 }) {
   const isSmallScreen = useDesktopOnly();
 
-  protectDashboardAccess("advisor");
+  useProtectDashboardAccess("advisor");
 
   const { loading, profile, advisorData } = useAuth();
 

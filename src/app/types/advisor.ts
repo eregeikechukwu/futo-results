@@ -178,7 +178,7 @@ export interface BatchInfo {
   uploaded_by: string;
 }
 
-interface SelectedOffering {
+export interface SelectedOffering {
   id: string;
   courses: {
     id: string;

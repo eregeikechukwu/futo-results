@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 /**
  * parser.ts — Spatial-Aware OCR Table Parser
  * Worker-ready TypeScript port of the FUTO spatial parser engine.

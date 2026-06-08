@@ -12,8 +12,9 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!, // service role — never expose to browser
 );
 
-async function processJob(job: any) {
+async function processJob(job) {
   try {
+    alert("We got here");
     // 1. DOwnload image from supabase storage
     const { data, error } = await supabase.storage
       .from("ocr-images")
@@ -45,6 +46,7 @@ async function processJob(job: any) {
     console.log(
       `[worker] Job ${job.id} done — ${parsed.data.length} rows parsed`,
     );
+    /* eslint-disable @typescript-eslint/no-explicit-any */
   } catch (err: any) {
     console.error(`[worker] Job ${job.id} failed: ${err.message}`);
 

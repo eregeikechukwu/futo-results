@@ -1,12 +1,12 @@
 import { createServerClient } from "@supabase/ssr";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, EmailOtpType } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const token_hash = searchParams.get("token_hash");
-  const type = searchParams.get("type") as any;
+  const type = searchParams.get("type") as EmailOtpType;
 
   console.log("1. token_hash:", token_hash);
   console.log("2. type:", type);
@@ -69,10 +69,9 @@ export async function GET(request: NextRequest) {
 
       // for students set passowrd
       return NextResponse.redirect(
-        new URL('/student/set-password', request.url)
-      )
+        new URL("/student/set-password", request.url),
+      );
     }
-
 
     /// This is the email confirmation flow for students. They land here after clicking the link in their email for the first time. We need to create their student row and mark preregistration as claimed, then redirect to dashboard
     if (regNumber) {

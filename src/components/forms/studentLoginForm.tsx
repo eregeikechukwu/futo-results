@@ -41,7 +41,7 @@ export default function StudentLoginForm({
       setLoading(true);
       await handleStudentLogin(data, router, reset);
       toast.success("Login successful! ");
-    } catch (error: any) {
+    } catch (error: unknown) {
       errorToastHandler(error, "Something went wrong, please try again");
       setLoading(false);
     } finally {

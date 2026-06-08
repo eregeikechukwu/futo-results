@@ -2,6 +2,7 @@
 @use "../../../../app/styles/sass/abstracts/mixins.scss" as *;
 @use "../../../../app/styles/sass/utilities/reusables.scss" as *;
 @use "../../../../app/styles/sass/abstracts/variables.scss" as *;
+@use "sass:color";
 // ============================================================================
 // PAGE LEVEL STYLES
 // ============================================================================
@@ -529,7 +530,7 @@
   background: var(--color-red);
 
   &:hover {
-    background: darken($color-red, 10%);
+    background: color.scale($color-red, $lighten: -10%);
   }
 
   &:active {
@@ -541,7 +542,7 @@
   background: var(--color-green);
 
   &:hover {
-    background: darken($color-green, 10%);
+    background: color.scale($color-green, $lighten: -10%);
   }
 
   &:active {
@@ -553,7 +554,7 @@
   background: $color-text-passive;
 
   &:hover {
-    background: darken($color-text-passive, 10%);
+    background: color.scale($color-text-passive, $lighten: -10%);
   }
 
   &:active {

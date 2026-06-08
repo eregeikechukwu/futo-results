@@ -51,7 +51,7 @@ export default function AreaChart() {
         borderWidth: 3,
         pointRadius: 0,
         borderColor: "rgb(59,130,246)",
-        backgroundColor: (ctx: any) => {
+        backgroundColor: (ctx) => {
           const chart = ctx.chart;
           const { ctx: canvasCtx, chartArea } = chart;
           if (!chartArea) return null;

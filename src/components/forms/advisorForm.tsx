@@ -8,7 +8,7 @@ import { AuthCTABtn } from "../secondary/buttons";
 import { Eye, EyeClosed, KeyRound, Lock, LogIn, Mail } from "lucide-react";
 import { useState } from "react";
 import { advisorLoginSchema } from "@/utils/authSchemas";
-import { Error } from "../secondary/common";
+import { Error as ErrorComponent } from "../secondary/common";
 import { AdvisorLoginFormProps } from "@/app/types/auth";
 import { handleCredentials } from "@/lib/auth/advisorLogin";
 
@@ -41,8 +41,9 @@ export default function AdvisorLoginForm({
       await handleCredentials({ ...data, role }); // Pass role to the login handler to differentiate between advisor and admin login
       setCredentials(data);
       onOtpSent(data.email);
-    } catch (error: any) {
-      toast.error(error.message || "Login failed. Please try again later");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Login failed. Please try again later";
+      toast.error(errorMessage);
       setIsloading(false);
     } finally {
       setIsloading(false);
@@ -67,7 +68,7 @@ export default function AdvisorLoginForm({
               type="email"
             />
             {/* Error */}
-            {errors.email && <Error>{errors.email.message}</Error>}
+            {errors.email && <ErrorComponent>{errors.email.message}</ErrorComponent>}
           </div>
         </div>
         {/* password */}
@@ -93,7 +94,7 @@ export default function AdvisorLoginForm({
               )}
             </button>
             {/* Error */}
-            {errors.password && <Error>{errors.password.message}</Error>}
+            {errors.password && <ErrorComponent>{errors.password.message}</ErrorComponent>}
           </div>
         </div>
       </div>

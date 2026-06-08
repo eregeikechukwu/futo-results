@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 export default function ChatTest() {
   const [socket, setSocket] = useState<WebSocket | null>(null);
-  const connected = useRef<Boolean>(false);
+  const connected = useRef<boolean>(false);
   const [chat, setChat] = useState<{ from: string; message: string }[]>([]);
   const [message, setMessage] = useState("");
 

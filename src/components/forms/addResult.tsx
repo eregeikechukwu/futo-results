@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { AddResultSchema } from "@/utils/resultSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm, type Resolver } from "react-hook-form";

@@ -4,7 +4,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-export function protectDashboardAccess(role: "student" | "advisor" | "admin") {
+export function useProtectDashboardAccess(
+  role: "student" | "advisor" | "admin",
+) {
   const { profile, loading, isStudent, isAdvisor, isAdmin, authInitialized } =
     useAuth();
   const router = useRouter();

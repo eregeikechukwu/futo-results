@@ -26,7 +26,6 @@ import { errorToastHandler } from "@/helpers/errorHandler";
 import toast from "react-hot-toast";
 import ConfirmationModal from "../secondary/confirmationModal";
 import { CoverLoader } from "../secondary/loaders/coverLoader";
-import ConfirmInput from "../secondary/confirmInput";
 
 export function AdvisorCoursesTable({
   sessionFilters,
@@ -295,7 +294,7 @@ export function AdvisorCoursesTable({
 
       {/* Confirmation modal */}
       <ConfirmationModal
-      isMutating={isMutating}
+        isMutating={isMutating}
         message="Delete course offering?"
         open={!!courseToBeDeleted}
         variant="danger"
