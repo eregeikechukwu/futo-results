@@ -530,7 +530,7 @@
   background: var(--color-red);
 
   &:hover {
-    background: color.scale($color-red, $lighten: -10%);
+    background: color.scale($color-red, $lightness: -10%);
   }
 
   &:active {
@@ -542,7 +542,7 @@
   background: var(--color-green);
 
   &:hover {
-    background: color.scale($color-green, $lighten: -10%);
+    background: color.scale($color-green, $lightness: -10%);
   }
 
   &:active {
@@ -554,7 +554,7 @@
   background: $color-text-passive;
 
   &:hover {
-    background: color.scale($color-text-passive, $lighten: -10%);
+    background: color.scale($color-text-passive, $lightness: -10%);
   }
 
   &:active {
