@@ -19,7 +19,7 @@ export function useOcrUpload(
   const [result, setResult] = useState<ParsedResult[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Cleanup on unmount
   useEffect(() => {
