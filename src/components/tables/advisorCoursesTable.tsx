@@ -138,7 +138,7 @@ export function AdvisorCoursesTable({
       cell: ({ row }) => {
         const handleDelete = () => {
           setCourseToBeDeleted(row.original);
-          console.log("Deleting course offering:", row);
+          // console.log("Deleting course offering:", row);
         };
         const toggleModal = () => {
           idRef.current = row.original;
@@ -165,7 +165,7 @@ export function AdvisorCoursesTable({
     },
   ];
 
-  console.log(isMutating, "isMutsting");
+  // console.log(isMutating, "isMutsting");
 
   //Ceating table instance
   const table: Table<AdvisorCourse> = useReactTable<AdvisorCourse>({
@@ -223,7 +223,7 @@ export function AdvisorCoursesTable({
   // FUnction for updating course
   const updateCourseHandler = useCallback(async (data: CourseData) => {
     setIsMutating(true);
-    console.log(data, "course to be edited");
+    // console.log(data, "course to be edited");
 
     const mutationData = {
       offeringId: idRef.current.id,
@@ -268,7 +268,7 @@ export function AdvisorCoursesTable({
             setCourseToBeDeleted(null);
           },
         });
-        console.log("Deleting course offering with ID:", offeringId);
+        // console.log("Deleting course offering with ID:", offeringId);
         // Example: removeCourseOfferingMutation.mutate(offeringId);
       }
     },

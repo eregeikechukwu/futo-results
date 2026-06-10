@@ -41,7 +41,7 @@ export function AddResultForm({
   }, [test, lab, exam, total, methods]);
 
   const onSubmit = (data: AddResultFormData) => {
-    console.log(data, " form data");
+    // console.log(data, " form data");
 
     const parsed: ParsedResult = {
       // prefer schema field or fallback to possible form field names

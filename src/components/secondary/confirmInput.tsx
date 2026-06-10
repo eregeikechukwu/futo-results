@@ -1,5 +1,6 @@
 import React, { Dispatch } from "react";
 import styles from "./styles.module.scss";
+import { Error } from "./common";
 
 function ConfirmInput({
   value,
@@ -13,7 +14,7 @@ function ConfirmInput({
   setDeleteConfirmInput: Dispatch<React.SetStateAction<string>>;
 }) {
   return (
-    <div className={`${styles.deleteConfirmContent} field`}>
+    <div className={`${styles.deleteConfirmContent} field relative`}>
       <p>
         To confirm deletion of <strong>{deleteConfirmValue}</strong>&apos;s{" "}
         {value === "result"
@@ -35,9 +36,7 @@ function ConfirmInput({
         className={styles.confirmInput}
       />
       {deleteConfirmInput && deleteConfirmInput !== deleteConfirmValue && (
-        <p
-          className={styles.errorText}
-        >{`${value === "result" ? "Reg number" : "Course code"} doesn&apos;t match`}</p>
+        <Error>{`${value === "result" ? "Reg number" : "Course code"} doesn't match`}</Error>
       )}
     </div>
   );

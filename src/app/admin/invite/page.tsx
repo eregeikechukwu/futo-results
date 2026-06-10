@@ -171,7 +171,7 @@ export default function InviteAdvisorPage() {
       try {
         const data = await fetchDepartments();
         setDepartments(data as Department[]);
-        console.log("Fetched departments:", data);
+        // console.log("Fetched departments:", data);
       } catch (err) {
         setError(true);
         setToast({
@@ -205,7 +205,7 @@ export default function InviteAdvisorPage() {
     e.preventDefault();
     setLoading(true);
 
-    console.log("Submitting invite with data:", form);
+    // console.log("Submitting invite with data:", form);
 
     try {
       // ── MODIFY HERE: This hits your Next.js route handler at /api/invite-advisor ──

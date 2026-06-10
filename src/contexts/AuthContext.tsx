@@ -103,7 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .eq("id", userId)
       .single();
 
-    console.log("fetchProfile result:", data, error);
+    // console.log("fetchProfile result:", data, error);
 
     if (error || !data) {
       errorToastHandler(error);
@@ -134,14 +134,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const supabase = createSupabaseClient();
-    console.log("AuthProvider useEffect fired");
+    // console.log("AuthProvider useEffect fired");
 
     let subscription: { unsubscribe: () => void } | null = null;
 
     // getSession() initializes the client's cookie storage first
     // Once it resolves, the client is fully ready for onAuthStateChange
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("getSession resolved:", session?.user?.id ?? "no user");
+      // console.log("getSession resolved:", session?.user?.id ?? "no user");
 
       // Set initial user state from session
       if (session?.user) {
@@ -158,11 +158,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // NOW set up the listener — client is fully initialized at this point
       const { data, error } = supabase.auth.onAuthStateChange(
         async (event, session) => {
-          console.log(
-            "onAuthStateChange:",
-            event,
-            session?.user?.id ?? "no user",
-          );
+          // console.log(
+          //   "onAuthStateChange:",
+          //   event,
+          //   session?.user?.id ?? "no user",
+          // );
 
           if (event === "TOKEN_REFRESHED") {
             if (session?.user) setUser(session.user);
@@ -185,7 +185,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (session?.user) {
             setLoading(true);
             setUser(session.user);
-            console.log("It happeded here o");
             await fetchProfile(session.user.id);
           } else {
             setLoading(false);

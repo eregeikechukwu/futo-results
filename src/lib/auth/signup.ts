@@ -7,7 +7,7 @@ export async function handleSignUp(
   setMode: (mode: "login" | "sign-up") => void,
   reset: () => void,
 ) {
-  console.log("form data: ", data);
+  // console.log("form data: ", data);
 
   // Step 1: check preregistration before creating anything
   const { data: preregData, error: preregError } = await supabase

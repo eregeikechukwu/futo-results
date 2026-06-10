@@ -173,3 +173,5 @@ export default function CgpaCalculatorPage() {
     </DashboardContainer>
   );
 }
+
+// column academic_terms_3.academic_year does not exist

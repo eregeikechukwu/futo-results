@@ -1,11 +1,14 @@
 import { AlertTriangle } from "lucide-react";
+import { CustomBtn } from "../buttons";
 
 type SomethingWentWrongProps = {
   message?: string;
+  retry?: () => void;
 };
 
 export default function SomethingWentWrong({
   message = "Something went wrong. Please try again.",
+  retry,
 }: SomethingWentWrongProps) {
   return (
     <div className="flex min-h-[250px] w-full items-center justify-center p-[1.5rem]">
@@ -22,6 +25,15 @@ export default function SomethingWentWrong({
 
         {/* Message */}
         <p className="text-sm leading-6 text-gray-500">{message}</p>
+        {/* Retry button */}
+        {retry && (
+          <CustomBtn
+            onClick={retry}
+            className="border border-(--color-border-light)"
+          >
+            Retry
+          </CustomBtn>
+        )}
       </div>
     </div>
   );

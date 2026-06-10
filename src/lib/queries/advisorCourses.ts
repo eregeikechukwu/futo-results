@@ -119,7 +119,6 @@ export async function updateCourseOffering(
 ) {
   const supabase = createSupabaseClient();
 
-  console.log(1, "before");
   // For simplicity, this example only allows updating the unit and term of an offering.
   const { data: updatedOffering, error } = await Promise.race([
     supabase

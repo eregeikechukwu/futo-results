@@ -11,8 +11,6 @@ export function useProtectDashboardAccess(
     useAuth();
   const router = useRouter();
 
-  console.log(loading, profile, "From protected dahsboard");
-
   useEffect(() => {
     if (loading || !authInitialized) return; // Still loading, don't redirect yet
 

@@ -30,7 +30,6 @@ export async function fetchAdvisorStudents(
 ) {
   const supabase = createSupabaseClient();
 
-  console.log(departmentId);
 
   // Fetch advsr students data,  from the students data
   const { data: studentsFromData, error: errorFromStudents } =

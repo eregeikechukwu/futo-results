@@ -5,7 +5,7 @@ import {
   addCourseOffering,
   deleteCourseOffering,
 } from "../queries/advisorCourses";
-import { UpdateCourseInput } from "@/app/types/advisor";
+import { AdvisorCourseDB, UpdateCourseInput } from "@/app/types/advisor";
 import { timeout } from "@/app/advisor/functions/students";
 
 // ── Fetch all offerings for an advisor in a specific term ──
@@ -30,7 +30,7 @@ export function useAdvisorOfferings(advisorId: string) {
       // .eq("term_id", termId)
 
       if (error) throw error;
-      return data;
+      return data as AdvisorCourseDB[];
     },
     enabled: !!advisorId,
   });
@@ -96,7 +96,7 @@ export function useUpdateCourseOffering() {
       // const result = await Promise.race([query, timeout(500)]);
 
       if (error) throw error;
-      console.log("No error was called");
+      // console.log("No error was called");
 
       // return updatedOffering;
     },

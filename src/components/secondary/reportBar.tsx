@@ -67,7 +67,7 @@ export function RecentResultReportBar({
   color?: "green" | "red" | "brown";
   coursecode: string;
   date: string;
-  img: string;
+  img?: string;
   onClick?: () => void;
 }) {
   const colors = colorMap[color || "green"];
@@ -92,46 +92,39 @@ export function RecentResultReportBar({
             </div>
           </div>
 
-          <div className={`${div2Styles} flex items-center gap-18`}>
-            <button
-              onClick={onClick}
-              className="relative group h-30 w- 30 center-child hover:bg-[var(--color-background-secondary)] rounded-full transition-colors cursor-pointer"
-            >
-              <Edit
-                className="group-active:text-black/60 transition"
-                size={16}
-              />
-              <div className="absolute bottom-full right-full p-20 opacity-50 text-nowrap bg-black/0 group-hover:bg-black/70 text-white duration-[300ms]">
-                Edit Result
-              </div>
-            </button>
-            <div
-              className="h-50 group relative w-50 rounded-[5px] overflow-hidden hover:bg-blend-darken cursor-pointer after:"
-              onClick={toggleModal}
-            >
-              <Image
-                alt="result sheet"
-                height={50}
-                width={50}
-                className="object-contain w-auto h-auto"
-                src={img}
-              />
+          {/* IMage */}
+          {img && (
+            <div className={`${div2Styles} flex items-center gap-18`}>
+              <div
+                className="h-50 group relative w-50 rounded-[5px] overflow-hidden hover:bg-blend-darken cursor-pointer after:"
+                onClick={toggleModal}
+              >
+                <Image
+                  alt="result sheet"
+                  height={50}
+                  width={50}
+                  className="object-contain w-auto h-auto"
+                  src={img}
+                />
 
-              {/* hover overlay */}
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50  transition-opacity duration-300 center-child">
-                <span className="text-white -translate-x-10 group-hover:translate-0 transition ease-out">
-                  View
-                </span>
+                {/* hover overlay */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50  transition-opacity duration-300 center-child">
+                  <span className="text-white -translate-x-10 group-hover:translate-0 transition ease-out">
+                    View
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
       {/* IMage viewer modal */}
-      <ModalTemplate title={title}>
-        <ImageModal imageUrl={img} onClose={toggleModal} />
-      </ModalTemplate>
+      {img && (
+        <ModalTemplate title={title}>
+          <ImageModal imageUrl={img} onClose={toggleModal} />
+        </ModalTemplate>
+      )}
     </>
   );
 }

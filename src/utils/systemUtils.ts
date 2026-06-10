@@ -27,13 +27,13 @@ export const gradePointMap: Record<GradeLetter, number> = {
 export const gradeToneMap: Record<GradeLetter, GradeTone> = {
   A: {
     bg: "var(--color-green-background)",
-    text: "var(--color-text-green-dark)",
+    text: "var(--color-text-green)",
   },
   B: { bg: "var(--color-blue-background)", text: "var(--color-text-blue)" },
-  C: { bg: "var(--color-brown-background)", text: "var(--color-text-brown)" },
-  D: { bg: "var(--color-purple-background)", text: "var(--color-white)" },
-  E: { bg: "var(--color-red-background)", text: "var(--color-text-red)" },
-  F: { bg: "var(--color-red)", text: "var(--color-white)" },
+  C: { bg: "var(--color-yellow-background)", text: "var(--color-yellow)" },
+  D: { bg: "var(--color-orange-background)", text: "var(--color-orange)" },
+  E: { bg: "var(--color-brown-background)", text: "var(--color-brown)" },
+  F: { bg: "var(--color-red-background)", text: "var(--color-red)" },
 };
 
 const gradeLetters = ["A", "B", "C", "D", "E", "F"] as const;
@@ -170,5 +170,5 @@ export const editCourseFields = [
   },
 ];
 
-// Universal password length
+// Universal minimum password length
 export const passwordLength = 6;

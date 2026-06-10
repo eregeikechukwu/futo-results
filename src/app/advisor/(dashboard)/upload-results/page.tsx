@@ -11,15 +11,15 @@ import { SelectCourse } from "@/components/secondary/helpers";
 import { RecentlyUploadedResults } from "@/components/secondary/RecentlyUploadedResults";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdvisorOfferings } from "@/lib/hooks/useAdvisorCourses";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 export default function UploadResult() {
   const [parsedJson, setParsedJson] = useState<ParsedResult[]>([]);
-  const [course, setCourse] = useState<string>("");
+  const [course, setCourse] = useState<SelectedOffering | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const { FileSelectComponent, mode } = useAdvisorUploadFileSelect(
     setParsedJson,
-    course,
+    course?.id || "",
   );
   const { advisorData } = useAuth();
 
@@ -28,19 +28,25 @@ export default function UploadResult() {
     data: courseOfferings,
     error: advisorOfferingsError,
     isPending,
+    refetch,
   } = useAdvisorOfferings(advisorData?.id || "");
 
   useEffect(() => {
     if (!parsedJson?.length) return;
     setIsEditing(true);
-    console.log(parsedJson);
+    // console.log(parsedJson);
     // alert("parsed Json is landed");
   }, [parsedJson]);
 
   //Warn user before leaving before editing is complete
   useWarnBeforeUnload(isEditing);
 
-  console.log(course, "results age course offerfings");
+  const closeEditting = useCallback(() => {
+    setIsEditing(false);
+    setParsedJson([]);
+  }, [isEditing]);
+
+  // console.log(course, "results age course offerfings");
 
   return (
     <DashboardContainer>
@@ -53,6 +59,8 @@ export default function UploadResult() {
             setCourse={setCourse}
             courseOfferings={courseOfferings as SelectedOffering[]}
             isPending={isPending}
+            refetch={refetch}
+            isDisabled={isEditing}
             advisorOfferingsError={advisorOfferingsError as Error}
           />
         }
@@ -62,11 +70,13 @@ export default function UploadResult() {
       {!isEditing && course && FileSelectComponent}
 
       {/* Table edit component */}
-      {isEditing && (
+      {isEditing && course && (
         <ResultEditTable
+          courseOfferingId={course?.id}
+          courseCode={course.courses.course_code}
           mode={mode}
           parsedJson={parsedJson}
-          setIsEditting={setIsEditing}
+          closeEditting={closeEditting}
           setParsedJson={setParsedJson}
         />
       )}

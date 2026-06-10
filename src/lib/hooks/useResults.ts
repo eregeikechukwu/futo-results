@@ -7,7 +7,8 @@ import {
   deleteResultEntry,
   publishBatch,
   publishAllDraftBatches,
-} from "../queries/results";
+} from "../queries/advisorResultsDownload";
+import { fetchStudentResults } from "../queries/results";
 import { gcTimeUni, staleTimeUni } from "./utils";
 import { errorToastHandler } from "@/helpers/errorHandler";
 import toast from "react-hot-toast";
@@ -38,6 +39,17 @@ export function useResultsForOffering(offeringId: string) {
     queryFn: () => fetchResultsForOffering(offeringId),
     enabled: !!offeringId,
     staleTime: staleTimeUni,
+    gcTime: gcTimeUni,
+    refetchOnWindowFocus: false,
+  });
+}
+
+export function useStudentResults(studentId: string) {
+  return useQuery({
+    queryKey: ["student-results", studentId],
+    queryFn: () => fetchStudentResults(studentId),
+    enabled: !!studentId,
+    staleTime: 5 * 60 * 1000,
     gcTime: gcTimeUni,
     refetchOnWindowFocus: false,
   });
@@ -81,7 +93,6 @@ export function useUpdateResultEntry(offeringId: string) {
       return updateResultEntry(entryId, payload);
     },
     onSuccess: () => {
-      toast.success("Score updated successfully!");
       // Invalidate results so table refetches with new data
       queryClient.invalidateQueries({ queryKey: ["results", offeringId] });
     },

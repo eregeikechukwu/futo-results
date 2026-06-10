@@ -101,3 +101,10 @@ export type ParsedResult = {
   grade: string | null;
   remark: string | null;
 };
+
+export interface UploadResult {
+    reg_number: string;
+    test_score?: number;
+    exam_score?: number;
+    lab_score?: number;
+  }

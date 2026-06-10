@@ -1,6 +1,6 @@
 "use client";
 
-import React, { RefAttributes } from "react";
+import React from "react";
 import styles from "./header.module.scss";
 import { LoaderSpinner3 } from "./loaders/loaders";
 import { iconMap } from "@/utils/iconMap";

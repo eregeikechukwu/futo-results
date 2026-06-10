@@ -3,12 +3,28 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { CustomBtn } from "../secondary/buttons";
 import { InfoCard } from "../utilities";
-import { computeGrade, editCourseFields } from "@/utils/systemUtils";
+import {
+  computeGrade,
+  editCourseFields,
+  gradeToneMap,
+} from "@/utils/systemUtils";
 import { useModalTemplate } from "../modals/overlay";
 import { AddResultForm } from "./addResult";
-import { ParsedResult } from "@/app/types/resultsUpload";
-import * as XLSX from "xlsx";
+import { ParsedResult, UploadResult } from "@/app/types/resultsUpload";
 import { RotateCcw, Download, Upload, Eye, EyeOff } from "lucide-react";
+import {
+  handleDownloadTemplate,
+  handleExportToExcel,
+  handleImportFromExcel,
+  handleResultTableChange,
+  resultStats,
+  validateJsonData,
+} from "@/helpers/resultEdit";
+import toast from "react-hot-toast";
+import { useUploadExcelResults } from "@/lib/hooks/useUploadResult";
+import { useAuth } from "@/contexts/AuthContext";
+import { errorToastHandler } from "@/helpers/errorHandler";
+import { CoverLoader } from "../secondary/loaders/coverLoader";
 
 const tableHeaders = [
   "Name",
@@ -22,22 +38,28 @@ const tableHeaders = [
 ];
 
 export function ResultEditTable({
+  courseCode,
+  courseOfferingId,
   setParsedJson,
   parsedJson,
-  setIsEditting,
+  closeEditting,
   mode,
 }: {
+  courseCode: string;
+  courseOfferingId: string;
   setParsedJson: React.Dispatch<React.SetStateAction<ParsedResult[]>>;
   parsedJson: ParsedResult[];
-  setIsEditting: React.Dispatch<React.SetStateAction<boolean>>;
+  closeEditting: () => void;
   mode: string;
 }) {
   // errors -> row index -> field name -> error message
   const [errors, setErrors] = useState<Record<number, Record<string, string>>>(
     {},
   );
-  const [courseCode, setCourseCode] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Get advisor data
+  const { profile: advisorProfile } = useAuth();
 
   // Undo/Redo Stack
   const [history, setHistory] = useState<ParsedResult[][]>([parsedJson]);
@@ -56,6 +78,12 @@ export function ResultEditTable({
       Remark: false,
     },
   );
+  // SUbmit/upload handler
+  const {
+    mutate: uploadResultMutate,
+    isPending,
+    error,
+  } = useUploadExcelResults();
 
   // Filter parsed data based on search query
   const filteredData = parsedJson.filter((row) => {
@@ -65,53 +93,6 @@ export function ResultEditTable({
       String(row.regNo).includes(query)
     );
   });
-
-  // Calculate stats
-  const stats = useCallback(() => {
-    if (parsedJson.length === 0)
-      return {
-        avgScore: 0,
-        passRate: 0,
-        gradeDistribution: {} as Record<string, number>,
-        totalStudents: 0,
-        passCount: 0,
-        failCount: 0,
-      };
-
-    let totalScore = 0;
-    let passCount = 0;
-    const gradeDistribution: Record<string, number> = {
-      A: 0,
-      B: 0,
-      C: 0,
-      D: 0,
-      E: 0,
-      F: 0,
-    };
-
-    parsedJson.forEach((row) => {
-      const test = parseInt(row.test || "0");
-      const lab = parseInt(row.lab || "0");
-      const exam = parseInt(row.exam || "0");
-      const total = test + lab + exam;
-      const grade = computeGrade(total);
-
-      totalScore += total;
-      if (grade !== "F") passCount++;
-      gradeDistribution[grade]++;
-    });
-
-    return {
-      avgScore: (totalScore / parsedJson.length).toFixed(2),
-      passRate: ((passCount / parsedJson.length) * 100).toFixed(1),
-      gradeDistribution,
-      totalStudents: parsedJson.length,
-      passCount,
-      failCount: parsedJson.length - passCount,
-    };
-  }, [parsedJson]);
-
-  const statsData = stats();
 
   //Type course modal handler
   const { ModalTemplate, toggleModal } = useModalTemplate();
@@ -125,6 +106,9 @@ export function ResultEditTable({
       setHistoryIndex(newHistory.length - 1);
     }
   }, [parsedJson, history, historyIndex]);
+
+  // Calculate stats
+  const statsData = resultStats(parsedJson);
 
   const handleUndo = useCallback(() => {
     if (historyIndex > 0) {
@@ -142,76 +126,63 @@ export function ResultEditTable({
     }
   }, [historyIndex, history, setParsedJson]);
 
-  const handleChange = useCallback(
-    (index: number, field: string, value: string) => {
-      setParsedJson((prev) => {
-        const updatedResults = [...prev];
-        updatedResults[index] = { ...updatedResults[index], [field]: value };
-        return updatedResults;
-      });
-
-      // Clear error for this specific field when editing
-      setErrors((prev) => {
-        const rowErrors = prev[index] ? { ...prev[index] } : {};
-        if (rowErrors[field]) {
-          delete rowErrors[field];
-        }
-        const newErrors = { ...prev };
-        if (Object.keys(rowErrors).length > 0) newErrors[index] = rowErrors;
-        else delete newErrors[index];
-        return newErrors;
-      });
-    },
-    [setParsedJson],
-  );
-
-  const validateData = useCallback(() => {
-    const newErrors: Record<number, Record<string, string>> = {};
-
-    parsedJson.forEach((row, index) => {
-      const rowErrors: Record<string, string> = {};
-
-      if (!row.regNo || !String(row.regNo).trim())
-        rowErrors["regNo"] = "RegNo is required";
-      else if (row.regNo.toString().length !== 11)
-        rowErrors["regNo"] = "RegNo must be 11 digits";
-
-      const test = parseInt(row.test || "0");
-      const lab = parseInt(row.lab || "0");
-      const exam = parseInt(row.exam || "0");
-
-      if (isNaN(test)) rowErrors["test"] = "Test must be a number";
-      else if (test < 0 || test > 50) rowErrors["test"] = "Test must be 0-50";
-
-      if (isNaN(lab)) rowErrors["lab"] = "Lab must be a number";
-      else if (lab < 0 || lab > 100) rowErrors["lab"] = "Lab must be 0-100";
-
-      if (isNaN(exam)) rowErrors["exam"] = "Exam must be a number";
-      else if (exam < 0 || exam > 100) rowErrors["exam"] = "Exam must be 0-100";
-
-      if (Object.keys(rowErrors).length > 0) newErrors[index] = rowErrors;
-    });
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  }, [parsedJson]);
+  // const validateData = validateJsonData(parsedJson, setErrors);
 
   //Main submission function
   const handleSubmit = useCallback(() => {
-    if (!validateData()) {
-      alert("Please fix validation errors before submitting");
+    if (!validateJsonData(parsedJson, setErrors)) {
+      toast.error("Please fix validation errors before submitting");
       return;
     }
     if (!courseCode.trim()) {
-      alert("Please enter a course code");
+      toast.error("Please enter a course code");
+      return;
+    }
+    if (parsedJson.length === 0) {
+      toast.error("No results to submit");
       return;
     }
 
     //  submission logic here
-    alert(
+    const formattedResults: UploadResult[] = parsedJson.map((entry) => ({
+      reg_number: `${entry.regNo}`,
+      test_score: Number(entry.test),
+      exam_score: Number(entry.exam),
+      lab_score: Number(entry.lab),
+    }));
+
+    uploadResultMutate(
+      {
+        courseOfferingId: courseOfferingId,
+        parsedRows: formattedResults,
+        advisorProfileId: advisorProfile?.id || "",
+      },
+      {
+        onSuccess: (result) => {
+          //   Build inofrmative success message
+          const msg =
+            result.unmatched.length > 0
+              ? `${result.inserted} entries uploaded, ${result.unmatched.length} reg numbers not found: ${result.unmatched.join(",")}`
+              : `${result.inserted} entries uploaded successfully.`;
+
+          toast.success(msg, {
+            duration: 50000,
+          });
+          closeEditting();
+        },
+        onError: (error) => {
+          errorToastHandler(
+            error,
+            "Failed to upload results. Please try again.",
+          );
+        },
+      },
+    );
+
+    /*toast.success(
       `Successfully saved ${parsedJson.length} results for course ${courseCode}`,
     );
-    setIsEditting(false);
+    closeEditting();
 
     //Save in local storage
     const alreadySavedResults = localStorage.getItem(`results-${courseCode}`);
@@ -224,8 +195,8 @@ export function ResultEditTable({
         `results-${courseCode}`,
         JSON.stringify(updatedResults),
       );
-    }
-  }, [courseCode, parsedJson, validateData]);
+    } */
+  }, [courseCode, parsedJson, setErrors]);
 
   const handleDeleteRow = useCallback(
     (indexToDelete: number) => {
@@ -239,93 +210,6 @@ export function ResultEditTable({
     },
     [parsedJson, filteredData, setParsedJson],
   );
-
-  const handleExportToExcel = useCallback(() => {
-    const ws = XLSX.utils.json_to_sheet(
-      parsedJson.map((row) => ({
-        Name: row.name,
-        RegNo: row.regNo,
-        Test: row.test,
-        Lab: row.lab,
-        Exam: row.exam,
-        Total:
-          parseInt(row.test || "0") +
-          parseInt(row.lab || "0") +
-          parseInt(row.exam || "0"),
-        Grade: computeGrade(
-          parseInt(row.test || "0") +
-            parseInt(row.lab || "0") +
-            parseInt(row.exam || "0"),
-        ),
-        Remark: row.remark,
-      })),
-    );
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Results");
-    XLSX.writeFile(wb, `results-${courseCode || "export"}.xlsx`);
-  }, [parsedJson, courseCode]);
-
-  const handleDownloadTemplate = useCallback(() => {
-    const templateData = [
-      {
-        Name: "John Doe",
-        RegNo: "20231245883",
-        Test: 15,
-        Lab: 18,
-        Exam: 45,
-      },
-    ];
-    const ws = XLSX.utils.json_to_sheet(templateData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Template");
-    XLSX.writeFile(wb, "results-template.xlsx");
-  }, []);
-
-  const handleImportFromExcel = useCallback(() => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".xlsx,.xls";
-    input.onchange = async (e: Event) => {
-      const target = e.target as HTMLInputElement;
-      const file = target.files?.[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (event: ProgressEvent<FileReader>) => {
-        try {
-          const result = (event.target as FileReader).result as ArrayBuffer;
-          const workbook = XLSX.read(result, { type: "array" });
-          const sheet = workbook.Sheets[workbook.SheetNames[0]];
-          const data = XLSX.utils.sheet_to_json(sheet) as Record<
-            string,
-            unknown
-          >[];
-
-          const asString = (v: unknown) =>
-            v === null || v === undefined ? null : String(v);
-
-          const importedData: ParsedResult[] = data.map((row) => ({
-            name: asString(row["Name"]),
-            regNo: asString(row["RegNo"]),
-            test: String(row["Test"] ?? 0),
-            lab: String(row["Lab"] ?? 0),
-            exam: String(row["Exam"] ?? 0),
-            total: String(row["Total"] ?? 0),
-            grade: asString(row["Grade"]),
-            remark: asString(row["Remark"]),
-          }));
-
-          setParsedJson(importedData);
-          alert(`Successfully imported ${importedData.length} records`);
-        } catch (error) {
-          alert("Error importing file. Please check the format.");
-          console.error(error);
-        }
-      };
-      reader.readAsArrayBuffer(file);
-    };
-    input.click();
-  }, [setParsedJson]);
 
   const toggleColumnVisibility = useCallback((column: string) => {
     setVisibleColumns((prev) => ({
@@ -351,7 +235,7 @@ export function ResultEditTable({
         {/* Buttons */}
         <div>
           <CustomBtn
-            onClick={() => setIsEditting(false)}
+            onClick={() => closeEditting()}
             className="border-[#d1d5db] border-1 text-[var(--color-text-link)] bg-white"
           >
             Cancel
@@ -383,15 +267,6 @@ export function ResultEditTable({
 
       {/* Course details input */}
       <div className="flex gap-4 w-full items-center">
-        <label className="label">Course Code: </label>
-        <input
-          type="text"
-          value={courseCode}
-          onChange={(e) => setCourseCode(e.target.value)}
-          className="modal-input flex-1 px-2 py-1"
-          placeholder="eg: GET210"
-        />
-
         <input
           type="text"
           value={searchQuery}
@@ -467,14 +342,14 @@ export function ResultEditTable({
           <RotateCcw size={16} className="rotate-180" /> Redo
         </button>
         <button
-          onClick={handleExportToExcel}
+          onClick={() => handleExportToExcel(parsedJson, courseCode)}
           className="px-12 py-8 bg-green-100 text-green-700 rounded-[8px] text-sm hover:bg-green-200 transition-all flex items-center gap-2"
           title="Export to Excel"
         >
           <Download size={16} /> Export
         </button>
         <button
-          onClick={handleImportFromExcel}
+          onClick={() => handleImportFromExcel(setParsedJson)}
           className="px-12 py-8 bg-orange-100 text-orange-700 rounded-[8px] text-sm hover:bg-orange-200 transition-all flex items-center gap-2"
           title="Import from Excel"
         >
@@ -533,7 +408,15 @@ export function ResultEditTable({
                 course={course}
                 index={index}
                 errors={errors}
-                handleChange={handleChange}
+                handleChange={(rowIndex, field, value) =>
+                  handleResultTableChange(
+                    rowIndex,
+                    field,
+                    value,
+                    setErrors,
+                    setParsedJson,
+                  )
+                }
                 onDelete={() => handleDeleteRow(index)}
                 visibleColumns={visibleColumns}
               />
@@ -549,6 +432,9 @@ export function ResultEditTable({
           setParsedJson={setParsedJson}
         />
       </ModalTemplate>
+
+      {/* Loader that covers the table */}
+      {isPending && <CoverLoader />}
     </div>
   );
 }
@@ -586,21 +472,9 @@ export function TableRow({
     const computedRemark = computedGrade === "F" ? "FAIL" : "PASS";
 
     if (fieldName === "grade") {
-      switch (computedGrade) {
-        case "A":
-          return "#16a34a"; // green-600
-        case "B":
-          return "#2563eb"; // blue-600
-        case "C":
-          return "#ca8a04"; // yellow-600
-        case "D":
-          return "#ea580c"; // orange-600
-        case "F":
-          return "#dc2626"; // red-600
-        default:
-          return "#000000";
-      }
+      return gradeToneMap[computedGrade].text;
     }
+
     if (fieldName === "remark") {
       switch (computedRemark) {
         case "PASS":
@@ -662,7 +536,7 @@ export function TableRow({
                 aria-invalid={fieldError ? true : undefined}
                 className={`outline-none ${field.className} ${
                   fieldError
-                    ? "rounded-[4px] border-solid border-1 border-red-500"
+                    ? "rounded-sm border-solid border border-red-500"
                     : "border-none"
                 }`}
               />
@@ -676,7 +550,7 @@ export function TableRow({
       <td className="flex items-center justify-center py-2">
         <button
           onClick={onDelete}
-          className="px-12 py-6 bg-red-500 text-white rounded-[4px] text-sm hover:bg-red-600 active:opacity-90 transition-all cursor-pointer"
+          className="px-12 py-6 bg-red-500 text-white rounded-sm text-sm hover:bg-red-600 active:opacity-90 transition-all cursor-pointer"
           title="Delete this row"
         >
           ✕

@@ -68,7 +68,7 @@ export default function AdvisorDashboard() {
 
   if (loading) return <LoaderSpinner3 />;
 
-  console.log(uploadSummaryData, " upload summary data in dashboard");
+  // console.log(uploadSummaryData, " upload summary data in dashboard");
 
   const uploadSummary = uploadSummaryData?.map((batch) => {
     return {
@@ -83,7 +83,7 @@ export default function AdvisorDashboard() {
   // if (isLoading || uploadActivityLoading || uploadSummaryLoading)
   //   return <div>Skeleton</div>;
 
-  console.log("statsData.new: ", uploadSummary);
+  // console.log("statsData.new: ", uploadSummary);
 
   // Error handling professionlayy
   if (uploadActivityError || uploadSummaryError || error) {
@@ -93,10 +93,10 @@ export default function AdvisorDashboard() {
         error?.message ||
         "Failed to load dashboard data, please reload the page. If the problem persists, contact support.",
     );
-    // return <SomethingWentWrong me/ssage="Failed to load dashboard data" />;
+    return <SomethingWentWrong message="Failed to load dashboard data" />;
   }
 
-  console.log(statsData?.targetLevel);
+  // console.log(statsData?.targetLevel);
 
   return (
     <>

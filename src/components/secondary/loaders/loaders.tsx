@@ -58,3 +58,15 @@ export function BigLoader() {
     </div>
   );
 }
+
+export function LoadingMessage({
+  message = "Loading...",
+}: {
+  message?: string;
+}) {
+  return (
+    <div>
+      <p className="loading">{message}</p>
+    </div>
+  );
+}

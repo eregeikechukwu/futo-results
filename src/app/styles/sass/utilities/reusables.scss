@@ -1,5 +1,6 @@
 @use "../functions/toRem.scss" as *;
 @use "../abstracts/mixins.scss" as *;
+@use "../main/animations.scss" as *;
 
 .button-primary {
   font-size: toRem(18);
@@ -39,15 +40,24 @@
   box-shadow: 0 toRem(1) toRem(2) 0 rgba(0, 0, 0, 0.05);
 }
 
-@keyframes fallout {
-  0% {
-    transform: translateY(toRem(-20));
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
+// Error text general sty;e
+.error {
+  position: absolute;
+  bottom: toRem(-20);
+  left: 0;
+  animation: fallout 0.4s ease-in-out;
+  color: var(--color-red) !important;
+  font-size: toRem(11);
+}
+
+// loading text general sty;e
+.loading {
+  position: absolute;
+  bottom: toRem(-20);
+  left: 0;
+  animation: pulse 0.8s ease-in-out infinite;
+  color: var(--color-text-passive);
+  font-size: toRem(12);
 }
 
 // Auth form field styles
@@ -101,12 +111,7 @@
     }
 
     & p.error {
-      position: absolute;
-      bottom: toRem(-20);
-      left: 0;
-      animation: fallout 0.4s ease-in-out;
-      color: var(--color-red);
-      font-size: toRem(11);
+      @extend .error;
     }
 
     &#password {
@@ -277,6 +282,7 @@
   @extend .input;
   width: 100%;
   padding: toRem(12) toRem(16);
+  position: relative;
 }
 
 .cancel-btn {

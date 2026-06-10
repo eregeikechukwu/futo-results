@@ -112,6 +112,10 @@ export function useAdvisorUploadFileSelect(
           toast.error("Please select a file");
           return;
         }
+
+        toast.error("OCR extraction is not available under free plan");
+        fileRef.current = null;
+        return;
         // if (ocrError) {
         //   alert("OCR ERRPR");
         //   setErrorMessage(ocrError);
@@ -179,7 +183,8 @@ export function useAdvisorUploadFileSelect(
       fileType: "PDF, JPEG, PNG",
       acceptedFormats: "image/*",
       title2: "Upload Scanned Result sheet",
-      instruction: "AI will extract data from your scanned document",
+      instruction:
+        "AI will extract data from your scanned document (Not available under free plan)",
       colors: {
         borderActive: "border-purple-400",
         borderHover: "hover:border-purple-400",

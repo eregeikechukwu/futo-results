@@ -65,7 +65,7 @@ export default function ManageStudents() {
           department_id: advisorData?.advisor_assignments[0].departments.id,
         };
       });
-      console.log(enrichedData, "Enriched sgasioasoaksas");
+      // console.log(enrichedData, "Enriched sgasioasoaksas");
 
       if (enrichedData.length > 0) {
         uploadStudentsMutation.mutate(enrichedData, {
@@ -74,7 +74,7 @@ export default function ManageStudents() {
               `File uploaded successfully! ${result.length} student${result.length > 1 && "s"} ${result.length > 1 ? "where" : "was"} added`,
             );
 
-            console.log(result, " THe added students hereeeeeeeee");
+            // console.log(result, " THe added students hereeeeeeeee");
             e.target.value = "";
             // setFile(null);
             setUploading(false);

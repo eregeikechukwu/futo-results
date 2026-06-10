@@ -1,0 +1,186 @@
+@use "../../app/styles/sass/functions/toRem.scss" as *;
+@use "../../app/styles/sass/abstracts/mixins.scss" as *;
+
+.heroCard {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: toRem(24);
+  padding: toRem(32);
+  border-radius: toRem(16);
+  background: linear-gradient(135deg, #1d4ed8, #2563eb 60%, #3b82f6);
+}
+
+.heroTitleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: toRem(8);
+  color: var(--color-white);
+}
+
+.heroTitle {
+  font-size: toRem(30);
+  line-height: toRem(36);
+  font-weight: 700;
+}
+
+.heroSubtitle {
+  line-height: toRem(24);
+}
+
+.heroButton {
+  color: var(--color-primary);
+  background-color: var(--color-white);
+  padding: toRem(12) toRem(24);
+  border-radius: toRem(12);
+  font-weight: 600;
+  width: max-content;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.heroButton:hover {
+  background-color: #f3f4f6;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(toRem(224), 1fr));
+  gap: toRem(24);
+}
+
+.bottomSpacer {
+  min-height: toRem(4);
+}
+
+// Core responsive move: collapse hero + stat density for one-handed phone scanning.
+@include mobile-compact {
+  .heroCard {
+    gap: toRem(18);
+    padding: toRem(18);
+  }
+
+  .heroTitle {
+    font-size: toRem(22);
+    line-height: toRem(30);
+  }
+
+  .heroSubtitle {
+    font-size: toRem(14);
+    line-height: toRem(21);
+  }
+
+  .heroButton {
+    width: 100%;
+    text-align: center;
+    padding-inline: toRem(14);
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(auto-fit, minmax(toRem(150), 1fr));
+    gap: toRem(14);
+  }
+}
+
+.exportCard {
+  border-radius: toRem(16);
+  padding: toRem(20) toRem(24);
+  background: linear-gradient(to right, #2563eb, #1d4ed8);
+  color: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: toRem(12);
+}
+
+.exportTitle {
+  font-size: toRem(24);
+  line-height: toRem(32);
+  font-weight: 700;
+}
+
+.exportSubtitle {
+  margin-top: toRem(6);
+  color: #dbeafe;
+  font-size: toRem(14);
+  line-height: toRem(20);
+}
+
+.exportButton {
+  background-color: var(--color-white);
+  color: var(--color-primary);
+  padding: toRem(12) toRem(20);
+  border-radius: toRem(12);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: toRem(8);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.exportButton:hover {
+  background-color: #f3f4f6;
+}
+
+.exportButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.controls {
+  display: flex;
+  gap: toRem(16);
+  align-items: flex-end;
+}
+
+.semesterField {
+  width: 100%;
+  max-width: toRem(360);
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.cgpaCell {
+  text-align: right;
+  font-weight: 700;
+}
+
+// Core responsive move: stack export call-to-action and filters to avoid horizontal clipping.
+@include mobile-compact {
+  .exportCard {
+    flex-direction: column;
+    align-items: stretch;
+    padding: toRem(16);
+  }
+
+  .exportTitle {
+    font-size: toRem(20);
+    line-height: toRem(28);
+  }
+
+  .exportSubtitle {
+    font-size: toRem(13);
+    line-height: toRem(19);
+  }
+
+  .exportButton {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .semesterField {
+    max-width: none;
+  }
+
+  .cgpaCell {
+    text-align: left;
+  }
+}

@@ -394,7 +394,7 @@ export default function ResultsTable({
         onSuccess: () => {
           setEditingRowId(null);
           setEditValues({ test_score: "", lab_score: "", exam_score: "" });
-          toast.success("Scores updated successfully");
+          toast.success("Score updated successfully");
         },
         onError: (error) => {
           toast.error(`Failed to update scores: ${error.message}`);

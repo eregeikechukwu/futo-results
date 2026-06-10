@@ -31,6 +31,7 @@
 }
 
 .select {
+  position: relative;
   padding: toRem(10) toRem(12);
   border: toRem(1) solid var(--color-border-light);
   border-radius: toRem(8);

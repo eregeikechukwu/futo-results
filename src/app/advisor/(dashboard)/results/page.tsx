@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Header } from "@/components/secondary/header";
-import { DashboardContainer } from "@/components/secondary/common";
+import { DashboardContainer, Error } from "@/components/secondary/common";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAcademicTerms, useActiveTerm } from "@/lib/hooks/useAcademicTerms";
 import {
@@ -15,6 +15,7 @@ import SomethingWentWrong from "@/components/secondary/error/somethingWentWrong"
 import ResultsTable from "./ResultsTable";
 import styles from "./ResultsTable.module.scss";
 import { useWarnBeforeUnload } from "@/app/hooks/useWarnBeforeUnload";
+import { RefetchButton } from "@/components/secondary/buttons";
 
 export default function ResultsManagementPage() {
   const { advisorData, loading: authLoading } = useAuth();
@@ -31,6 +32,7 @@ export default function ResultsManagementPage() {
     data: allTerms,
     isLoading: termsLoading,
     error: termsError,
+    refetch: refetchTerms,
   } = useAcademicTerms();
 
   // Fetch active term to set as default
@@ -46,6 +48,7 @@ export default function ResultsManagementPage() {
     data: courseOfferings,
     isLoading: offeringsLoading,
     error: offeringsError,
+    refetch: refetchOfferings,
   } = useCourseOfferingsForTerm(advisorData?.id || "", selectedTermId || "");
 
   // Fetch results and batch info for selected offering
@@ -55,7 +58,7 @@ export default function ResultsManagementPage() {
     error: resultsError,
   } = useResultsForOffering(selectedOfferingId || "");
 
-  console.log(selectedOfferingId, "   results in page component");
+  // console.log(selectedOfferingId, "   results in page component");
 
   const {
     data: batches,
@@ -64,26 +67,29 @@ export default function ResultsManagementPage() {
   } = useBatchForOffering(selectedOfferingId || "");
 
   // Error handling
-  if (termsError) {
-    console.log(termsError, "---terms error");
+    if (termsError) {
     errorToastHandler(termsError, "Failed to load academic terms");
-    return <SomethingWentWrong message="Failed to load academic terms" />;
   }
 
   if (offeringsError) {
-    console.log(offeringsError, "   offerings error");
     errorToastHandler(offeringsError, "Failed to load course offerings");
-    return <SomethingWentWrong message="Failed to load course offerings" />;
   }
 
+
   if (resultsError) {
-    console.log(resultsError, "   results error");
-    errorToastHandler(resultsError, "Failed to load results");
+    // console.log(resultsError, "   results error");
+    errorToastHandler(
+      resultsError,
+      "Failed to load results, please reload and try again.",
+    );
   }
 
   if (batchError) {
-    console.log(batchError, "   batch error");
-    errorToastHandler(batchError, "Failed to load batch information");
+    // console.log(batchError, "   batch error");
+    errorToastHandler(
+      batchError,
+      "Failed to load batch information, please reload and try again",
+    );
   }
 
   if (authLoading) return <div>Loading...</div>;
@@ -94,7 +100,7 @@ export default function ResultsManagementPage() {
     (co) => co.id === selectedOfferingId,
   );
 
-  console.log(results, "   results to be displayed");
+  // console.log(results, "   results to be displayed");
 
   const isLoading =
     termsLoading || offeringsLoading || resultsLoading || batchLoading;
@@ -128,7 +134,12 @@ export default function ResultsManagementPage() {
                 {term.session} - {term.semester}
               </option>
             ))}
+
+            {/* {Error} */}
+            {termsError && <Error>Error loading terms</Error>}
           </select>
+          {/* Refetch */}
+          {termsError && <RefetchButton refetch={refetchTerms} />}
         </div>
 
         {/* Course Offering Selector */}
@@ -148,7 +159,11 @@ export default function ResultsManagementPage() {
                 {offering.courses.course_code} - {offering.courses.course_title}
               </option>
             ))}
+            {/* {Error} */}
+            {offeringsError && <Error>Error loading course offerings</Error>}
           </select>
+          {/* Refetch */}
+          {offeringsError && <RefetchButton refetch={refetchOfferings} />}
         </div>
       </div>
 

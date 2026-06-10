@@ -40,12 +40,12 @@ export function AddCourse({ toggleModal }: { toggleModal: () => void }) {
       return;
     }
 
-    console.log({
-      course_code: data.courseCode,
-      course_title: data.courseTitle,
-      unit: data.unit,
-      term: data.term,
-    });
+    // console.log({
+    //   course_code: data.courseCode,
+    //   course_title: data.courseTitle,
+    //   unit: data.unit,
+    //   term: data.term,
+    // });
 
     addCourseMutation(
       {

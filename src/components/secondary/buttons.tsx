@@ -1,5 +1,6 @@
 import React from "react";
 import { LoaderSpinner3 } from "./loaders/loaders";
+import { RefreshCcw } from "lucide-react";
 
 export function AuthCTABtn({
   children,
@@ -35,9 +36,24 @@ export function CustomBtn({
   return (
     <button
       onClick={onClick}
-      className={`py-8 px-24 lh-24 text-center rounded-[8px] border-solid cursor-pointer hover:opacity-80 active:opacity-90 transition-all ${className}`}
+      className={`py-8 px-24 lh-24 text-center rounded-lg border-solid cursor-pointer hover:opacity-80 active:opacity-90 transition-all ${className}`}
     >
       {children}
+    </button>
+  );
+}
+
+// Rferesh
+export function RefetchButton({ refetch }: { refetch: () => void }) {
+  return (
+    <button
+      className="group py-10 px-10 center-child rounded-lg border-solid border border-(--color-border-light) cursor-pointer"
+      onClick={refetch}
+    >
+      <RefreshCcw
+        className="group-hover:rotate-50 transition-all duration-300"
+        size={20}
+      />
     </button>
   );
 }

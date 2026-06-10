@@ -180,6 +180,7 @@ export interface BatchInfo {
 
 export interface SelectedOffering {
   id: string;
+  unit: number;
   courses: {
     id: string;
     course_code: string;

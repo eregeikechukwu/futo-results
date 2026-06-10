@@ -53,7 +53,7 @@ export function TextFieldResult({
           let val: string | number = e.target.value;
           if (onChange) val = onChange(val) ?? val;
           if (type === "number") val = Number(val);
-          console.log(val);
+          // console.log(val);
           setValue(name as keyof AddedResult, val);
         }}
         placeholder={placeholder}

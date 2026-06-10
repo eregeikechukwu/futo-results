@@ -37,9 +37,12 @@ export function StudentsDashboardShell({
 
   // Protect the dashboard
   useProtectDashboardAccess("student");
-  const { loading } = useAuth();
+  const { loading, profile, studentData } = useAuth();
 
-  // Show nothing or loader  before profile is been fetched to prevent hydration mismatch
+  const studentName = profile?.full_name || "Student";
+  const registrationNumber = studentData?.reg_number || "";
+
+  // Show nothing or loader before profile is been fetched to prevent hydration mismatch
   if (loading)
     return (
       <>
@@ -54,11 +57,11 @@ export function StudentsDashboardShell({
         <div className={styles.topBar}>
           {/* Title */}
           <div className={styles.titleWrap}>
-            <h1 className={styles.title}>Welcome, Nelson Erege</h1>
-            <h2 className={styles.subTitle}>20231456334</h2>
+            <h1 className={styles.title}>Welcome, {studentName}</h1>
+            <h2 className={styles.subTitle}>{registrationNumber}</h2>
           </div>
 
-          {/* NOtification */}
+          {/* Notification */}
           <div>
             <Notification count={0} />
           </div>

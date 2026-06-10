@@ -1,5 +1,8 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
-import { createResultBatch, deleteBatch } from "../queries/results";
+import {
+  createResultBatch,
+  deleteBatch,
+} from "../queries/advisorResultsDownload";
 import toast from "react-hot-toast";
 import { ParsedResult } from "@/app/types/resultsUpload";
 

@@ -26,7 +26,7 @@ export function ProgressBar({
     return "#A855F7"; // PURPLE-500
   };
 
-  console.log(errorMessage);
+  // console.log(errorMessage);
 
   return (
     <div className="min-h-[calc(100vh-var(--nav-height)] min-w-screen bg-transparent flex items-center justify-center p-16">

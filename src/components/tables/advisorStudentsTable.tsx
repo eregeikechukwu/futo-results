@@ -58,7 +58,7 @@ export function AdvisorStudentsTable({
   const { mutate: updateStudentMutation } = useUpdateStudentStatus();
 
   const handleDeleteStudent = (studentId, status) => {
-    console.log("Deleting student:", studentId, status);
+    // console.log("Deleting student:", studentId, status);
     if (!confirmDelete) {
       toast.error("Reg Number doesn't match");
     } else {
@@ -174,7 +174,7 @@ export function AdvisorStudentsTable({
           } else {
             updateStatus(row.original.id, "flagged");
           }
-          console.log("Flagging student:", row.original.regNumber);
+          // console.log("Flagging student:", row.original.regNumber);
         };
         return (
           <div className="flex items-center text-medium gap-24 ">
@@ -200,7 +200,7 @@ export function AdvisorStudentsTable({
     },
   ];
 
-  console.log(isMutating, " Sometign si muaiaekdjo");
+  // console.log(isMutating, " Sometign si muaiaekdjo");
 
   //Creating table instance
   const table = useReactTable({

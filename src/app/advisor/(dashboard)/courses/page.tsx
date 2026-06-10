@@ -15,6 +15,7 @@ import toast from "react-hot-toast";
 import "@aejkatappaja/phantom-ui";
 import { AdvisorTablesSkeleton } from "@/components/skeletons/advisorSkeletons";
 import { ColumnFilter } from "@tanstack/react-table";
+import { AdvisorCourse } from "@/app/types/advisor";
 
 export default function AdvisorCourses() {
   const [sessionFilters, setSessionFilters] = useState<ColumnFilter[]>([
@@ -48,14 +49,14 @@ export default function AdvisorCourses() {
     }
   }, [activeSession, sessionFilters]);
 
-  const advisorOfferings = useMemo(() => {
+  const advisorOfferings: AdvisorCourse[] = useMemo(() => {
     if (!advisorOffering) return [];
     return advisorOffering.map((offering) => ({
       id: offering.id,
       courseCode: offering.courses.course_code,
       courseTitle: offering.courses.course_title,
-      unit: offering.unit,
-      semester: offering.academic_terms.semester,
+      unit: `${offering.unit}`,
+      semester: offering.academic_terms.semester as 'Rain' | 'Harmattan',
       session: offering.academic_terms.session,
     }));
   }, [advisorOffering]);

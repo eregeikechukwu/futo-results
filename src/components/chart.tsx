@@ -27,25 +27,34 @@ ChartJS.register(
   Legend,
 );
 
-export default function AreaChart() {
+type AreaChartProps = {
+  labels?: string[];
+  dataPoints?: number[];
+};
+
+export default function AreaChart({
+  labels: providedLabels,
+  dataPoints,
+}: AreaChartProps) {
   const chartRef = useRef<ChartJS<"line">>(null);
 
-  // demo CGPA progression data
-
-  const labels = resultData.map((semester) => {
-    const semesterOb = {
-      semester: semester.semester.toLowerCase() === "harmattan" ? "1st" : "2nd",
-      level: semester.student.level.split(" ")[0],
-    };
-    return `${semesterOb.level} ${semesterOb.semester}`;
-  });
+  const labels = providedLabels
+    ? providedLabels
+    : resultData.map((semester) => {
+        const semesterOb = {
+          semester:
+            semester.semester.toLowerCase() === "harmattan" ? "1st" : "2nd",
+          level: semester.student.level.split(" ")[0],
+        };
+        return `${semesterOb.level} ${semesterOb.semester}`;
+      });
 
   const data = {
     labels,
     datasets: [
       {
         label: "GPA",
-        data: gpas,
+        data: dataPoints ?? gpas,
         fill: true,
         tension: 0.4,
         borderWidth: 3,
