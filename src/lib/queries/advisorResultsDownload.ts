@@ -1,5 +1,6 @@
 import { createSupabaseClient } from "@/lib/supabase/client";
 import { timeout } from "@/app/advisor/functions/students";
+import { requestTimeoutTime } from "@/utils/systemUtils";
 
 /**
  * Fetch course offerings for a specific advisor in a given term
@@ -120,9 +121,9 @@ export async function publishAllDraftBatches(offeringId: string) {
 export async function updateResultEntry(
   entryId: string,
   payload: {
-    test_score?: number;
+    test_score?: number | null;
     lab_score?: number | null;
-    exam_score?: number;
+    exam_score?: number | null;
   },
 ) {
   const supabase = createSupabaseClient();
@@ -191,7 +192,7 @@ export async function createResultBatch(
       })
       .select("id")
       .single(),
-    timeout(30000),
+    timeout(requestTimeoutTime),
   ]);
 
   if (error) throw error;
@@ -209,7 +210,7 @@ export async function deleteBatch(batchId) {
       .select("id")
       .eq("batch_id", batchId)
       .limit(1),
-    timeout(30000),
+    timeout(requestTimeoutTime),
   ]);
 
   if (checkError) throw checkError;

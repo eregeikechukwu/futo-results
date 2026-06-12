@@ -90,8 +90,8 @@ export function Modal({
 export function Overlay({ active = true }: { active?: boolean }) {
   return (
     <div
-      className={`fixed inset-0 z-40 min-w-screen min-h-screen bg-gray-600 transition-opacity duration-300 ${
-        active ? "opacity-50" : "opacity-0 pointer-events-none"
+      className={`fixed inset-0 z-40 min-w-screen min-h-screen bg-gray-600 transition-opacity duration-400 ${
+        active ? "opacity-70" : "opacity-0 pointer-events-none"
       }`}
     />
   );

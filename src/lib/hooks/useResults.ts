@@ -85,9 +85,9 @@ export function useUpdateResultEntry(offeringId: string) {
     }: {
       entryId: string;
       payload: {
-        test_score?: number;
+        test_score?: number | null;
         lab_score?: number | null;
-        exam_score?: number;
+        exam_score?: number | null;
       };
     }) => {
       return updateResultEntry(entryId, payload);
@@ -115,7 +115,6 @@ export function useDeleteResultEntry(offeringId: string) {
       return deleteResultEntry(entryId);
     },
     onSuccess: () => {
-      toast.success("Result entry deleted successfully!");
       // Invalidate results so table refetches
       queryClient.invalidateQueries({ queryKey: ["results", offeringId] });
     },

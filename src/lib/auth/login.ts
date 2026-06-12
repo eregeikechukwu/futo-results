@@ -4,6 +4,7 @@ import { timeout } from "@/app/advisor/functions/students";
 import { createSupabaseClient } from "../supabase/client";
 import { LoginFormData } from "@/app/types/auth";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { requestTimeoutTime } from "@/utils/systemUtils";
 
 export async function handleStudentLogin(
   data: LoginFormData,
@@ -18,7 +19,7 @@ export async function handleStudentLogin(
       email: data.email,
       password: data.password,
     }),
-    timeout(5000),
+    timeout(requestTimeoutTime),
   ]);
 
   if (authData) {

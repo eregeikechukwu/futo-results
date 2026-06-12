@@ -35,6 +35,7 @@
 }
 
 .advisorBadge {
+  width: auto;
   padding: toRem(4) toRem(12);
   margin: toRem(16);
   background: var(--color-blue-background);
@@ -63,7 +64,6 @@
 
   .advisorBadge {
     margin: toRem(10);
-    width: 100%;
     justify-content: center;
   }
 

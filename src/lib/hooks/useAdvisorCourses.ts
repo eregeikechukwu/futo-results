@@ -7,6 +7,7 @@ import {
 } from "../queries/advisorCourses";
 import { AdvisorCourseDB, UpdateCourseInput } from "@/app/types/advisor";
 import { timeout } from "@/app/advisor/functions/students";
+import { requestTimeoutTime } from "@/utils/systemUtils";
 
 // ── Fetch all offerings for an advisor in a specific term ──
 export function useAdvisorOfferings(advisorId: string) {
@@ -89,7 +90,7 @@ export function useUpdateCourseOffering() {
             term_id: input.term_id,
           })
           .eq("id", offeringId),
-        timeout(10000),
+        timeout(requestTimeoutTime),
       ]);
       // console.log(2, "after");
 

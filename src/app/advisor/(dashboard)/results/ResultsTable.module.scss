@@ -373,7 +373,7 @@
 }
 
 .th {
-  padding: toRem(14) toRem(16);
+  padding: toRem(14) toRem(6);
   text-align: left;
   font-weight: 600;
   color: var(--color-text-dark);
@@ -401,7 +401,7 @@
 }
 
 .td {
-  padding: toRem(12) toRem(16);
+  padding: toRem(12) toRem(12);
   color: var(--color-text);
   vertical-align: middle;
 }
@@ -422,6 +422,7 @@
 
 .editInput {
   width: 100%;
+  // min-width: 4rem;
   padding: toRem(6) toRem(8);
   border: toRem(1) solid var(--color-primary);
   border-radius: toRem(4);

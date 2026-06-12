@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -10,7 +10,6 @@ import {
   ColumnDef,
   SortingState,
 } from "@tanstack/react-table";
-import { Edit2, Trash2, Check, X } from "lucide-react";
 import toast from "react-hot-toast";
 import {
   useUpdateResultEntry,
@@ -21,8 +20,10 @@ import {
 import styles from "./ResultsTable.module.scss";
 import ConfirmModal from "@/components/secondary/confirmationModal";
 import { CoverLoader } from "@/components/secondary/loaders/coverLoader";
-import ConfirmInput from "@/components/secondary/confirmInput";
 import { ResultsTableProps, ResultEntry } from "@/app/types/advisor";
+import { Edit2, Trash2, Check, X } from "lucide-react";
+import { errorToastHandler } from "@/helpers/errorHandler";
+import { resultsEditTableColumns } from "@/components/tables/tableColumns/resultsEditTableColumns";
 
 const BATCH_PAGE_SIZE = 20;
 
@@ -30,7 +31,6 @@ export default function ResultsTable({
   results,
   batches,
   offeringId,
-  selectedOffering,
 }: ResultsTableProps) {
   const [globalFilter, setGlobalFilter] = useState("");
   const [gradeFilter, setGradeFilter] = useState("");
@@ -44,7 +44,6 @@ export default function ResultsTable({
   }>({ test_score: "", lab_score: "", exam_score: "" });
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [deleteConfirmRegNo, setDeleteConfirmRegNo] = useState("");
-  const [deleteConfirmInput, setDeleteConfirmInput] = useState("");
   const [showPublishAllModal, setShowPublishAllModal] = useState(false);
   const [batchPages, setBatchPages] = useState<Record<string, number>>({});
   const [sorting, setSorting] = useState<SortingState>([
@@ -71,216 +70,321 @@ export default function ResultsTable({
 
       // status filter
       const matchesStatus =
-        !statusFilter || result.result_batches.status === statusFilter;
+        !statusFilter ||
+        result.result_batches.status === statusFilter.toLowerCase();
 
       // Remark filter
       const matchesRemark = !remarkFilter || result.remark === remarkFilter;
 
-      return matchesSearch && matchesGrade && matchesRemark;
+      return matchesSearch && matchesGrade && matchesRemark && matchesStatus;
     });
-  }, [results, globalFilter, gradeFilter, remarkFilter]);
+  }, [results, globalFilter, gradeFilter, remarkFilter, statusFilter]);
 
-  // Columns define how result entry fields render and support inline editing
-  const columns: ColumnDef<ResultEntry>[] = [
-    {
-      accessorKey: "rowNumber",
-      header: "#",
-      cell: ({ row }) => row.index + 1,
-      size: 40,
-    },
-    {
-      accessorKey: "regNumber",
-      header: "Reg Number",
-      cell: ({ row }) => (
-        <span className={styles.cellValue}>
-          {row.original.students.reg_number}
-        </span>
-      ),
-    },
-    {
-      accessorKey: "fullName",
-      header: "Full Name",
-      cell: ({ row }) => (
-        <span className={styles.cellValue}>
-          {row.original.students.profiles.full_name}
-        </span>
-      ),
-    },
-    {
-      accessorKey: "testScore",
-      header: "Test (30)",
-      cell: ({ row }) => {
-        if (editingRowId === row.original.id) {
-          return (
-            <input
-              type="number"
-              min="0"
-              max="30"
-              value={editValues.test_score}
-              onChange={(e) =>
-                setEditValues({
-                  ...editValues,
-                  test_score: e.target.value,
-                })
-              }
-              className={styles.editInput}
-            />
-          );
-        }
-        return (
-          <span className={styles.scoreValue}>{row.original.test_score}</span>
-        );
+  // Begin editing a single result row and populate the edit buffer
+  const handleEditStart = (row: ResultEntry) => {
+    setEditingRowId(row.id);
+    setEditValues(() => {
+      const getValue = (value) => (value !== null ? value.toString() : "");
+      return {
+        test_score: getValue(row.test_score),
+        lab_score: getValue(row.lab_score),
+        exam_score: getValue(row.exam_score),
+      };
+    });
+  };
+
+  // Validate and save edited score values for a result entry
+  const handleSave = async (row: ResultEntry) => {
+    const getValue = (value: string) =>
+      value.trim() === "" ? null : parseFloat(value);
+    const test = getValue(editValues.test_score);
+    const lab = getValue(editValues.lab_score);
+    const exam = getValue(editValues.exam_score);
+
+    const checkValue = (value: number | null) => value !== null && isNaN(value);
+
+    if (checkValue(test) && checkValue(lab) && checkValue(exam)) {
+      toast.error("Please enter valid numbers for the scores");
+      return;
+    }
+
+    if (test !== null && (test < 0 || test > 40)) {
+      toast.error("Test score must be between 0 and 40");
+      return;
+    }
+
+    if (lab !== null && (lab < 0 || lab > 100)) {
+      toast.error("Lab score must be between 0 and 100");
+      return;
+    }
+
+    if (exam !== null && (exam < 0 || exam > 100)) {
+      toast.error("Exam score must be between 0 and 100");
+      return;
+    }
+
+    updateMutation.mutate(
+      {
+        entryId: row.id,
+        payload: {
+          test_score: test,
+          lab_score: lab,
+          exam_score: exam,
+        },
       },
-    },
-    {
-      accessorKey: "labScore",
-      header: "Lab (30)",
-      cell: ({ row }) => {
-        if (editingRowId === row.original.id) {
-          return (
-            <input
-              type="number"
-              min="0"
-              max="30"
-              value={editValues.lab_score}
-              onChange={(e) =>
-                setEditValues({
-                  ...editValues,
-                  lab_score: e.target.value,
-                })
-              }
-              className={styles.editInput}
-            />
-          );
-        }
-        return (
-          <span className={styles.scoreValue}>
-            {row.original.lab_score ?? "-"}
+      {
+        onSuccess: () => {
+          setEditingRowId(null);
+          setEditValues({ test_score: "", lab_score: "", exam_score: "" });
+          toast.success("Score updated successfully");
+        },
+        onError: (error) => {
+          toast.error(`Failed to update scores: ${error.message}`);
+        },
+      },
+    );
+  };
+
+  // Confirm and execute deletion of a single result entry
+  const handleDelete = () => {
+    if (deleteConfirmId) {
+      deleteMutation.mutate(deleteConfirmId, {
+        onSuccess: () => {
+          setDeleteConfirmId(null);
+          setDeleteConfirmRegNo("");
+          toast.success("Resuly entry deleted successfully!");
+        },
+        onError: (error) => {
+          toast.error(`Failed to delete entry: ${error.message}`);
+        },
+      });
+    }
+  };
+
+  // Create columns with all dependencies
+  // const columns = useMemo(
+  //   () =>
+  //     resultsEditTableColumns({
+  //       editingRowId,
+  //       editValues,
+  //       setEditValues,
+  //       handleSave,
+  //       handleEditStart,
+  //       setDeleteConfirmId,
+  //       setDeleteConfirmRegNo,
+  //       setEditingRowId,
+  //     }),
+  //   [editingRowId, editValues, handleSave, handleEditStart],
+  // );
+  const columns = useMemo(() => {
+    const columns: ColumnDef<ResultEntry>[] = [
+      {
+        accessorKey: "rowNumber",
+        header: "#",
+        cell: ({ row }) => row.index + 1,
+        size: 40,
+      },
+      {
+        accessorKey: "regNumber",
+        header: "Reg Number",
+        cell: ({ row }) => (
+          <span className={styles.cellValue}>
+            {row.original.students.reg_number}
           </span>
-        );
+        ),
       },
-    },
-    {
-      accessorKey: "examScore",
-      header: "Exam (70)",
-      cell: ({ row }) => {
-        if (editingRowId === row.original.id) {
+      {
+        accessorKey: "fullName",
+        header: "Full Name",
+        cell: ({ row }) => (
+          <span className={styles.cellValue}>
+            {row.original.students.profiles.full_name}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "testScore",
+        header: "Test",
+        cell: ({ row }) => {
+          if (editingRowId === row.original.id) {
+            return (
+              <input
+                type="number"
+                min="0"
+                max="40"
+                value={editValues.test_score}
+                onChange={(e) =>
+                  setEditValues({
+                    ...editValues,
+                    test_score: e.target.value,
+                  })
+                }
+                className={styles.editInput}
+              />
+            );
+          }
           return (
-            <input
-              type="number"
-              min="0"
-              max="70"
-              value={editValues.exam_score}
-              onChange={(e) =>
-                setEditValues({
-                  ...editValues,
-                  exam_score: e.target.value,
-                })
-              }
-              className={styles.editInput}
-            />
+            <span className={styles.scoreValue}>{row.original.test_score}</span>
           );
-        }
-        return (
-          <span className={styles.scoreValue}>{row.original.exam_score}</span>
-        );
+        },
       },
-    },
-    {
-      accessorKey: "total",
-      header: "Total",
-      cell: ({ row }) => {
-        if (editingRowId === row.original.id) {
-          const test = parseFloat(editValues.test_score) || 0;
-          const lab = parseFloat(editValues.lab_score) || 0;
-          const exam = parseFloat(editValues.exam_score) || 0;
-          const total = test + lab + exam;
-          return <span className={styles.totalValue}>{total.toFixed(2)}</span>;
-        }
-        return (
-          <span className={styles.totalValue}>{row.original.total_score}</span>
-        );
+      {
+        accessorKey: "labScore",
+        header: "Lab",
+        cell: ({ row }) => {
+          if (editingRowId === row.original.id) {
+            return (
+              <input
+                type="number"
+                min="0"
+                max="100"
+                value={editValues.lab_score}
+                onChange={(e) =>
+                  setEditValues({
+                    ...editValues,
+                    lab_score: e.target.value,
+                  })
+                }
+                className={styles.editInput}
+              />
+            );
+          }
+          return (
+            <span className={styles.scoreValue}>
+              {row.original.lab_score ?? "-"}
+            </span>
+          );
+        },
       },
-    },
-    {
-      accessorKey: "grade",
-      header: "Grade",
-      cell: ({ row }) => (
-        <span className={styles.gradeBadge}>{row.original.grade}</span>
-      ),
-    },
-    {
-      accessorKey: "remark",
-      header: "Remark",
-      cell: ({ row }) => (
-        <span
-          className={`${styles.remarkBadge} ${
-            row.original.remark === "PASS"
-              ? styles.remarkPass
-              : styles.remarkFail
-          }`}
-        >
-          {row.original.remark}
-        </span>
-      ),
-    },
-    {
-      accessorKey: "actions",
-      header: "Actions",
-      cell: ({ row }) => {
-        if (editingRowId === row.original.id) {
+      {
+        accessorKey: "examScore",
+        header: "Exam",
+        cell: ({ row }) => {
+          if (editingRowId === row.original.id) {
+            return (
+              <input
+                type="number"
+                min="0"
+                max="100"
+                value={editValues.exam_score}
+                onChange={(e) =>
+                  setEditValues({
+                    ...editValues,
+                    exam_score: e.target.value,
+                  })
+                }
+                className={styles.editInput}
+              />
+            );
+          }
+          return (
+            <span className={styles.scoreValue}>{row.original.exam_score}</span>
+          );
+        },
+      },
+      {
+        accessorKey: "total",
+        header: "Total",
+        cell: ({ row }) => {
+          if (editingRowId === row.original.id) {
+            const test = parseFloat(editValues.test_score) || 0;
+            const lab = parseFloat(editValues.lab_score) || 0;
+            const exam = parseFloat(editValues.exam_score) || 0;
+            const total = test + lab + exam;
+            return (
+              <span className={styles.totalValue}>{total.toFixed(2)}</span>
+            );
+          }
+          return (
+            <span className={styles.totalValue}>
+              {row.original.total_score}
+            </span>
+          );
+        },
+      },
+      {
+        accessorKey: "grade",
+        header: "Grade",
+        cell: ({ row }) => (
+          <span className={styles.gradeBadge}>{row.original.grade}</span>
+        ),
+      },
+      {
+        accessorKey: "remark",
+        header: "Remark",
+        cell: ({ row }) => (
+          <span
+            className={`${styles.remarkBadge} ${
+              row.original.remark === "PASS"
+                ? styles.remarkPass
+                : styles.remarkFail
+            }`}
+          >
+            {row.original.remark}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "actions",
+        header: "Actions",
+        cell: ({ row }) => {
+          if (editingRowId === row.original.id) {
+            return (
+              <div className={styles.actionButtons}>
+                <button
+                  onClick={() => handleSave(row.original)}
+                  className={styles.saveBtn}
+                  title="Save changes"
+                >
+                  <Check size={16} />
+                </button>
+                <button
+                  onClick={() => {
+                    setEditingRowId(null);
+                    setEditValues({
+                      test_score: "",
+                      lab_score: "",
+                      exam_score: "",
+                    });
+                  }}
+                  className={styles.cancelBtn}
+                  title="Cancel edit"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            );
+          }
+
           return (
             <div className={styles.actionButtons}>
               <button
-                onClick={() => handleSave(row.original)}
-                className={styles.saveBtn}
-                title="Save changes"
+                onClick={() => handleEditStart(row.original)}
+                className={styles.editBtn}
+                title="Edit entry"
               >
-                <Check size={16} />
+                <Edit2 size={16} />
               </button>
               <button
                 onClick={() => {
-                  setEditingRowId(null);
-                  setEditValues({
-                    test_score: "",
-                    lab_score: "",
-                    exam_score: "",
-                  });
+                  setDeleteConfirmId(row.original.id);
+                  setDeleteConfirmRegNo(row.original.students.reg_number);
                 }}
-                className={styles.cancelBtn}
-                title="Cancel edit"
+                className={styles.deleteBtn}
+                title="Delete entry"
               >
-                <X size={16} />
+                <Trash2 size={16} />
               </button>
             </div>
           );
-        }
-
-        return (
-          <div className={styles.actionButtons}>
-            <button
-              onClick={() => handleEditStart(row.original)}
-              className={styles.editBtn}
-              title="Edit entry"
-            >
-              <Edit2 size={16} />
-            </button>
-            <button
-              onClick={() => {
-                setDeleteConfirmId(row.original.id);
-                setDeleteConfirmRegNo(row.original.students.reg_number);
-                setDeleteConfirmInput("");
-              }}
-              className={styles.deleteBtn}
-              title="Delete entry"
-            >
-              <Trash2 size={16} />
-            </button>
-          </div>
-        );
+        },
       },
-    },
-  ];
+    ];
+
+    return columns;
+  }, [editingRowId, editValues, handleSave, handleEditStart]);
+
+  // Columns define how result entry fields render and support inline editing
 
   // Create the table instance for sorting and row model access
   const table = useReactTable({
@@ -342,89 +446,6 @@ export default function ResultsTable({
 
   const shortenBatchId = (batchId: string) => batchId.slice(0, 8);
 
-  // Begin editing a single result row and populate the edit buffer
-  const handleEditStart = (row: ResultEntry) => {
-    setEditingRowId(row.id);
-    setEditValues({
-      test_score: row.test_score.toString(),
-      lab_score: row.lab_score !== null ? row.lab_score.toString() : "",
-      exam_score: row.exam_score.toString(),
-    });
-  };
-
-  // Validate and save edited score values for a result entry
-  const handleSave = async (row: ResultEntry) => {
-    const test = parseFloat(editValues.test_score);
-    const lab =
-      editValues.lab_score.trim() === ""
-        ? null
-        : parseFloat(editValues.lab_score);
-    const exam = parseFloat(editValues.exam_score);
-
-    if (isNaN(test) || isNaN(exam) || (lab !== null && isNaN(lab))) {
-      toast.error("Please enter valid numbers for all scores");
-      return;
-    }
-
-    if (test < 0 || test > 30) {
-      toast.error("Test score must be between 0 and 30");
-      return;
-    }
-
-    if (lab !== null && (lab < 0 || lab > 30)) {
-      toast.error("Lab score must be between 0 and 30");
-      return;
-    }
-
-    if (exam < 0 || exam > 70) {
-      toast.error("Exam score must be between 0 and 70");
-      return;
-    }
-
-    updateMutation.mutate(
-      {
-        entryId: row.id,
-        payload: {
-          test_score: test,
-          lab_score: lab,
-          exam_score: exam,
-        },
-      },
-      {
-        onSuccess: () => {
-          setEditingRowId(null);
-          setEditValues({ test_score: "", lab_score: "", exam_score: "" });
-          toast.success("Score updated successfully");
-        },
-        onError: (error) => {
-          toast.error(`Failed to update scores: ${error.message}`);
-        },
-      },
-    );
-  };
-
-  // Confirm and execute deletion of a single result entry
-  const handleDelete = () => {
-    if (deleteConfirmInput !== deleteConfirmRegNo) {
-      toast.error("Reg number doesn't match. Try again.");
-      return;
-    }
-
-    if (deleteConfirmId) {
-      deleteMutation.mutate(deleteConfirmId, {
-        onSuccess: () => {
-          setDeleteConfirmId(null);
-          setDeleteConfirmRegNo("");
-          setDeleteConfirmInput("");
-          toast.success("Entry deleted successfully");
-        },
-        onError: (error) => {
-          toast.error(`Failed to delete entry: ${error.message}`);
-        },
-      });
-    }
-  };
-
   // Publish a single batch by ID
   const handlePublish = (batchId: string) => {
     publishMutation.mutate(batchId);
@@ -435,6 +456,12 @@ export default function ResultsTable({
     publishAllMutation.mutate(undefined, {
       onSuccess: () => {
         setShowPublishAllModal(false);
+      },
+      onError: (error) => {
+        errorToastHandler(
+          error,
+          "Failed to publish batches. Please try again.",
+        );
       },
     });
   };
@@ -598,8 +625,8 @@ export default function ResultsTable({
               <div className={styles.tableContainer}>
                 <table className={styles.table}>
                   <thead className={styles.thead}>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                      <tr key={headerGroup.id}>
+                    {table.getHeaderGroups().map((headerGroup, i) => (
+                      <tr key={`${headerGroup.id}`}>
                         {headerGroup.headers.map((header) => (
                           <th key={header.id} className={styles.th}>
                             {header.isPlaceholder
@@ -623,7 +650,7 @@ export default function ResultsTable({
                             : ""
                         }`}
                       >
-                        {row.getVisibleCells().map((cell) => (
+                        {row.getVisibleCells().map((cell, i) => (
                           <td key={cell.id} className={styles.td}>
                             {cell.column.id === "rowNumber"
                               ? currentPage * BATCH_PAGE_SIZE + rowIndex + 1
@@ -689,19 +716,14 @@ export default function ResultsTable({
           onCancel={() => {
             setDeleteConfirmId(null);
             setDeleteConfirmRegNo("");
-            setDeleteConfirmInput("");
           }}
           onConfirm={handleDelete}
           confirmLabel="Delete"
           cancelLabel="Cancel"
-        >
-          <ConfirmInput
-            value="result"
-            deleteConfirmInput={deleteConfirmInput}
-            deleteConfirmValue={deleteConfirmRegNo}
-            setDeleteConfirmInput={setDeleteConfirmInput}
-          />
-        </ConfirmModal>
+          actionConfirmValue={deleteConfirmRegNo}
+          value={"result"}
+          isMutating={deleteMutation.isPending}
+        />
       )}
 
       {showPublishAllModal && (

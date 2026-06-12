@@ -1,6 +1,7 @@
 import { timeout } from "@/app/advisor/functions/students";
 import { createSupabaseClient } from "../supabase/client";
 import { UpdateCourseInput, AddCourseInput } from "@/app/types/advisor";
+import { requestTimeoutTime } from "@/utils/systemUtils";
 
 // lib/queries/courses.ts
 export async function addCourseOffering(input: AddCourseInput) {
@@ -21,7 +22,7 @@ export async function addCourseOffering(input: AddCourseInput) {
       .select("id, course_code, course_title")
       .eq("course_code", normalizedCode)
       .maybeSingle(),
-    timeout(30000),
+    timeout(requestTimeoutTime),
   ]);
 
   if (lookupError) throw lookupError;
@@ -42,7 +43,7 @@ export async function addCourseOffering(input: AddCourseInput) {
         })
         .select("id")
         .single(),
-      timeout(30000),
+      timeout(requestTimeoutTime),
     ]);
     if (insertCourseError) throw insertCourseError;
     courseId = newCourse.id;
@@ -69,7 +70,7 @@ export async function addCourseOffering(input: AddCourseInput) {
     `,
       )
       .single(),
-    timeout(30000),
+    timeout(requestTimeoutTime),
   ]);
 
   if (offeringError) {
@@ -93,7 +94,7 @@ export async function deleteCourseOffering(offeringId: string) {
       .select("id")
       .eq("offering_id", offeringId)
       .limit(1),
-    timeout(30000),
+    timeout(requestTimeoutTime),
   ]);
 
   if (checkError) throw checkError;
@@ -129,7 +130,7 @@ export async function updateCourseOffering(
       })
       .eq("id", offeringId),
 
-    timeout(10000),
+    timeout(requestTimeoutTime),
   ]);
   if (error) throw error;
 

@@ -103,6 +103,9 @@ export function formatSessionInput(value: string): string | undefined {
   return digits.slice(0, 4) + "/" + digits.slice(4, 8);
 }
 
+// Timeout until request is acalled as took too long
+export const requestTimeoutTime = 50000;
+
 export const editCourseFields = [
   {
     name: "name",

@@ -2,6 +2,7 @@ import { createSupabaseClient } from "../supabase/client";
 import { NormalizedStudentsData } from "@/app/types/utils";
 import { AdvisorStudent } from "@/app/types/advisor";
 import { timeout } from "@/app/advisor/functions/students";
+import { requestTimeoutTime } from "@/utils/systemUtils";
 
 export async function uploadPreregistrations(
   newStudentsList: NormalizedStudentsData[],
@@ -16,7 +17,7 @@ export async function uploadPreregistrations(
         ignoreDuplicates: true,
       })
       .select(),
-    timeout(5000),
+    timeout(requestTimeoutTime),
   ]);
   if (error) throw error;
 
@@ -43,7 +44,7 @@ export async function fetchAdvisorStudents(
         .eq("admission_year", admissionYear)
         .eq("department_id", departmentId)
         .is("deleted_at", null),
-      timeout(5000),
+      timeout(requestTimeoutTime),
     ]);
 
   const { data: studentsFromPrereg, error: errorFromPrereg } =
@@ -54,7 +55,7 @@ export async function fetchAdvisorStudents(
         .eq("claimed", false)
         .order("reg_number", { ascending: true })
         .eq("created_by", advisorId),
-      timeout(5000),
+      timeout(requestTimeoutTime),
     ]);
 
   if (errorFromPrereg) throw errorFromPrereg;

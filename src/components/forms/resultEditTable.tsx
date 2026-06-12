@@ -25,6 +25,7 @@ import { useUploadExcelResults } from "@/lib/hooks/useUploadResult";
 import { useAuth } from "@/contexts/AuthContext";
 import { errorToastHandler } from "@/helpers/errorHandler";
 import { CoverLoader } from "../secondary/loaders/coverLoader";
+import ConfirmationModal from "../secondary/confirmationModal";
 
 const tableHeaders = [
   "Name",
@@ -85,17 +86,12 @@ export function ResultEditTable({
     error,
   } = useUploadExcelResults();
 
-  // Filter parsed data based on search query
-  const filteredData = parsedJson.filter((row) => {
-    const query = searchQuery.toLowerCase();
-    return (
-      row.name?.toLowerCase().includes(query) ||
-      String(row.regNo).includes(query)
-    );
-  });
-
   //Type course modal handler
   const { ModalTemplate, toggleModal } = useModalTemplate();
+  // Confirmation modal state
+  const [isCancelConfirmationOpen, setCancelConfirmationOpen] = useState(false);
+  const [isPublishConfirmationOpen, setPublishConfirmationOpen] =
+    useState(false);
 
   // Add to history when data changes
   useEffect(() => {
@@ -130,19 +126,6 @@ export function ResultEditTable({
 
   //Main submission function
   const handleSubmit = useCallback(() => {
-    if (!validateJsonData(parsedJson, setErrors)) {
-      toast.error("Please fix validation errors before submitting");
-      return;
-    }
-    if (!courseCode.trim()) {
-      toast.error("Please enter a course code");
-      return;
-    }
-    if (parsedJson.length === 0) {
-      toast.error("No results to submit");
-      return;
-    }
-
     //  submission logic here
     const formattedResults: UploadResult[] = parsedJson.map((entry) => ({
       reg_number: `${entry.regNo}`,
@@ -166,8 +149,13 @@ export function ResultEditTable({
               : `${result.inserted} entries uploaded successfully.`;
 
           toast.success(msg, {
-            duration: 50000,
+            duration: 20000,
           });
+          setTimeout(() => {
+            toast.success(
+              "Go to the Results Management page and publish the results for students to view.",
+            );
+          }, 2500);
           closeEditting();
         },
         onError: (error) => {
@@ -178,6 +166,23 @@ export function ResultEditTable({
         },
       },
     );
+  }, [parsedJson]);
+
+  const handleSubmitCallback = useCallback(() => {
+    if (!validateJsonData(parsedJson, setErrors)) {
+      toast.error("Please fix validation errors before submitting");
+      return;
+    }
+    if (!courseOfferingId?.trim()) {
+      toast.error("No course offering selected");
+      return;
+    }
+    if (parsedJson.length === 0) {
+      toast.error("No results to submit");
+      return;
+    }
+
+    setPublishConfirmationOpen(true);
 
     /*toast.success(
       `Successfully saved ${parsedJson.length} results for course ${courseCode}`,
@@ -197,6 +202,15 @@ export function ResultEditTable({
       );
     } */
   }, [courseCode, parsedJson, setErrors]);
+
+  // Filter parsed data based on search query
+  const filteredData = parsedJson.filter((row) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      row.name?.toLowerCase().includes(query) ||
+      String(row.regNo).includes(query)
+    );
+  });
 
   const handleDeleteRow = useCallback(
     (indexToDelete: number) => {
@@ -227,7 +241,7 @@ export function ResultEditTable({
         {/* Heading */}
         <div>
           <h2 className="text-medium">{mode} Extraction Preview</h2>
-          <h3 className="text-[var(--color-text-link)]">
+          <h3 className="text-(--color-text-link)">
             Review and edit extracted data before saving
           </h3>
         </div>
@@ -235,19 +249,19 @@ export function ResultEditTable({
         {/* Buttons */}
         <div>
           <CustomBtn
-            onClick={() => closeEditting()}
-            className="border-[#d1d5db] border-1 text-[var(--color-text-link)] bg-white"
+            onClick={() => setCancelConfirmationOpen(true)}
+            className="border-[#d1d5db] border text-(--color-text-link) bg-white"
           >
             Cancel
           </CustomBtn>
           <CustomBtn
             onClick={toggleModal}
-            className="border-[#d1d5db] border-1 text-[var(--color-text-link)] ml-12"
+            className="border-[#d1d5db] border text-(--color-text-link) ml-12"
           >
             Type in result
           </CustomBtn>
           <CustomBtn
-            onClick={handleSubmit}
+            onClick={() => handleSubmitCallback()}
             className="text-white font-medium bg-[#9333ea] ml-12"
           >
             Approve & save results
@@ -261,8 +275,8 @@ export function ResultEditTable({
         variant="medium"
       >
         Please review the extracted data below. You can edit any incorrect
-        entries by clicking on them. Make sure the course code inputted here
-        matches the one used to add the course.
+        entries by clicking on them. 
+        After reviewing and saving the results, you can go to the Results Management page and publish the results for students to view.
       </InfoCard>
 
       {/* Course details input */}
@@ -328,7 +342,7 @@ export function ResultEditTable({
         <button
           onClick={handleUndo}
           disabled={historyIndex <= 0}
-          className="px-12 py-8 bg-blue-100 text-blue-700 rounded-[8px] text-sm hover:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+          className="px-12 py-8 bg-blue-100 text-blue-700 rounded-lg text-sm hover:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
           title="Undo last change"
         >
           <RotateCcw size={16} /> Undo
@@ -336,28 +350,28 @@ export function ResultEditTable({
         <button
           onClick={handleRedo}
           disabled={historyIndex >= history.length - 1}
-          className="px-12 py-8 bg-blue-100 text-blue-700 rounded-[8px] text-sm hover:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+          className="px-12 py-8 bg-blue-100 text-blue-700 rounded-lg text-sm hover:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
           title="Redo last change"
         >
           <RotateCcw size={16} className="rotate-180" /> Redo
         </button>
         <button
           onClick={() => handleExportToExcel(parsedJson, courseCode)}
-          className="px-12 py-8 bg-green-100 text-green-700 rounded-[8px] text-sm hover:bg-green-200 transition-all flex items-center gap-2"
+          className="px-12 py-8 bg-green-100 text-green-700 rounded-lg text-sm hover:bg-green-200 transition-all flex items-center gap-2"
           title="Export to Excel"
         >
           <Download size={16} /> Export
         </button>
         <button
           onClick={() => handleImportFromExcel(setParsedJson)}
-          className="px-12 py-8 bg-orange-100 text-orange-700 rounded-[8px] text-sm hover:bg-orange-200 transition-all flex items-center gap-2"
+          className="px-12 py-8 bg-orange-100 text-orange-700 rounded-lg text-sm hover:bg-orange-200 transition-all flex items-center gap-2"
           title="Import from Excel"
         >
           <Upload size={16} /> Import
         </button>
         <button
           onClick={handleDownloadTemplate}
-          className="px-12 py-8 bg-purple-100 text-purple-700 rounded-[8px] text-sm hover:bg-purple-200 transition-all flex items-center gap-2"
+          className="px-12 py-8 bg-purple-100 text-purple-700 rounded-lg text-sm hover:bg-purple-200 transition-all flex items-center gap-2"
           title="Download template"
         >
           <Download size={16} /> Template
@@ -435,6 +449,26 @@ export function ResultEditTable({
 
       {/* Loader that covers the table */}
       {isPending && <CoverLoader />}
+
+      {/* COnfirmation */}
+      <ConfirmationModal
+        open={isCancelConfirmationOpen}
+        onCancel={() => setCancelConfirmationOpen(false)}
+        message="discard your changes and close the editor"
+        variant="warning"
+        onConfirm={closeEditting}
+      />
+      {/* COnfirmation */}
+      <ConfirmationModal
+        open={isPublishConfirmationOpen}
+        onCancel={() => setPublishConfirmationOpen(false)}
+        message="Approve and save results"
+        variant="warning"
+        confirmLabel="Approve"
+        canBeUndone={true}
+        onConfirm={handleSubmit}
+        isMutating={isPending}
+      />
     </div>
   );
 }
@@ -490,7 +524,7 @@ export function TableRow({
 
   return (
     <tr
-      key={`${course.regNo}-${index}-row`}
+      key={`${index * 2}-${index}-row`}
       className={
         errors[index] && Object.keys(errors[index]).length > 0
           ? "bg-red-300"

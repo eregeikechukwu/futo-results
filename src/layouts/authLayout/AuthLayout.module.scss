@@ -19,6 +19,10 @@
   padding: toRem(16);
   grid-template-columns: repeat(2, minmax(toRem(500), 1fr));
   gap: toRem(48);
+
+  @include respond-to-abs(medium) {
+    gap: 0;
+  }
 }
 
 .visualPanel {
@@ -39,6 +43,7 @@
 
   @include respond-to-abs(medium) {
     display: none;
+    height: 0;
   }
 }
 

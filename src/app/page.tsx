@@ -228,10 +228,11 @@ export default function Home() {
           </blockquote>
           <div className={styles.atRight}>
             <p className={styles.atBody}>
-              The FUTO Student Results Portal was designed to eliminate the
-              frustration of chasing printed results and unofficial
-              spreadsheets. It creates a single, trusted source of truth for
-              academic records in the Department of Mechatronics Engineering.
+              The FUTO Student Results Portal was designed to simplify access to
+              academic results and reduce the challenges associated with
+              retrieving and tracking academic records. It serves as a
+              centralized and trusted source of information within the
+              university system.
             </p>
             <p className={styles.atBody}>
               Security, transparency and simplicity aren&apos;t trade-offs here
@@ -270,7 +271,8 @@ export default function Home() {
           </div>
         </div>
         <div className={styles.footerCopy}>
-          &copy; 2025 FUTO Student Results Portal. All rights reserved.
+          &copy; {new Date().getFullYear()} FUTO Student Results Portal. All
+          rights reserved.
         </div>
       </footer>
 
@@ -304,16 +306,19 @@ export default function Home() {
 
               <p className={styles.modalSectionLabel}>The problem</p>
               <p className={styles.modalP}>
-                In the Department of Mechatronics Engineering at FUTO, students
-                had no reliable, centralised way to view their academic results.
-                Results circulated informally — through spreadsheets, WhatsApp
-                messages, or physical noticeboards — creating room for error,
-                confusion, and lost records.
+                Across the university community, students, advisors, and
+                academic staff interact with a wide range of academic
+                information throughout each semester. As these processes
+                continue to evolve, there is growing value in providing a
+                centralized platform that makes academic records easier to
+                access, manage, and review.
               </p>
+
               <p className={styles.modalP}>
-                Advisors similarly had no structured system to publish and
-                verify student records digitally, leading to repeated follow-ups
-                and administrative overhead every semester.
+                FUTO Results Portal was created to support this need by offering
+                a structured digital environment for managing academic results
+                and related records, improving accessibility, transparency, and
+                efficiency for the university community.
               </p>
 
               <hr className={styles.modalDivider} />
@@ -326,7 +331,7 @@ export default function Home() {
                 to view their own verified records — privately and instantly.
               </p>
               <p className={styles.modalP}>
-                Built on Next.js and Supabase, with row-level security ensuring
+                Built with state-of-the-art encryption and security ensuring
                 each student only ever sees their own data. Email confirmation
                 and OTP-based advisor authentication add layers of identity
                 assurance that informal systems simply can&apos;t offer.

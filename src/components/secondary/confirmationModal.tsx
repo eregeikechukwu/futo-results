@@ -1,6 +1,6 @@
 import React, { Dispatch, useEffect, useRef, useState } from "react";
 import ConfirmInput from "./confirmInput";
-import { LoaderSpinner2, LoaderSpinner3 } from "./loaders/loaders";
+import { LoaderSpinner3 } from "./loaders/loaders";
 import toast from "react-hot-toast";
 
 type ConfirmModalVariant = "danger" | "warning" | "info";
@@ -12,6 +12,7 @@ interface ConfirmModalProps {
   children?: React.ReactNode;
   confirmLabel?: string;
   cancelLabel?: string;
+  canBeUndone?: boolean;
   variant?: ConfirmModalVariant;
   onConfirm: () => void;
   isMutating?: boolean;
@@ -66,6 +67,7 @@ function ConfirmModal({
   cancelLabel = "Cancel",
   children,
   variant = "danger",
+  canBeUndone = false,
   isMutating = false,
   onConfirm,
   onCancel,
@@ -101,12 +103,12 @@ function ConfirmModal({
   const onConfirmFn = () => {
     if (actionConfirmValue) {
       if (actionConfirmInput === actionConfirmValue) {
-      setActionConfirmInput("");
-      onConfirm();
-    } else
-      toast.error(
-        `${value === "result" || value === "student" ? "Reg Number" : "Course code"} doesnt match`,
-      );
+        setActionConfirmInput("");
+        onConfirm();
+      } else
+        toast.error(
+          `${value === "result" || value === "student" ? "Reg Number" : "Course code"} doesnt match`,
+        );
     } else {
       onConfirm();
     }
@@ -176,8 +178,8 @@ function ConfirmModal({
   "
         >
           Are you sure you want to{" "}
-          <strong className="font-medium text-gray-700">{message}</strong>? This
-          action cannot be undone.
+          <strong className="font-medium text-gray-700">{message}</strong>?
+          {!canBeUndone && " This action cannot be undone."}
         </p>
 
         {/* Divider */}

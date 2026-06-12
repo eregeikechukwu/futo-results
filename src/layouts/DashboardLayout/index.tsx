@@ -4,12 +4,13 @@ import { DashboardLogo } from "@/components/utilities";
 import React, { RefAttributes } from "react";
 import { usePathname } from "next/navigation";
 import styles from "./styles.module.scss";
-import { Check, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useModalTemplate } from "@/components/modals/overlay";
 import ConfirmModal from "@/components/secondary/confirmationModal";
 import { iconMap } from "@/utils/iconMap";
+import { errorToastHandler } from "@/helpers/errorHandler";
 
 type dashboardLinksType = {
   name: string;
@@ -38,6 +39,13 @@ export function DashboardLayout({
   const signOutFunction = (name) => {
     if (name === "Logout") {
       toggleModal();
+    }
+  };
+  const callSignOut = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      errorToastHandler(error);
     }
   };
 
@@ -108,7 +116,7 @@ export function DashboardLayout({
       <ConfirmModal
         message="logout"
         open={isModalOpen}
-        onConfirm={() => signOut()}
+        onConfirm={() => callSignOut()}
         onCancel={toggleModal}
         title="Logout"
       />

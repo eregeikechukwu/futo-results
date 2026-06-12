@@ -137,7 +137,7 @@ export function TextAdd({ children }: { children: string }) {
       <span
         className={`absolute left-full ml-[2px] top-1/2 -translate-y-1/2 w-[2px] h-[1em] bg-current transition-opacity duration-100 ${
           cursor ? "opacity-100" : "opacity-0"
-        } ${textVis.length === 0 && "translate-y-[-3rem]"}`}
+        } ${textVis.length === 0 && "md:!translate-y-[-3rem] -translate-y-7!"}`}
         aria-hidden="true"
       />
     </span>
