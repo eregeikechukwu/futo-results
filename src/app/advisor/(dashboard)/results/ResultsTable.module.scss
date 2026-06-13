@@ -355,32 +355,6 @@
 // TABLE STYLES
 // ============================================================================
 
-.tableContainer {
-  overflow-x: auto;
-  border-radius: toRem(12);
-  border: toRem(1) solid var(--color-border-light);
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--color-white);
-  font-size: toRem(13);
-}
-
-.thead {
-  background: var(--color-background-mild);
-}
-
-.th {
-  padding: toRem(14) toRem(6);
-  text-align: left;
-  font-weight: 600;
-  color: var(--color-text-dark);
-  border-bottom: toRem(2) solid var(--color-border-light);
-  white-space: nowrap;
-}
-
 .tbody {
   tr:hover {
     background: var(--color-background-mild);
@@ -401,7 +375,7 @@
 }
 
 .td {
-  padding: toRem(12) toRem(12);
+  padding: toRem(12) toRem(12) !important;
   color: var(--color-text);
   vertical-align: middle;
 }
@@ -415,14 +389,16 @@
 }
 
 .scoreValue {
+  display: block;
+  width: 4rem;
   font-weight: 500;
   color: var(--color-text);
   font-family: monospace;
 }
 
 .editInput {
-  width: 100%;
-  // min-width: 4rem;
+  // width: 100%;
+  min-width: 4rem;
   padding: toRem(6) toRem(8);
   border: toRem(1) solid var(--color-primary);
   border-radius: toRem(4);

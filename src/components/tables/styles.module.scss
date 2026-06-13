@@ -1,0 +1,122 @@
+@use "../../app/styles/sass/functions/toRem.scss" as *;
+@use "../../app/styles/sass/abstracts/mixins.scss" as *;
+@use "../../app/styles/sass/utilities/reusables.scss" as *;
+@use "../../app/styles/sass/utilities/typography.scss" as *;
+@use "../../app/styles/sass/abstracts/variables.scss" as *;
+@use "sass:color";
+
+// ============================================================================
+// TABLE STYLES
+
+.tableContainer {
+  overflow-x: auto;
+  border-radius: toRem(12);
+  border: toRem(1) solid var(--color-border-light);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-white);
+  font-size: toRem(13);
+}
+
+.tableTitle {
+  padding: toRem(24);
+  padding-top: toRem(16);
+  padding-bottom: toRem(16);
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+  border-bottom: 1px solid inherit;
+  background-color: var(--color-white);
+  @extend .text-medium;
+}
+
+.thead {
+  background: var(--color-background-mild);
+}
+
+.th {
+  padding: toRem(14) toRem(16);
+  text-align: left;
+  font-weight: 600;
+  color: var(--color-text-dark);
+  border-bottom: toRem(2) solid var(--color-border-light);
+  white-space: nowrap;
+}
+
+.tbody {
+  tr:hover {
+    background: var(--color-background-mild);
+  }
+}
+
+.tr {
+  border-bottom: toRem(1) solid var(--color-border-light);
+  transition: background 0.15s ease;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &.editingRow {
+    background: var(--color-blue-background-light);
+  }
+}
+
+.td {
+  padding: toRem(12) toRem(12) !important;
+  color: var(--color-text);
+  vertical-align: middle;
+}
+
+.cellValue {
+  display: inline-block;
+  max-width: toRem(150);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.batchPagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: toRem(12);
+  padding: toRem(16);
+  background: var(--color-background-secondary);
+  border-top: toRem(1) solid var(--color-border-light);
+}
+
+.batchPaginationInfo {
+  color: var(--color-text-passive);
+  font-size: toRem(13);
+  font-weight: 600;
+}
+
+.paginationButtons {
+  display: flex;
+  gap: toRem(8);
+}
+
+.paginationBtn {
+  padding: toRem(8) toRem(16);
+  border: toRem(1) solid var(--color-border-light);
+  background: var(--color-white);
+  color: var(--color-text);
+  border-radius: toRem(6);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--color-primary);
+    color: var(--color-white);
+    border-color: var(--color-primary);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}

@@ -15,6 +15,7 @@ export function useProtectDashboardAccess(
     if (loading || !authInitialized) return; // Still loading, don't redirect yet
 
     if (!profile) {
+      console.log("we are here agaon");
       router.replace(
         role === "student"
           ? "/student/auth"

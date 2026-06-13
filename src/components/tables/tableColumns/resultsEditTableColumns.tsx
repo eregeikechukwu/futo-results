@@ -5,16 +5,12 @@ import styles from "@/app/advisor/(dashboard)/results/ResultsTable.module.scss";
 
 interface ColumnsConfig {
   editingRowId: string | null;
-  editValues: {
+  editValuesRef: React.RefObject<{
     test_score: string;
     lab_score: string;
     exam_score: string;
-  };
-  setEditValues: (values: {
-    test_score: string;
-    lab_score: string;
-    exam_score: string;
-  }) => void;
+  }>;
+
   handleSave: (row: ResultEntry) => void;
   handleEditStart: (row: ResultEntry) => void;
   setDeleteConfirmId: (id: string | null) => void;
@@ -25,8 +21,7 @@ interface ColumnsConfig {
 export const resultsEditTableColumns = (config: ColumnsConfig) => {
   const {
     editingRowId,
-    editValues,
-    setEditValues,
+    editValuesRef,
     handleSave,
     handleEditStart,
     setDeleteConfirmId,
@@ -61,7 +56,7 @@ export const resultsEditTableColumns = (config: ColumnsConfig) => {
     },
     {
       accessorKey: "testScore",
-      header: "Test",
+      header: "Test    ",
       cell: ({ row }) => {
         if (editingRowId === row.original.id) {
           return (
@@ -69,13 +64,10 @@ export const resultsEditTableColumns = (config: ColumnsConfig) => {
               type="number"
               min="0"
               max="40"
-              value={editValues.test_score}
-              onChange={(e) =>
-                setEditValues({
-                  ...editValues,
-                  test_score: e.target.value,
-                })
-              }
+              defaultValue={row.original.test_score ?? ""}
+              onChange={(el) => {
+                editValuesRef.current.test_score = el.target.value;
+              }}
               className={styles.editInput}
             />
           );
@@ -87,7 +79,7 @@ export const resultsEditTableColumns = (config: ColumnsConfig) => {
     },
     {
       accessorKey: "labScore",
-      header: "Lab",
+      header: "Lab    ",
       cell: ({ row }) => {
         if (editingRowId === row.original.id) {
           return (
@@ -95,13 +87,10 @@ export const resultsEditTableColumns = (config: ColumnsConfig) => {
               type="number"
               min="0"
               max="100"
-              value={editValues.lab_score}
-              onChange={(e) =>
-                setEditValues({
-                  ...editValues,
-                  lab_score: e.target.value,
-                })
-              }
+              defaultValue={row.original.lab_score}
+              onChange={(el) => {
+                editValuesRef.current.lab_score = el.target.value;
+              }}
               className={styles.editInput}
             />
           );
@@ -115,7 +104,7 @@ export const resultsEditTableColumns = (config: ColumnsConfig) => {
     },
     {
       accessorKey: "examScore",
-      header: "Exam",
+      header: "Exam ",
       cell: ({ row }) => {
         if (editingRowId === row.original.id) {
           return (
@@ -123,13 +112,10 @@ export const resultsEditTableColumns = (config: ColumnsConfig) => {
               type="number"
               min="0"
               max="100"
-              value={editValues.exam_score}
-              onChange={(e) =>
-                setEditValues({
-                  ...editValues,
-                  exam_score: e.target.value,
-                })
-              }
+              defaultValue={row.original.exam_score}
+              onChange={(el) => {
+                editValuesRef.current.exam_score = el.target.value;
+              }}
               className={styles.editInput}
             />
           );
@@ -144,9 +130,9 @@ export const resultsEditTableColumns = (config: ColumnsConfig) => {
       header: "Total",
       cell: ({ row }) => {
         if (editingRowId === row.original.id) {
-          const test = parseFloat(editValues.test_score) || 0;
-          const lab = parseFloat(editValues.lab_score) || 0;
-          const exam = parseFloat(editValues.exam_score) || 0;
+          const test = parseFloat(editValuesRef.current.test_score) || 0;
+          const lab = parseFloat(editValuesRef.current.lab_score) || 0;
+          const exam = parseFloat(editValuesRef.current.exam_score) || 0;
           const total = test + lab + exam;
           return <span className={styles.totalValue}>{total.toFixed(2)}</span>;
         }
@@ -194,11 +180,11 @@ export const resultsEditTableColumns = (config: ColumnsConfig) => {
               <button
                 onClick={() => {
                   setEditingRowId(null);
-                  setEditValues({
+                  editValuesRef.current = {
                     test_score: "",
                     lab_score: "",
                     exam_score: "",
-                  });
+                  };
                 }}
                 className={styles.cancelBtn}
                 title="Cancel edit"

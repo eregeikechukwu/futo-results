@@ -15,18 +15,18 @@ import { DashboardContainer } from "../secondary/common";
 export function AdvisorTablesSkeleton() {
   return (
     <phantom-ui stagger={2} loading={true}>
-    <DashboardContainer>
+      <DashboardContainer>
         <AdvisorStudentsStatsCards
-        totalStudents={0}
-        verified={0}
-        flagged={0}
-        pending={0}
-      />
-      {/* Students table */}
-      <AdvisorStudentsTable
-        advisorStudents={advisorStudents as AdvisorStudent[]}
-      />
-    </DashboardContainer>
+          totalStudents={0}
+          verified={0}
+          flagged={0}
+          pending={0}
+        />
+        {/* Students table */}
+        <AdvisorStudentsTable
+          advisorStudents={advisorStudents as AdvisorStudent[]}
+        />
+      </DashboardContainer>
     </phantom-ui>
   );
 }
@@ -55,7 +55,7 @@ export function AdvisorProgressBarsSkeleton() {
         {/* Heading */}
         <div className="flex justify-between mb-30">
           <Heading2>Recent Upload Activity</Heading2>
-          <span className="text-[var(--color-text-passive)] secondary-heading flex gap-8 items-center">
+          <span className="text-(--color-text-passive) secondary-heading flex gap-8 items-center">
             <Calendar size={16} /> Last 5 months
           </span>
         </div>

@@ -41,7 +41,7 @@ export function InfoCard({
   heading: string;
   children: React.ReactNode;
   type: "warning" | "success" | "error" | "info";
-  variant: "small" | "medium";
+  variant?: "small" | "medium";
 }) {
   const variants = {
     small: "p-17 rounded-small lh-16 text-12",

@@ -41,7 +41,7 @@ export function Modal({
   return (
     <div
       className={`modal fixed inset-0 z-50 flex items-center justify-center ${
-        !state ? "pointer-events-none" : ""
+        !state ? "pointer-events-none hidden" : "block"
       }`}
       aria-hidden={!state}
     >
@@ -49,9 +49,7 @@ export function Modal({
         className={`modal-content ${
           withTemplate ? "modal-content-styled" : ""
         } transition-transform duration-300 ease-out transform ${
-          state
-            ? "opacity-100 translate-y-0 scale-100"
-            : "opacity-0 translate-y-4 scale-95"
+          state ? "opacity-100 block opacity-in" : "opacity-0 hidden"
         }`}
       >
         <div className="flex justify-between relative">
@@ -65,7 +63,7 @@ export function Modal({
               } opacity-100 `}
             >
               <X
-                className={`text-[var(--color-text-link)]  cursor-pointer `}
+                className={`text-(--color-text-link)  cursor-pointer `}
                 size={20}
                 onClick={toggleModal}
               />
@@ -90,7 +88,7 @@ export function Modal({
 export function Overlay({ active = true }: { active?: boolean }) {
   return (
     <div
-      className={`fixed inset-0 z-40 min-w-screen min-h-screen bg-gray-600 transition-opacity duration-400 ${
+      className={`fixed inset-0 z-40 min-w-screen min-h-screen bg-gray-600 transition-opacity duration-400  ${
         active ? "opacity-70" : "opacity-0 pointer-events-none"
       }`}
     />
@@ -110,29 +108,21 @@ export function useModalTemplate(stall = false) {
 
   // const Modal = useMemo(
   //   () =>
-  function ModalTemplate({
-    withTemplate = true,
-    children,
-    title,
-  }: {
-    withTemplate?: boolean;
-    children: React.ReactNode;
-    title?: string;
-  }) {
-    return (
-      <div>
-        <Modal
-          title={title}
-          withTemplate={withTemplate}
-          stall={stall}
-          toggleModal={toggleModalMain}
-          state={isModalOpen}
-        >
-          {children}
-        </Modal>
-      </div>
-    );
-  }
+
+  const ModalTemplate = useCallback(
+    ({ children, title }: { children: React.ReactNode; title?: string }) => (
+      <Modal
+        title={title}
+        withTemplate={true}
+        stall={stall}
+        toggleModal={toggleModalMain}
+        state={isModalOpen}
+      >
+        {children}
+      </Modal>
+    ),
+    [isModalOpen, stall, toggleModalMain],
+  );
 
   return {
     ModalTemplate,

@@ -5,6 +5,15 @@
 
 import { createSupabaseClient } from "../supabase/client";
 import { UploadResult } from "@/app/types/resultsUpload";
+import { deleteBatch } from "./advisorResultsDownload";
+
+const deleteOrphanedBatch = async (batchId: string) => {
+  try {
+    await deleteBatch(batchId);
+  } catch (err) {
+    console.error("Failed to clean up orphaned batch:", err);
+  }
+};
 
 export async function uploadExcelResults(
   courseOfferingId: string,
@@ -57,6 +66,7 @@ export async function uploadExcelResults(
 
   if (studentsError) {
     console.log("students error " + studentsError);
+    deleteOrphanedBatch(batchId);
     throw studentsError;
   }
   console.log(students, "students");
@@ -101,6 +111,7 @@ export async function uploadExcelResults(
   }, []);
 
   if (entries.length === 0) {
+    deleteOrphanedBatch(batchId);
     throw new Error(
       `No matching students found. Unmatched reg numbers: ${unmatched.join(", ")}`,
     );
@@ -116,12 +127,15 @@ export async function uploadExcelResults(
     })
     .select("id");
 
-  if (upsertError) throw upsertError;
+  if (upsertError) {
+    deleteOrphanedBatch(batchId);
+    throw upsertError;
+  }
 
   // Step 5: Return Summary
   return {
     batchId,
-    inserted: upserted.length ?? 0,
+    inserted: upserted?.length ?? 0,
     unmatched, //Count of unmatched reg numbers, should be sown on the client to warn the advisor
     skipped: unmatched.length,
   };

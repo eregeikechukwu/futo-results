@@ -33,7 +33,7 @@
     "**/*.tsx",
     "**/*.d.ts",
     ".next/types/**/*.ts",
-    "src/components/forms/resultEditTable.tsx"
+    "src/components/tables/resultEditTable.tsx"
   ],
   "exclude": ["node_modules", "worker/**/*"]
 }

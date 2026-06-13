@@ -96,8 +96,6 @@ export default function ManageStudents() {
     [parseFile],
   );
 
-  if (!advisorData) return <SomethingWentWrong />;
-
   // Error loading students
   if (studentsError) {
     errorToastHandler(

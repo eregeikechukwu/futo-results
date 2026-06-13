@@ -10,6 +10,7 @@ import {
   LoaderSpinner3,
 } from "../secondary/loaders/loaders";
 import { useAuth } from "@/contexts/AuthContext";
+import SomethingWentWrong from "../secondary/error/somethingWentWrong";
 
 const links = [
   { name: "dashboard", href: "/student/dashboard", icon: "LayoutDashboard" },
@@ -68,7 +69,9 @@ export function StudentsDashboardShell({
         </div>
 
         {/* Pages content */}
-        <div className={styles.content}>{children}</div>
+        <div className={styles.content}>
+          {!studentData?.id ? <SomethingWentWrong /> : children}
+        </div>
       </div>
     </DashboardLayout>
   );

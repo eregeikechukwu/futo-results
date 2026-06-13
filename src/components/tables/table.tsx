@@ -1,13 +1,108 @@
-import { AdvisorCourse, AdvisorStudent } from "@/app/types/advisor";
+import {
+  AdvisorCourse,
+  AdvisorStudent,
+  ResultEntry,
+} from "@/app/types/advisor";
 import { flexRender, Table } from "@tanstack/react-table";
+import styles from "./styles.module.scss";
 
-export function TableTemplate<T extends AdvisorStudent | AdvisorCourse>({
+export function TableTemplate<
+  T extends AdvisorStudent | AdvisorCourse | ResultEntry,
+>({
+  table,
+  title,
+  BATCH_PAGE_SIZE = 20,
+  children,
+}: {
+  table: Table<T>;
+  title?: string;
+  BATCH_PAGE_SIZE?: number;
+  children?: React.ReactNode;
+}) {
+  const pageCount = table.getPageCount();
+  const currentPage = table.getState().pagination.pageIndex + 1;
+
+  return (
+    <div>
+      <div className={styles.tableContainer}>
+        {title && <div className={styles.tableTitle}>{title}</div>}
+        <table className={styles.table}>
+          <thead className={styles.thead}>
+            {table.getHeaderGroups().map((headerGroup, i) => (
+              <tr key={`${headerGroup.id}`}>
+                {headerGroup.headers.map((header) => (
+                  <th key={header.id} className={styles.th}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+
+          {children ? (
+            children
+          ) : (
+            <tbody className={styles.tbody}>
+              {table.getRowModel().rows.map((row, rowIndex) => (
+                <tr key={row.id} className={`${styles.tr}`}>
+                  {row.getVisibleCells().map((cell, i) => (
+                    <td key={cell.id} className={styles.td}>
+                      {cell.column.id === "rowNumber"
+                        ? currentPage * BATCH_PAGE_SIZE + rowIndex + 1
+                        : flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          )}
+        </table>
+      </div>
+
+      <div className={styles.batchPagination}>
+        <div className={styles.batchPaginationInfo}>
+          Page {currentPage} of {pageCount}
+        </div>
+        <div className={styles.paginationButtons}>
+          <button
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+            className={styles.paginationBtn}
+          >
+            Previous
+          </button>
+          <button
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+            className={styles.paginationBtn}
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/*
+export function TableTemplate<T extends AdvisorStudent | AdvisorCourse | ResultEntry>({
   table,
   title,
 }: {
   table: Table<T>;
   title?: string;
 }) {
+  const pageCount = table.getPageCount();
+  const currentPage = table.getState().pagination.pageIndex + 1;
+
   return (
     <div className="border-light rounded-[24px]">
       {title && (
@@ -23,7 +118,7 @@ export function TableTemplate<T extends AdvisorStudent | AdvisorCourse>({
                 <th key={header.column.id}>
                   {flexRender(
                     header.column.columnDef.header,
-                    header.getContext()
+                    header.getContext(),
                   )}
                 </th>
               ))}
@@ -35,7 +130,7 @@ export function TableTemplate<T extends AdvisorStudent | AdvisorCourse>({
           {table.getRowModel().rows.map((row) => (
             <tr key={row.id}>
               {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className="py-16 px-24 ">
+                <td key={cell.id} className="py-16 px-24 max-w-60 truncate">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
@@ -44,8 +139,12 @@ export function TableTemplate<T extends AdvisorStudent | AdvisorCourse>({
         </tbody>
       </table>
 
-      {/* Pagination */}
-      <div className="w-full p-20">
+      // {/* Pagination 
+      <div className="w-full p-20 flex items-center justify-between">
+        <div>
+          Page {currentPage} of {pageCount}
+        </div>
+
         <div className="flex justify-between gap-8 ">
           <button
             onClick={() => table.previousPage()}
@@ -66,3 +165,4 @@ export function TableTemplate<T extends AdvisorStudent | AdvisorCourse>({
     </div>
   );
 }
+ */

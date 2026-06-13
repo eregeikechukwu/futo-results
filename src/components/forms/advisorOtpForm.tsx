@@ -44,6 +44,13 @@ export function AdvisorOtpForm({
   const [isResendLoading, setIsResendLoading] = useState(false);
   const canResend = secondsLeft === 0;
 
+  // Focus On firsy inpoput field
+  useEffect(() => {
+    if (digitRefs.current[0]) {
+      digitRefs.current[0].focus();
+    }
+  }, []);
+
   useEffect(() => {
     if (secondsLeft <= 0) {
       return;

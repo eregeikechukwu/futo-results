@@ -3,7 +3,7 @@
 import { useWarnBeforeUnload } from "@/app/hooks/useWarnBeforeUnload";
 import { SelectedOffering } from "@/app/types/advisor";
 import { ParsedResult } from "@/app/types/resultsUpload";
-import { ResultEditTable } from "@/components/forms/resultEditTable";
+import { ResultEditTable } from "@/components/tables/resultEditTable";
 import { useAdvisorUploadFileSelect } from "@/components/pages/AdvisorUploadFileSelect";
 import { DashboardContainer } from "@/components/secondary/common";
 import { Header } from "@/components/secondary/header";
@@ -12,6 +12,8 @@ import { RecentlyUploadedResults } from "@/components/secondary/RecentlyUploaded
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdvisorOfferings } from "@/lib/hooks/useAdvisorCourses";
 import { useEffect, useState, useCallback } from "react";
+import toast from "react-hot-toast";
+import { InfoCard } from "@/components/utilities";
 
 export default function UploadResult() {
   const [parsedJson, setParsedJson] = useState<ParsedResult[]>([]);
@@ -34,8 +36,6 @@ export default function UploadResult() {
   useEffect(() => {
     if (!parsedJson?.length) return;
     setIsEditing(true);
-    // console.log(parsedJson);
-    // alert("parsed Json is landed");
   }, [parsedJson]);
 
   //Warn user before leaving before editing is complete
@@ -45,8 +45,6 @@ export default function UploadResult() {
     setIsEditing(false);
     setParsedJson([]);
   }, [isEditing]);
-
-  // console.log(course, "results age course offerfings");
 
   return (
     <DashboardContainer>
@@ -65,6 +63,15 @@ export default function UploadResult() {
           />
         }
       />
+
+      {courseOfferings?.length === 0 && (
+        <InfoCard type="warning" heading="No course found">
+          <p>
+            You don&apos;t have any course to upload results for <br />
+            Go to the courses page to add new courses
+          </p>
+        </InfoCard>
+      )}
 
       {/* Upload results through OCR or Excel */}
       {!isEditing && course && FileSelectComponent}

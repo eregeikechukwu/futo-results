@@ -106,7 +106,7 @@ export function AdvisorCoursesTable({
       accessorKey: "unit",
       header: "credit unit",
       cell: ({ row }: { row: { original: AdvisorCourse } }) => (
-        <span>
+        <span className="max-w-37.5">
           {row.original.unit} {Number(row.original.unit) > 1 ? "units" : "unit"}
         </span>
       ),

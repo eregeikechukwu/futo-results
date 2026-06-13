@@ -67,14 +67,13 @@ export default function ResultsManagementPage() {
   } = useBatchForOffering(selectedOfferingId || "");
 
   // Error handling
-    if (termsError) {
+  if (termsError) {
     errorToastHandler(termsError, "Failed to load academic terms");
   }
 
   if (offeringsError) {
     errorToastHandler(offeringsError, "Failed to load course offerings");
   }
-
 
   if (resultsError) {
     // console.log(resultsError, "   results error");
@@ -93,7 +92,6 @@ export default function ResultsManagementPage() {
   }
 
   if (authLoading) return <div>Loading...</div>;
-  if (!advisorData) return <SomethingWentWrong />;
 
   // Find selected course offering for display
   const selectedOffering = courseOfferings?.find(

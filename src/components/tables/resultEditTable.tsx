@@ -9,7 +9,7 @@ import {
   gradeToneMap,
 } from "@/utils/systemUtils";
 import { useModalTemplate } from "../modals/overlay";
-import { AddResultForm } from "./addResult";
+import { AddResultForm } from "../forms/addResult";
 import { ParsedResult, UploadResult } from "@/app/types/resultsUpload";
 import { RotateCcw, Download, Upload, Eye, EyeOff } from "lucide-react";
 import {
@@ -275,8 +275,9 @@ export function ResultEditTable({
         variant="medium"
       >
         Please review the extracted data below. You can edit any incorrect
-        entries by clicking on them. 
-        After reviewing and saving the results, you can go to the Results Management page and publish the results for students to view.
+        entries by clicking on them. After reviewing and saving the results, you
+        can go to the Results Management page and publish the results for
+        students to view.
       </InfoCard>
 
       {/* Course details input */}

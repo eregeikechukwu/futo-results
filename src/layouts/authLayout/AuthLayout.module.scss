@@ -21,6 +21,7 @@
   gap: toRem(48);
 
   @include respond-to-abs(medium) {
+    display: none;
     gap: 0;
   }
 }

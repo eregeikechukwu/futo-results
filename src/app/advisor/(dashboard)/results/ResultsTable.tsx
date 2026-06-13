@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -21,9 +21,9 @@ import styles from "./ResultsTable.module.scss";
 import ConfirmModal from "@/components/secondary/confirmationModal";
 import { CoverLoader } from "@/components/secondary/loaders/coverLoader";
 import { ResultsTableProps, ResultEntry } from "@/app/types/advisor";
-import { Edit2, Trash2, Check, X } from "lucide-react";
 import { errorToastHandler } from "@/helpers/errorHandler";
 import { resultsEditTableColumns } from "@/components/tables/tableColumns/resultsEditTableColumns";
+import { TableTemplate } from "@/components/tables/table";
 
 const BATCH_PAGE_SIZE = 20;
 
@@ -37,7 +37,12 @@ export default function ResultsTable({
   const [remarkFilter, setRemarkFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
-  const [editValues, setEditValues] = useState<{
+  // const [editValues, setEditValues] = useState<{
+  //   test_score: string;
+  //   lab_score: string;
+  //   exam_score: string;
+  // }>({ test_score: "", lab_score: "", exam_score: "" });
+  const editValuesRef = useRef<{
     test_score: string;
     lab_score: string;
     exam_score: string;
@@ -83,23 +88,24 @@ export default function ResultsTable({
   // Begin editing a single result row and populate the edit buffer
   const handleEditStart = (row: ResultEntry) => {
     setEditingRowId(row.id);
-    setEditValues(() => {
+    editValuesRef.current = (() => {
       const getValue = (value) => (value !== null ? value.toString() : "");
       return {
         test_score: getValue(row.test_score),
         lab_score: getValue(row.lab_score),
         exam_score: getValue(row.exam_score),
       };
-    });
+    })();
   };
 
   // Validate and save edited score values for a result entry
   const handleSave = async (row: ResultEntry) => {
+    // console.log(editValuesRef.current,"  Edit values ref current");
     const getValue = (value: string) =>
       value.trim() === "" ? null : parseFloat(value);
-    const test = getValue(editValues.test_score);
-    const lab = getValue(editValues.lab_score);
-    const exam = getValue(editValues.exam_score);
+    const test = getValue(editValuesRef.current.test_score);
+    const lab = getValue(editValuesRef.current.lab_score);
+    const exam = getValue(editValuesRef.current.exam_score);
 
     const checkValue = (value: number | null) => value !== null && isNaN(value);
 
@@ -135,7 +141,11 @@ export default function ResultsTable({
       {
         onSuccess: () => {
           setEditingRowId(null);
-          setEditValues({ test_score: "", lab_score: "", exam_score: "" });
+          editValuesRef.current = {
+            test_score: "",
+            lab_score: "",
+            exam_score: "",
+          };
           toast.success("Score updated successfully");
         },
         onError: (error) => {
@@ -162,229 +172,20 @@ export default function ResultsTable({
   };
 
   // Create columns with all dependencies
-  // const columns = useMemo(
-  //   () =>
-  //     resultsEditTableColumns({
-  //       editingRowId,
-  //       editValues,
-  //       setEditValues,
-  //       handleSave,
-  //       handleEditStart,
-  //       setDeleteConfirmId,
-  //       setDeleteConfirmRegNo,
-  //       setEditingRowId,
-  //     }),
-  //   [editingRowId, editValues, handleSave, handleEditStart],
-  // );
-  const columns = useMemo(() => {
-    const columns: ColumnDef<ResultEntry>[] = [
-      {
-        accessorKey: "rowNumber",
-        header: "#",
-        cell: ({ row }) => row.index + 1,
-        size: 40,
-      },
-      {
-        accessorKey: "regNumber",
-        header: "Reg Number",
-        cell: ({ row }) => (
-          <span className={styles.cellValue}>
-            {row.original.students.reg_number}
-          </span>
-        ),
-      },
-      {
-        accessorKey: "fullName",
-        header: "Full Name",
-        cell: ({ row }) => (
-          <span className={styles.cellValue}>
-            {row.original.students.profiles.full_name}
-          </span>
-        ),
-      },
-      {
-        accessorKey: "testScore",
-        header: "Test",
-        cell: ({ row }) => {
-          if (editingRowId === row.original.id) {
-            return (
-              <input
-                type="number"
-                min="0"
-                max="40"
-                value={editValues.test_score}
-                onChange={(e) =>
-                  setEditValues({
-                    ...editValues,
-                    test_score: e.target.value,
-                  })
-                }
-                className={styles.editInput}
-              />
-            );
-          }
-          return (
-            <span className={styles.scoreValue}>{row.original.test_score}</span>
-          );
-        },
-      },
-      {
-        accessorKey: "labScore",
-        header: "Lab",
-        cell: ({ row }) => {
-          if (editingRowId === row.original.id) {
-            return (
-              <input
-                type="number"
-                min="0"
-                max="100"
-                value={editValues.lab_score}
-                onChange={(e) =>
-                  setEditValues({
-                    ...editValues,
-                    lab_score: e.target.value,
-                  })
-                }
-                className={styles.editInput}
-              />
-            );
-          }
-          return (
-            <span className={styles.scoreValue}>
-              {row.original.lab_score ?? "-"}
-            </span>
-          );
-        },
-      },
-      {
-        accessorKey: "examScore",
-        header: "Exam",
-        cell: ({ row }) => {
-          if (editingRowId === row.original.id) {
-            return (
-              <input
-                type="number"
-                min="0"
-                max="100"
-                value={editValues.exam_score}
-                onChange={(e) =>
-                  setEditValues({
-                    ...editValues,
-                    exam_score: e.target.value,
-                  })
-                }
-                className={styles.editInput}
-              />
-            );
-          }
-          return (
-            <span className={styles.scoreValue}>{row.original.exam_score}</span>
-          );
-        },
-      },
-      {
-        accessorKey: "total",
-        header: "Total",
-        cell: ({ row }) => {
-          if (editingRowId === row.original.id) {
-            const test = parseFloat(editValues.test_score) || 0;
-            const lab = parseFloat(editValues.lab_score) || 0;
-            const exam = parseFloat(editValues.exam_score) || 0;
-            const total = test + lab + exam;
-            return (
-              <span className={styles.totalValue}>{total.toFixed(2)}</span>
-            );
-          }
-          return (
-            <span className={styles.totalValue}>
-              {row.original.total_score}
-            </span>
-          );
-        },
-      },
-      {
-        accessorKey: "grade",
-        header: "Grade",
-        cell: ({ row }) => (
-          <span className={styles.gradeBadge}>{row.original.grade}</span>
-        ),
-      },
-      {
-        accessorKey: "remark",
-        header: "Remark",
-        cell: ({ row }) => (
-          <span
-            className={`${styles.remarkBadge} ${
-              row.original.remark === "PASS"
-                ? styles.remarkPass
-                : styles.remarkFail
-            }`}
-          >
-            {row.original.remark}
-          </span>
-        ),
-      },
-      {
-        accessorKey: "actions",
-        header: "Actions",
-        cell: ({ row }) => {
-          if (editingRowId === row.original.id) {
-            return (
-              <div className={styles.actionButtons}>
-                <button
-                  onClick={() => handleSave(row.original)}
-                  className={styles.saveBtn}
-                  title="Save changes"
-                >
-                  <Check size={16} />
-                </button>
-                <button
-                  onClick={() => {
-                    setEditingRowId(null);
-                    setEditValues({
-                      test_score: "",
-                      lab_score: "",
-                      exam_score: "",
-                    });
-                  }}
-                  className={styles.cancelBtn}
-                  title="Cancel edit"
-                >
-                  <X size={16} />
-                </button>
-              </div>
-            );
-          }
-
-          return (
-            <div className={styles.actionButtons}>
-              <button
-                onClick={() => handleEditStart(row.original)}
-                className={styles.editBtn}
-                title="Edit entry"
-              >
-                <Edit2 size={16} />
-              </button>
-              <button
-                onClick={() => {
-                  setDeleteConfirmId(row.original.id);
-                  setDeleteConfirmRegNo(row.original.students.reg_number);
-                }}
-                className={styles.deleteBtn}
-                title="Delete entry"
-              >
-                <Trash2 size={16} />
-              </button>
-            </div>
-          );
-        },
-      },
-    ];
-
-    return columns;
-  }, [editingRowId, editValues, handleSave, handleEditStart]);
-
   // Columns define how result entry fields render and support inline editing
+  const columns = useMemo(
+    () =>
+      resultsEditTableColumns({
+        editingRowId,
+        editValuesRef,
+        handleSave,
+        handleEditStart,
+        setDeleteConfirmId,
+        setDeleteConfirmRegNo,
+        setEditingRowId,
+      }),
+    [editingRowId, editValuesRef, handleSave],
+  );
 
   // Create the table instance for sorting and row model access
   const table = useReactTable({
@@ -407,7 +208,7 @@ export default function ResultsTable({
     > = {};
 
     rowModel.rows.forEach((row) => {
-      const batchId = row.original.batch_id;
+      const batchId = row.original.result_batches.id;
       if (!groups[batchId]) {
         groups[batchId] = {
           batch: row.original.result_batches,
@@ -428,6 +229,8 @@ export default function ResultsTable({
   const draftBatchCount = batches.filter(
     (batch) => batch.status === "draft",
   ).length;
+
+  console.log(batchGroups, "batchGroups");
 
   const publishAllMutation = usePublishAllDraftBatches(offeringId);
 
@@ -568,16 +371,16 @@ export default function ResultsTable({
       </div>
 
       {batchGroups.length > 0 ? (
-        batchGroups.map(({ batch, rows }) => {
+        batchGroups.map(({ batch, rows: batchRows }) => {
           const pageCount = Math.max(
             1,
-            Math.ceil(rows.length / BATCH_PAGE_SIZE),
+            Math.ceil(batchRows.length / BATCH_PAGE_SIZE),
           );
           const currentPage = Math.min(
             batchPages[batch.id] ?? 0,
             pageCount - 1,
           );
-          const pageRows = rows.slice(
+          const pageRows = batchRows.slice(
             currentPage * BATCH_PAGE_SIZE,
             currentPage * BATCH_PAGE_SIZE + BATCH_PAGE_SIZE,
           );
@@ -594,7 +397,8 @@ export default function ResultsTable({
                       Uploaded {formatBatchDate(batch.created_at)}
                     </span>
                     <span className={styles.batchDetailItem}>
-                      {rows.length} entr{rows.length === 1 ? "y" : "ies"}
+                      {batchRows.length} entr
+                      {batchRows.length === 1 ? "y" : "ies"}
                     </span>
                   </div>
                 </div>
@@ -622,81 +426,32 @@ export default function ResultsTable({
                 </div>
               </div>
 
-              <div className={styles.tableContainer}>
-                <table className={styles.table}>
-                  <thead className={styles.thead}>
-                    {table.getHeaderGroups().map((headerGroup, i) => (
-                      <tr key={`${headerGroup.id}`}>
-                        {headerGroup.headers.map((header) => (
-                          <th key={header.id} className={styles.th}>
-                            {header.isPlaceholder
-                              ? null
-                              : flexRender(
-                                  header.column.columnDef.header,
-                                  header.getContext(),
-                                )}
-                          </th>
-                        ))}
-                      </tr>
-                    ))}
-                  </thead>
-                  <tbody className={styles.tbody}>
-                    {pageRows.map((row, rowIndex) => (
-                      <tr
-                        key={row.id}
-                        className={`${styles.tr} ${
-                          editingRowId === row.original.id
-                            ? styles.editingRow
-                            : ""
-                        }`}
-                      >
-                        {row.getVisibleCells().map((cell, i) => (
-                          <td key={cell.id} className={styles.td}>
-                            {cell.column.id === "rowNumber"
-                              ? currentPage * BATCH_PAGE_SIZE + rowIndex + 1
-                              : flexRender(
-                                  cell.column.columnDef.cell,
-                                  cell.getContext(),
-                                )}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <div className={styles.batchPagination}>
-                <div className={styles.batchPaginationInfo}>
-                  Page {currentPage + 1} of {pageCount}
-                </div>
-                <div className={styles.batchPaginationButtons}>
-                  <button
-                    onClick={() =>
-                      setBatchPages((prev) => ({
-                        ...prev,
-                        [batch.id]: Math.max(currentPage - 1, 0),
-                      }))
-                    }
-                    disabled={currentPage === 0}
-                    className={styles.paginationBtn}
-                  >
-                    Previous
-                  </button>
-                  <button
-                    onClick={() =>
-                      setBatchPages((prev) => ({
-                        ...prev,
-                        [batch.id]: Math.min(currentPage + 1, pageCount - 1),
-                      }))
-                    }
-                    disabled={currentPage >= pageCount - 1}
-                    className={styles.paginationBtn}
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
+              {/* Table */}
+              <TableTemplate table={table}>
+                <tbody className={styles.tbody}>
+                  {batchRows.map((row, rowIndex) => (
+                    <tr
+                      key={row.id}
+                      className={`${styles.tr} ${
+                        editingRowId === row.original.id
+                          ? styles.editingRow
+                          : ""
+                      }`}
+                    >
+                      {row.getVisibleCells().map((cell, i) => (
+                        <td key={cell.id} className={styles.td}>
+                          {cell.column.id === "rowNumber"
+                            ? currentPage * BATCH_PAGE_SIZE + rowIndex + 1
+                            : flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext(),
+                              )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </TableTemplate>
             </section>
           );
         })

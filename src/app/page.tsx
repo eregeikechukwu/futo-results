@@ -1,13 +1,11 @@
 "use client";
 
 import { Logo, LogoWithName } from "@/components/secondary/logo";
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { TextAdd } from "@/components/textAdd";
 import styles from "./home.module.scss";
 import { useDesktopOnly } from "./hooks/useDesktopOnly";
-import CountUp from "@/utils/countUp";
 
 export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);

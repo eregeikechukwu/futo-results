@@ -63,81 +63,83 @@ export function TableControls({
 */
 
   return (
-    <div className="dashboard-container mb-32 grid grid-cols-3 gap-16 items-center">
-      {/* Search */}
-      <div>
-        <label
-          htmlFor="search"
-          className="secondary-heading text-[var(--color-text-dark)]"
-        >
-          {utils.searchTitle}
-        </label>
-        <div className={`relative h-46  mt-8 input-height`}>
-          <div className="center-child h-full bottom-0 left-0 top-0  absolute text-[#9ca3af] p-12">
-            <Search size={18} />
-          </div>
-          <input
-            id="search"
-            type="text"
-            placeholder={`${utils.placeholder}`}
-            value={globalFilter ?? ""}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            className="w-full py-12 pl-40 pr-12 rounded-small border-light secondary-heading input"
-          />
-        </div>
-      </div>
-
-      {/* Filter */}
-      <div>
-        <label
-          htmlFor={`${utils.optionTilte.toLowerCase()}`}
-          className="secondary-heading text-[var(--color-text-dark)]"
-        >
-          {utils.optionTilte}
-        </label>
-        <div className="input-height">
-          <select
-            id={`${utils.optionTilte.toLowerCase()}`}
-            onChange={(e) => {
-              console.log(e.target.value);
-              return table
-                .getColumn(utils.optionTilte.toLowerCase())
-                ?.setFilterValue(e.target.value);
-            }}
-            value={
-              table
-                .getColumn(utils.optionTilte.toLowerCase())
-                ?.getFilterValue()
-                ?.toString() ?? ""
-            }
-            className="w-full mt-8 py-12 pl-12 pr-12 border-light secondary-heading input"
+    <div className="dashboard-container mb-32">
+      <div className="  flex gap-16 items-center w-full">
+        {/* Search */}
+        <div className="flex-1">
+          <label
+            htmlFor="search"
+            className="secondary-heading text-(--color-text-dark)"
           >
-            {loading ? (
-              <option>Loading...</option>
-            ) : error ? (
-              <option>Error loading options</option>
-            ) : (
-              utils.options.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.title}
-                </option>
-              ))
-            )}
-          </select>
+            {utils.searchTitle}
+          </label>
+          <div className={`relative h-46  mt-8 input-height`}>
+            <div className="center-child h-full bottom-0 left-0 top-0  absolute text-[#9ca3af] p-12">
+              <Search size={18} />
+            </div>
+            <input
+              id="search"
+              type="text"
+              placeholder={`${utils.placeholder}`}
+              value={globalFilter ?? ""}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              className="w-full py-12 pl-40 pr-12 rounded-small border-light secondary-heading input"
+            />
+          </div>
         </div>
-      </div>
 
-      {/* Reset */}
-      <button
-        onClick={resetFilters}
-        className={`input-height group h-46 !mt-auto flex rounded-small gap-8 center-child text-[var(--color-text-dark)] font-medium bg-[var(--color-background-mild)] hover:bg-gray-300 transition`}
-      >
-        <RefreshCcw
-          size={17}
-          className="group-hover:rotate-[30deg] transition"
-        />{" "}
-        Reset Filters
-      </button>
+        {/* Filter */}
+        <div className="flex-1">
+          <label
+            htmlFor={`${utils.optionTilte.toLowerCase()}`}
+            className="secondary-heading text-(--color-text-dark)"
+          >
+            {utils.optionTilte}
+          </label>
+          <div className="input-height">
+            <select
+              id={`${utils.optionTilte.toLowerCase()}`}
+              onChange={(e) => {
+                console.log(e.target.value);
+                return table
+                  .getColumn(utils.optionTilte.toLowerCase())
+                  ?.setFilterValue(e.target.value);
+              }}
+              value={
+                table
+                  .getColumn(utils.optionTilte.toLowerCase())
+                  ?.getFilterValue()
+                  ?.toString() ?? ""
+              }
+              className="w-full mt-6  py-12 pl-12 pr-12 border-light secondary-heading input"
+            >
+              {loading ? (
+                <option>Loading...</option>
+              ) : error ? (
+                <option>Error loading options</option>
+              ) : (
+                utils.options.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.title}
+                  </option>
+                ))
+              )}
+            </select>
+          </div>
+        </div>
+
+        {/* Reset */}
+        <button
+          onClick={resetFilters}
+          className={`flex-1 input-height group h-46 mt-auto! flex rounded-small gap-8 center-child text-[var(--color-text-dark)] font-medium bg-[var(--color-background-mild)] hover:bg-gray-300 transition`}
+        >
+          <RefreshCcw
+            size={17}
+            className="group-hover:rotate-[30deg] transition"
+          />{" "}
+          Reset Filters
+        </button>
+      </div>
     </div>
   );
 }

@@ -37,9 +37,7 @@ export function RecentlyUploadedResults({
                 key={index}
                 title="2023/2024 - Harmattan"
                 coursecode="CSC301"
-                // items="45 students"
                 date="2024-01-17"
-                img="/images/clear.jpg"
               />
             ))}
           </phantom-ui>
