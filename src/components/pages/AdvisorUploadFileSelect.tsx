@@ -7,7 +7,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { InfoCard } from "../utilities";
 import { uploadImageForOCR } from "../../lib/api";
 import { Modal } from "../modals/overlay";
-import { ProgressBar } from "../ocrProgress";
+import { ProgressBar } from "../secondary/ocrProgress";
 import { OcrJob } from "@/app/types/advisor";
 import { useExcelParser } from "../../lib/excelToJson";
 import { ParsedResult } from "@/app/types/resultsUpload";

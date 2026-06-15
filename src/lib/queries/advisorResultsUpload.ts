@@ -85,6 +85,7 @@ export async function uploadExcelResults(
   const entries = parsedRows.reduce<
     {
       batch_id: string;
+      offering_id:string;
       student_id: string;
       test_score?: number;
       exam_score?: number;
@@ -102,6 +103,7 @@ export async function uploadExcelResults(
     acc.push({
       batch_id: batchId,
       student_id: studentId,
+      offering_id: courseOfferingId,
       test_score: row.test_score,
       exam_score: row.exam_score,
       lab_score: row.lab_score,
@@ -122,7 +124,7 @@ export async function uploadExcelResults(
   const { data: upserted, error: upsertError } = await supabase
     .from("result_entries")
     .upsert(entries, {
-      onConflict: "batch_id,student_id",
+      onConflict: "offering_id,student_id",
       ignoreDuplicates: false, // false = overwrite on conflict
     })
     .select("id");

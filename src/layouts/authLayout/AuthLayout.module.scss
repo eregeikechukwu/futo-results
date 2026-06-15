@@ -21,7 +21,6 @@
   gap: toRem(48);
 
   @include respond-to-abs(medium) {
-    display: none;
     gap: 0;
   }
 }
@@ -34,6 +33,10 @@
   transform: translateY(-50%);
   left: toRem(20);
   right: 50vw;
+
+  @include respond-to-abs(medium) {
+    display: none;
+  }
 }
 
 .visualImage {

@@ -24,6 +24,7 @@ import { ResultsTableProps, ResultEntry } from "@/app/types/advisor";
 import { errorToastHandler } from "@/helpers/errorHandler";
 import { resultsEditTableColumns } from "@/components/tables/tableColumns/resultsEditTableColumns";
 import { TableTemplate } from "@/components/tables/table";
+import { useWarnBeforeUnload } from "@/app/hooks/useWarnBeforeUnload";
 
 const BATCH_PAGE_SIZE = 20;
 
@@ -37,11 +38,11 @@ export default function ResultsTable({
   const [remarkFilter, setRemarkFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
-  // const [editValues, setEditValues] = useState<{
-  //   test_score: string;
-  //   lab_score: string;
-  //   exam_score: string;
-  // }>({ test_score: "", lab_score: "", exam_score: "" });
+  // Warn before leaving page
+
+  // Warn before leaving page
+  useWarnBeforeUnload(editingRowId !== null);
+
   const editValuesRef = useRef<{
     test_score: string;
     lab_score: string;

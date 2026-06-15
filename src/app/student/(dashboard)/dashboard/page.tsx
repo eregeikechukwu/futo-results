@@ -24,7 +24,6 @@ export default function StudentDashboard() {
     data: activeTerm,
     isLoading: activeTermLoading,
     error: activeTermError,
-    
   } = useActiveTerm();
 
   const {
@@ -87,9 +86,9 @@ export default function StudentDashboard() {
   if (resultsError || activeTermError) {
     return (
       <SomethingWentWrong
-       retry={
-refetchResults
-       } message="Unable to load your dashboard. Please try again." />
+        retry={refetchResults}
+        message="Unable to load your dashboard. Please try again."
+      />
     );
   }
 
@@ -102,7 +101,7 @@ refetchResults
       <div className={styles.heroCard}>
         <div className={styles.heroTitleBlock}>
           <h1 className={styles.heroTitle}>
-            Welcome back, {profile.full_name}
+            Welcome back, {profile.full_name.split(" ")[1] || profile.full_name}
           </h1>
           <h3 className={styles.heroSubtitle}>
             {departmentLabel} Department • Academic Session{" "}
@@ -121,7 +120,7 @@ refetchResults
             <StudentStatCard
               title="Current CGPA"
               count={Number(dashboardStats.cumulativeGpa.toFixed(2))}
-              subText="Published results"
+              subText=""
               icon="Trophy"
               color="blue"
             />

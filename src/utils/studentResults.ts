@@ -19,25 +19,25 @@ export type StudentResultEntry = {
   grade: string | null;
   remark: string | null;
   batch_id: string;
+  offering_id: string;
+  course_offerings: {
+    id: string;
+    unit: number;
+    courses: {
+      course_code: string;
+      course_title: string;
+    };
+    academic_terms: {
+      id: string;
+      session: string;
+      semester: string;
+      academic_year: number;
+    };
+  };
   result_batches: {
     id: string;
     status: string;
     published_at: string | null;
-    offering_id: string;
-    course_offerings: {
-      id: string;
-      unit: number;
-      courses: {
-        course_code: string;
-        course_title: string;
-      };
-      academic_terms: {
-        id: string;
-        session: string;
-        semester: string;
-        academic_year: number;
-      };
-    };
   };
 };
 
@@ -86,9 +86,9 @@ export function normalizeCourseResult(
   const grade = entry.grade ? toGradeLetter(entry.grade) : computeGrade(total);
 
   return {
-    courseCode: entry.result_batches.course_offerings.courses.course_code,
-    courseTitle: entry.result_batches.course_offerings.courses.course_title,
-    unit: Number(entry.result_batches.course_offerings.unit ?? 0),
+    courseCode: entry.course_offerings.courses.course_code,
+    courseTitle: entry.course_offerings.courses.course_title,
+    unit: Number(entry.course_offerings.unit ?? 0),
     test,
     lab,
     exam,
@@ -126,7 +126,7 @@ export function groupStudentResultsByTerm(
   >();
 
   for (const entry of entries) {
-    const offering = entry.result_batches?.course_offerings;
+    const offering = entry?.course_offerings;
     const term = offering?.academic_terms;
     if (!offering || !term?.session) continue;
 

@@ -35,19 +35,23 @@ export function StudentStatCard({
       </div>
 
       {/* TItle */}
-      <h3 className="text-sm text-[var(--color-text-link)] font-[600] !mb-[4px]">
+      <h3 className="text-sm text-(--color-text-link) font-[600] !mb-[4px]">
         {title}
       </h3>
 
       {/* count */}
-      {count && <CountUp end={count} styles="text-extra-large font-bold" />}
+      {(count === 0 || count) && (
+        <CountUp end={count || 0} styles="text-extra-large font-bold" />
+      )}
 
       {value && <h3 className="text-medium font-bold">{value}</h3>}
 
       {/* subtext */}
-      <p className="text-[var(--color-text-passive)] secondary-heading">
-        {subText}
-      </p>
+      {subText && (
+        <p className="text-(--color-text-passive) secondary-heading">
+          {subText}
+        </p>
+      )}
     </div>
   );
 }

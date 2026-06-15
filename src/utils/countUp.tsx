@@ -67,7 +67,7 @@ function CountUp({
         clearInterval(counter);
       }
       // Round to 2 decimal places for clean display
-      setCount(+start.toFixed(2));
+      setCount(+start.toFixed(2) || 0);
     }, 16);
 
     // Cleanup interval on unmount or when animation completes
@@ -76,7 +76,7 @@ function CountUp({
 
   return (
     <span ref={elementRef} className={styles}>
-      {count}
+      {count ?? "0"}
     </span>
   );
 }

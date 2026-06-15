@@ -11,10 +11,9 @@ import {
   useBatchForOffering,
 } from "@/lib/hooks/useResults";
 import { errorToastHandler } from "@/helpers/errorHandler";
-import SomethingWentWrong from "@/components/secondary/error/somethingWentWrong";
 import ResultsTable from "./ResultsTable";
 import styles from "./ResultsTable.module.scss";
-import { useWarnBeforeUnload } from "@/app/hooks/useWarnBeforeUnload";
+
 import { RefetchButton } from "@/components/secondary/buttons";
 
 export default function ResultsManagementPage() {
@@ -23,9 +22,6 @@ export default function ResultsManagementPage() {
   const [selectedOfferingId, setSelectedOfferingId] = useState<string | null>(
     null,
   );
-
-  // Warn before leaving page
-  useWarnBeforeUnload(selectedOfferingId !== null);
 
   // Fetch all academic terms
   const {

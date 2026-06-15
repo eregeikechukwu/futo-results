@@ -1,5 +1,6 @@
 @use "./styles/sass/functions/toRem.scss" as *;
 @use "./styles/sass/abstracts/mixins.scss" as *;
+@use "./styles/sass/main/animations.scss" as *;
 
 // ─── NAV ────────────────────────────────────────────────────────────────────
 
@@ -582,16 +583,7 @@
   justify-content: center;
   padding: toRem(24);
   backdrop-filter: blur(4px);
-  animation: overlayIn 0.2s ease;
-}
-
-@keyframes overlayIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  animation: opacityIn 0.2s ease;
 }
 
 .modal {
@@ -602,17 +594,6 @@
   max-height: 90vh;
   overflow-y: auto;
   animation: modalIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-@keyframes modalIn {
-  from {
-    opacity: 0;
-    transform: scale(0.94) translateY(toRem(12));
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
 }
 
 .modalHeader {
@@ -788,6 +769,7 @@
   // HERO
   .heroSection {
     min-height: auto;
+    height: calc(100vh - 4rem);
   }
 
   .heroGrid {

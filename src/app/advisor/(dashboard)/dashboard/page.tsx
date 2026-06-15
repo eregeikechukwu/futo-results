@@ -23,11 +23,11 @@ import {
   AdvisorStatsSkeleton,
   AdvisorUUploadSummarySkeleton,
 } from "@/components/skeletons/advisorSkeletons";
-// import "@aejkatappaja/phantom-cui";
+import "@aejkatappaja/phantom-ui";
 
 export default function AdvisorDashboard() {
-  const { loading, profile, advisorData } = useAuth();
   const [truncated, setTruncated] = useState(true);
+  const { loading, profile, advisorData } = useAuth();
 
   const {
     data: statsData,
@@ -53,7 +53,7 @@ export default function AdvisorDashboard() {
   } = useRecentBatches(profile?.id || "");
 
   useEffect(() => {
-    import("@aejkatappaja/phantom-ui");
+    // import("@aejkatappaja/phantom-ui");
 
     if ((!advisorData || !profile) && !loading) {
       toast.error(
@@ -87,6 +87,7 @@ export default function AdvisorDashboard() {
 
   // Error handling professionlayy
   if (uploadActivityError || uploadSummaryError || error) {
+    console.log("error", error, uploadActivityError, uploadSummaryError);
     errorToastHandler(
       uploadActivityError?.message ||
         uploadSummaryError?.message ||
@@ -101,13 +102,13 @@ export default function AdvisorDashboard() {
   return (
     <>
       <div className="dashboard-main-container">
-        <div className="flex justify-between  items-center bg-gradient-to-r from-[#effff8] to-[var(--color-white)] border border-[var(--color-blue-background)] rounded-[16px] lh-24 p-24">
+        <div className="flex justify-between  items-center bg-linear-to-r from-[#effff8] to-white border border-(--color-blue-background) rounded-2xl lh-24 p-24">
           <div>
             <h1 className="text-24 lh-32 font-bold mb-8">
               Welcome back, {advisorData?.title || "Advisor"}{" "}
               {profile?.full_name || "User"}
             </h1>
-            <h2 className="text-[var(--color-text-link)]">
+            <h2 className="text-(--color-text-link)">
               {advisorData?.advisor_assignments[0].departments.name ||
                 "Department"}{" "}
               Department • Academic Session{" "}
@@ -116,7 +117,7 @@ export default function AdvisorDashboard() {
           </div>
 
           {/* Badge */}
-          <div className="h-64 w-64 rounded-[16px] center-child bg-[var(--color-primary)]">
+          <div className="h-64 w-64 rounded-2xl center-child bg-(--color-primary)">
             <UserCheck2Icon size={26} stroke="var(--color-white)" />
           </div>
         </div>
@@ -144,7 +145,7 @@ export default function AdvisorDashboard() {
               {/* Heading */}
               <div className="flex justify-between mb-30">
                 <Heading2>Recent Upload Activity</Heading2>
-                <span className="text-[var(--color-text-passive)] secondary-heading flex gap-8 items-center">
+                <span className="text-(--color-text-passive) secondary-heading flex gap-8 items-center">
                   <Calendar size={16} /> Last 5 months
                 </span>
               </div>
@@ -183,7 +184,7 @@ export default function AdvisorDashboard() {
               {uploadSummary.length > 3 && (
                 <p
                   onClick={() => setTruncated(!truncated)}
-                  className="text-[var(--color-text-link)] cursor-pointer"
+                  className="text-(--color-text-link) cursor-pointer"
                 >
                   see {truncated ? "more" : "less"}
                 </p>

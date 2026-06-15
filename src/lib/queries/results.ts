@@ -18,12 +18,8 @@ export async function fetchStudentResults(
       grade,
       remark,
       batch_id,
-      result_batches!inner (
-        id,
-        status,
-        published_at,
-        offering_id,
-        course_offerings!inner (
+      offering_id,
+      course_offerings!inner (
           id,
           unit,
           courses!inner (
@@ -37,8 +33,12 @@ export async function fetchStudentResults(
             semester,
             admission_year
           )
+        ),
+        result_batches!inner (
+        id,
+        status,
+        published_at
         )
-      )
     `,
     )
     .eq("student_id", studentId);

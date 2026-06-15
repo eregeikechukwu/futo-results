@@ -24,7 +24,7 @@ export async function fetchCourseOfferingsForTerm(
     `,
     )
     .eq("advisor_id", advisorId)
-    .eq("academic_terms.id", termId)
+    .eq("term_id", termId)
     .order("courses(course_code)");
 
   if (error) throw error;
@@ -38,17 +38,6 @@ export async function fetchCourseOfferingsForTerm(
  */
 export async function fetchResultsForOffering(offeringId: string) {
   const supabase = createSupabaseClient();
-
-  // Step 1: Get all batch IDs for this offering
-  const { data: batches, error: batchError } = await supabase
-    .from("result_batches")
-    .select("id")
-    .eq("offering_id", offeringId);
-
-  if (batchError) throw batchError;
-  if (!batches || batches.length === 0) return [];
-
-  const batchIds = batches.map((b) => b.id);
 
   // Step 2: Fetch result entries filtered by those batch IDs
   const { data, error } = await supabase
@@ -78,8 +67,8 @@ export async function fetchResultsForOffering(offeringId: string) {
       )
     `,
     )
-    .in("batch_id", batchIds);
-  // .order("students(reg_number)");
+    .eq("offering_id", offeringId)
+    .order("students(reg_number)");
 
   if (error) throw error;
   return data || [];

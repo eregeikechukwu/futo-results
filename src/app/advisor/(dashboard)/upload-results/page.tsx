@@ -12,7 +12,6 @@ import { RecentlyUploadedResults } from "@/components/secondary/RecentlyUploaded
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdvisorOfferings } from "@/lib/hooks/useAdvisorCourses";
 import { useEffect, useState, useCallback } from "react";
-import toast from "react-hot-toast";
 import { InfoCard } from "@/components/utilities";
 
 export default function UploadResult() {
