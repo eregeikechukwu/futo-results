@@ -13,6 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useAdvisorOfferings } from "@/lib/hooks/useAdvisorCourses";
 import { useEffect, useState, useCallback } from "react";
 import { InfoCard } from "@/components/utilities";
+import { handleDownloadTemplate } from "@/helpers/resultEdit";
 
 export default function UploadResult() {
   const [parsedJson, setParsedJson] = useState<ParsedResult[]>([]);
@@ -51,6 +52,9 @@ export default function UploadResult() {
       <Header
         heading="Upload Results"
         subHeading="Upload student results via Excel spreadsheet or scanned documents"
+        button="Excel template"
+        icon="Download"
+        onClick={() => handleDownloadTemplate()}
         extraComponent={
           <SelectCourse
             setCourse={setCourse}
@@ -62,6 +66,18 @@ export default function UploadResult() {
           />
         }
       />
+
+      {courseOfferings?.length !== 0 && (
+        <InfoCard type="info" heading={"Guide"}>
+          <p>
+            1. Select a course to upload results for
+            <br />
+            2. If you dont have the excel file format, download the template
+            <br />
+            3. Upload the Excel or OCR file and wait for the upload to complete
+          </p>
+        </InfoCard>
+      )}
 
       {courseOfferings?.length === 0 && (
         <InfoCard type="warning" heading="No course found">

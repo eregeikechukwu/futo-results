@@ -15,6 +15,7 @@ import {
   User2,
   Trophy,
   RefreshCcwIcon,
+  Download,
 } from "lucide-react";
 
 export const iconMap: { [key: string]: React.ComponentType<LucideProps> } = {
@@ -34,4 +35,5 @@ export const iconMap: { [key: string]: React.ComponentType<LucideProps> } = {
   User2: User2,
   Trophy: Trophy,
   RefreshCcwIcon: RefreshCcwIcon,
+  Download: Download,
 };

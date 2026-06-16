@@ -22,6 +22,7 @@ export const resultData: SemesterResult[] = [
         exam: 42,
         total: 77,
         grade: "A",
+        uploaded_at: "",
       },
       {
         courseCode: "MEE303",
@@ -32,6 +33,7 @@ export const resultData: SemesterResult[] = [
         exam: 36,
         total: 65,
         grade: "B",
+        uploaded_at: "",
       },
       {
         courseCode: "MEE305",
@@ -42,6 +44,7 @@ export const resultData: SemesterResult[] = [
         exam: 38,
         total: 69,
         grade: "B",
+        uploaded_at: "",
       },
     ],
   },
@@ -66,6 +69,7 @@ export const resultData: SemesterResult[] = [
         exam: 34,
         total: 64,
         grade: "B",
+        uploaded_at: "",
       },
       {
         courseCode: "MEE304",
@@ -75,6 +79,7 @@ export const resultData: SemesterResult[] = [
         lab: 19,
         exam: 40,
         total: 77,
+        uploaded_at: "",
         grade: "A",
       },
       {
@@ -86,6 +91,7 @@ export const resultData: SemesterResult[] = [
         exam: 30,
         total: 55,
         grade: "C",
+        uploaded_at: "",
       },
     ],
   },
@@ -111,6 +117,7 @@ export const resultData: SemesterResult[] = [
         exam: 40,
         total: 70,
         grade: "A",
+        uploaded_at: "",
       },
       {
         courseCode: "MCE304",
@@ -121,6 +128,7 @@ export const resultData: SemesterResult[] = [
         exam: 40,
         total: 77,
         grade: "A",
+        uploaded_at: "",
       },
       {
         courseCode: "MEE306",
@@ -131,6 +139,7 @@ export const resultData: SemesterResult[] = [
         exam: 30,
         total: 55,
         grade: "C",
+        uploaded_at: "",
       },
     ],
   },
@@ -156,6 +165,7 @@ export const resultData: SemesterResult[] = [
         exam: 34,
         total: 64,
         grade: "B",
+        uploaded_at: "",
       },
       {
         courseCode: "MEE304",
@@ -166,6 +176,7 @@ export const resultData: SemesterResult[] = [
         exam: 40,
         total: 77,
         grade: "A",
+        uploaded_at: "",
       },
       {
         courseCode: "MEE306",
@@ -176,6 +187,7 @@ export const resultData: SemesterResult[] = [
         exam: 30,
         total: 55,
         grade: "C",
+        uploaded_at: "",
       },
     ],
   },

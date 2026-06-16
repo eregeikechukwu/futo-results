@@ -45,7 +45,7 @@ export function Header({
           </button>
         )}
 
-        {/* Extra button */}
+        {/* Extra \Component */}
         {extraComponent}
       </div>
     </div>

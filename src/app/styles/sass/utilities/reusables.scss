@@ -10,6 +10,7 @@
   padding: toRem(16) toRem(32);
   cursor: pointer;
   transition: all 0.2s;
+  text-wrap: nowrap;
 }
 
 .center-child {

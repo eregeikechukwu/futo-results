@@ -4,6 +4,7 @@ import { Toaster } from "react-hot-toast";
 import "./styles/globals.scss";
 import { Providers } from "./providers";
 import "@aejkatappaja/phantom-ui/ssr.css";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -32,6 +33,7 @@ export default function RootLayout({
       <body className={`${inter.variable} ${Mono.variable} antialiased `}>
         <Providers>
           {children}
+          <Analytics />
           <Toaster
             position="top-right"
             toastOptions={{
