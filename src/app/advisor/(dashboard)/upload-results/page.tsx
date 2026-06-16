@@ -67,7 +67,7 @@ export default function UploadResult() {
         }
       />
 
-      {courseOfferings?.length !== 0 && (
+      {courseOfferings?.length !== 0 && !course && (
         <InfoCard type="info" heading={"Guide"}>
           <p>
             1. Select a course to upload results for
