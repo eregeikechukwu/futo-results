@@ -45,7 +45,7 @@ export default function StudentAuthPage() {
           />
           {/* Mode Switcher */}
           <div
-            className={`${styles.modeSwitcher} transition-opacity transition-[0.5s] ${loading && "opacity-[50%] cursor-[not-allowed]"}`}
+            className={`${styles.modeSwitcher} transition-[0.5s] ${loading && "opacity-50 cursor-not-allowed"}`}
           >
             {Modes.map((m) => (
               <button
@@ -55,7 +55,7 @@ export default function StudentAuthPage() {
                   mode === m.name
                     ? styles.modeButtonActive
                     : styles.modeButtonInactive
-                }  ${loading && "!cursor-[not-allowed]"}`}
+                }  ${loading && "cursor-not-allowed!"}`}
               >
                 {m.name
                   .split("-")

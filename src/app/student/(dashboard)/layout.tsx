@@ -1,5 +1,3 @@
-"use client";
-
 import { StudentsDashboardShell } from "@/components/shells/studentsDashboardShell";
 
 export default async function StudentsMainLayout({

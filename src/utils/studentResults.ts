@@ -84,6 +84,7 @@ export function normalizeCourseResult(
   const exam = Number(entry.exam_score ?? 0);
   const total = Number(entry.total_score ?? test + lab + exam);
   const grade = entry.grade ? toGradeLetter(entry.grade) : computeGrade(total);
+  const uploaded_at = entry.result_batches.published_at || '';
 
   return {
     courseCode: entry.course_offerings.courses.course_code,
@@ -94,6 +95,7 @@ export function normalizeCourseResult(
     exam,
     total,
     grade,
+    uploaded_at
   };
 }
 

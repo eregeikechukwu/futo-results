@@ -17,7 +17,7 @@
 .nav {
   padding: toRem(32) toRem(16);
   width: 100%;
-  height: calc(100vh - var(--nav-height));
+  height: calc(100vh - var(--nav-height) * 2);
 }
 
 .main {

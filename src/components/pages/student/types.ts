@@ -9,6 +9,7 @@ export type StudentCourseResult = {
   exam: number;
   total: number;
   grade: GradeLetter;
+  uploaded_at: string;
 };
 
 export type SemesterResult = {

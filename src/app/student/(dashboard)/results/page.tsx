@@ -161,7 +161,7 @@ export default function StudentResultsPage() {
             <div className={styles.semesterField}>
               <label
                 htmlFor="semester"
-                className="secondary-heading text-[var(--color-text-dark)]"
+                className="secondary-heading text-(--color-text-dark)"
               >
                 Session / Semester
               </label>
@@ -192,25 +192,29 @@ export default function StudentResultsPage() {
                   <th>Exam</th>
                   <th>Total</th>
                   <th>Grade</th>
+                  <th>Uploaded At</th>
                 </tr>
               </thead>
               <tbody>
                 {normalizedCourses.map((course) => (
                   <tr key={course.courseCode}>
-                    <td>{course.courseCode}</td>
-                    <td>{course.courseTitle}</td>
-                    <td>{course.unit}</td>
-                    <td>{course.test}</td>
-                    <td>{course.lab}</td>
-                    <td>{course.exam}</td>
-                    <td>{course.total}</td>
-                    <td>
+                    <td className={styles.tableCell}>{course.courseCode}</td>
+                    <td className={styles.courseTitle}>{course.courseTitle}</td>
+                    <td className={styles.tableCell}>{course.unit}</td>
+                    <td className={styles.tableCell}>{course.test}</td>
+                    <td className={styles.tableCell}>{course.lab}</td>
+                    <td className={styles.tableCell}>{course.exam}</td>
+                    <td className={styles.tableCell}>{course.total}</td>
+                    <td className={styles.tableCell}>
                       <GradeBadge grade={course.grade} />
+                    </td>
+                    <td className={styles.tableCell}>
+                      {course.uploaded_at.split("T")[0]}
                     </td>
                   </tr>
                 ))}
                 <tr>
-                  <td colSpan={8} className={styles.cgpaCell}>
+                  <td colSpan={9} className={styles.cgpaCell}>
                     Semester CGPA: {formatCgpa(semesterCgpa)} / 5.00
                   </td>
                 </tr>
