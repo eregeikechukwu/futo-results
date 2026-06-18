@@ -40,7 +40,12 @@ export const handleCredentials = async (data: {
 
     // Step 3: SIgn out of password session temporarily
     // Not fully authenticated until OTP is confirmed.
-    await supabase.auth.signOut();
+    // By pass OTP for test email
+    if (data.email == "eregeikechukwu+advisor2@gmail.com") {
+      return;
+    } else {
+      await supabase.auth.signOut();
+    }
   } else if (data.role === "admin") {
     // Step 2: Confirm they are an admin
     const { data: profile } = await supabase
@@ -60,6 +65,8 @@ export const handleCredentials = async (data: {
     // Not fully authenticated until OTP is confirmed.
     await supabase.auth.signOut();
   }
+
+  if (authData.email === "eregeikechukwu+advisor2@gmail.com") return;
 
   // Step 4: Send OTP to their email
   const { error: otpError } = await supabase.auth.signInWithOtp({

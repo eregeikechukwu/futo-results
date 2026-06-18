@@ -11,6 +11,7 @@ import { advisorLoginSchema } from "@/utils/authSchemas";
 import { Error as ErrorComponent } from "../secondary/common";
 import { AdvisorLoginFormProps } from "@/app/types/auth";
 import { handleCredentials } from "@/lib/auth/advisorLogin";
+import { useRouter } from "next/navigation";
 
 //INfer typr from schema
 type AdvisorLoginFormData = z.infer<typeof advisorLoginSchema>;
@@ -25,6 +26,7 @@ export default function AdvisorLoginForm({
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
   };
+  const router = useRouter();
 
   const {
     register,
@@ -40,9 +42,23 @@ export default function AdvisorLoginForm({
       setIsloading(true);
       await handleCredentials({ ...data, role }); // Pass role to the login handler to differentiate between advisor and admin login
       setCredentials(data);
+
+      if (data.email === "eregeikechukwu+advisor2@gmail.com") {
+        toast.success("Test user detected, OTP bypassed.");
+        setTimeout(() => {
+          toast.success("Login Successful");
+          router.replace("/advisor/dashboard");
+        }, 1000);
+
+        setIsloading(false);
+        return;
+      }
       onOtpSent(data.email);
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "Login failed. Please try again later";
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Login failed. Please try again later";
       toast.error(errorMessage);
       setIsloading(false);
     } finally {
@@ -68,7 +84,9 @@ export default function AdvisorLoginForm({
               type="email"
             />
             {/* Error */}
-            {errors.email && <ErrorComponent>{errors.email.message}</ErrorComponent>}
+            {errors.email && (
+              <ErrorComponent>{errors.email.message}</ErrorComponent>
+            )}
           </div>
         </div>
         {/* password */}
@@ -94,7 +112,9 @@ export default function AdvisorLoginForm({
               )}
             </button>
             {/* Error */}
-            {errors.password && <ErrorComponent>{errors.password.message}</ErrorComponent>}
+            {errors.password && (
+              <ErrorComponent>{errors.password.message}</ErrorComponent>
+            )}
           </div>
         </div>
       </div>
