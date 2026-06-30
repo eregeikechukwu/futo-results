@@ -20,7 +20,7 @@ export async function handleSignUp(
 
   if (preregError || !preregData) {
     console.error(preregError + " ... Error");
-    alert(preregError?.message);
+
     errorThrowHandler(
       preregError,
       "Your email and reg number do not match our preregistration records. Contact your advisor.",
