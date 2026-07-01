@@ -15,11 +15,32 @@ export function AuthCTABtn({
     <button
       type="submit"
       disabled={isSubmitting}
-      className={`flex gap-10 text-medium cursor-pointer transition-all hover:bg-[var(--color-blue-light)] rounded-small shadow-xl center-child bg-[var(--color-primary)] group text-[var(--color-white)]  py-16 w-full ${isSubmitting && "opacity-70 cursor-not-allowed hover:bg-[var(--color-primary)]"}`}
+      className={`button-primary flex gap-10 items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"}`}
       onClick={CTA as () => void}
     >
       <p className=" flex items-center">{children}</p>
       {isSubmitting && <LoaderSpinner3 size={15} />}
+    </button>
+  );
+}
+
+export function CTAButton({
+  onClickCTA,
+  isMutating,
+  label,
+}: {
+  onClickCTA: () => void;
+  isMutating: boolean;
+  label: string;
+}) {
+  return (
+    <button
+      onClick={onClickCTA}
+      disabled={isMutating}
+      className="button-primary flex gap-8 items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      {label}
+      {isMutating && <LoaderSpinner3 size={10} />}
     </button>
   );
 }

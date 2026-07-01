@@ -8,7 +8,7 @@ export function Error({ children }: { children: React.ReactNode }) {
 
 export function ModalForm({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex flex-col gap-16 max-h-[23rem] overflow-y-scroll scrollbar !pb-2 ">
+    <div className="flex flex-col gap-16 max-h-92 overflow-y-scroll scrollbar pb-2! ">
       {children}
     </div>
   );

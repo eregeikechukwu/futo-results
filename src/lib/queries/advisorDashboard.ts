@@ -286,7 +286,7 @@ export async function fetchRecentBatches(
     items: `${batch.course_offerings.courses.unit} units`,
     statusLabel:
       batch.status === "published"
-        ? "Completed"
+        ? "Published"
         : batch.status === "draft"
           ? "In Progress"
           : "Failed",

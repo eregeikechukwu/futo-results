@@ -109,7 +109,7 @@ export function SelectField({
   name,
   options,
   label,
-  required,
+  required = false,
   id,
   numeric,
 }: SelectFieldProps) {
@@ -123,7 +123,48 @@ export function SelectField({
       {label && <Label htmlFor={id ?? String(name)}>{label}</Label>}
       <select
         id={id ?? String(name)}
+        // onChange={(e) => {
+        //   console.log(typeof e.target.value);
+        // }}
+        // required={required}
         {...register(name as keyof CourseData, { required })}
+        aria-invalid={!!error}
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+      {error && <Error>{error}</Error>}
+    </div>
+  );
+}
+
+// Select fiels that works better with react-hook-form, especially for numeric values
+export function SelectField2({
+  name,
+  options,
+  label,
+  required = false,
+  id,
+  numeric,
+}: SelectFieldProps) {
+  const { register, formState } = useFormContext<CourseData>();
+  const error = formState.errors[name as keyof CourseData]?.message as
+    | string
+    | undefined;
+
+  return (
+    <div className="modal-field">
+      {label && <Label htmlFor={id ?? String(name)}>{label}</Label>}
+      <select
+        id={id ?? String(name)}
+    
+        {...register(name as keyof CourseData, {
+          setValueAs: numeric ? (v) => Number(v) : undefined,
+          required,
+        })}
         aria-invalid={!!error}
       >
         {options.map((option) => (

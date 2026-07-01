@@ -103,6 +103,37 @@ export function formatSessionInput(value: string): string | undefined {
   return digits.slice(0, 4) + "/" + digits.slice(4, 8);
 }
 
+// Dates formatting
+export const weekdayLabels = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+
+export const formatTime = (time: string) => {
+  const [hours, minutes] = time.split(":");
+  const date = new Date();
+  date.setHours(Number(hours), Number(minutes), 0, 0);
+  return date.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+export const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+};
+
 // Timeout until request is acalled as took too long
 export const requestTimeoutTime = 50000;
 
