@@ -48,7 +48,7 @@ export default function Home() {
               <div className={styles.heroActions}>
                 <Link href="/student/auth">
                   <button
-                    className={`button-primary text-white hover:bg-[var(--color-blue-light)] bg-[var(--color-primary)] heroActionButton w-full md:w-auto`}
+                    className={`button-primary text-white hover:bg-(--color-blue-light) bg-(--color-primary) heroActionButton w-full md:w-auto`}
                   >
                     I&apos;m a Student
                   </button>
@@ -96,8 +96,8 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="bg-[var(--color-green-background)]  transition-[0.7s] p-32 hover:shadow-lg group rounded-[16px] justify-between flex flex-col items-center">
-                <div className="rounded-full mb-[1.5rem] bg-[var(--color-green)] transition-[0.4s] center-child w-64 h-64 group-hover:scale-[1.09375]">
+              <div className="bg-(--color-green-background)  transition-[0.7s] p-32 hover:shadow-lg group rounded-[16px] justify-between flex flex-col items-center">
+                <div className="rounded-full mb-[1.5rem] bg-(--color-green) transition-[0.4s] center-child w-64 h-64 group-hover:scale-[1.09375]">
                   <CloudUpload className="w-24 h-25 text-[var(--color-white)] " />
                 </div>
                 <p className="body-text font-[600] mb-16">

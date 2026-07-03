@@ -20,6 +20,7 @@ const links = [
   //   href: "/advisor/under-construction",
   //   icon: "Calendar",
   // },
+  { name: "Office Hours", href: "/advisor/office-hours", icon: "Clock" },
   { name: "Reports", href: "/advisor/under-construction", icon: "File" },
   // { name: "Settings", href: "/advisor/under-construction", icon: "Settings" },
   { name: "Logout", href: "", icon: "Logout" },

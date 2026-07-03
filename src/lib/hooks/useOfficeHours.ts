@@ -3,6 +3,8 @@ import {
   createAdvisorOfficeHour,
   createAdvisorOfficeHoursOverride,
   createAdvisorVisitIntent,
+  deleteAdvisorOfficeHour,
+  deleteAdvisorOfficeHoursOverride,
   fetchAdvisorOfficeHours,
   fetchAdvisorOfficeHoursOverrides,
   fetchAdvisorVisitIntents,
@@ -16,9 +18,16 @@ import { gcTimeUni, staleTimeUni } from "./utils";
 import { errorToastHandler } from "@/helpers/errorHandler";
 import { AdvisorVisitIntentStatus } from "@/app/types/officeHours";
 
+const advisorHoursqueryKeys = {
+  hours: "advisor-office-hours",
+  override: "advisor-office-hours-overrides",
+  studentsIntents: "student-visit-intents",
+  advisorIntents: "advisor-visit-intents",
+};
+
 export function useAdvisorOfficeHours(advisorId: string) {
   return useQuery({
-    queryKey: ["advisor-office-hours", advisorId],
+    queryKey: [advisorHoursqueryKeys.hours, advisorId],
     queryFn: () => fetchAdvisorOfficeHours(advisorId),
     enabled: !!advisorId,
     staleTime: staleTimeUni,
@@ -29,7 +38,7 @@ export function useAdvisorOfficeHours(advisorId: string) {
 
 export function useAdvisorOfficeHoursOverrides(advisorId: string) {
   return useQuery({
-    queryKey: ["advisor-office-hours-overrides", advisorId],
+    queryKey: [advisorHoursqueryKeys.override, advisorId],
     queryFn: () => fetchAdvisorOfficeHoursOverrides(advisorId),
     enabled: !!advisorId,
     staleTime: staleTimeUni,
@@ -40,7 +49,7 @@ export function useAdvisorOfficeHoursOverrides(advisorId: string) {
 
 export function useAdvisorVisitIntents(advisorId: string) {
   return useQuery({
-    queryKey: ["advisor-visit-intents", advisorId],
+    queryKey: [advisorHoursqueryKeys.advisorIntents, advisorId],
     queryFn: () => fetchAdvisorVisitIntents(advisorId),
     enabled: !!advisorId,
     staleTime: staleTimeUni,
@@ -62,7 +71,7 @@ export function useStudentAdvisor(departmentId: string, admissionYear: number) {
 
 export function useStudentVisitIntents(studentId: string) {
   return useQuery({
-    queryKey: ["student-visit-intents", studentId],
+    queryKey: [advisorHoursqueryKeys.studentsIntents, studentId],
     queryFn: () => fetchStudentVisitIntents(studentId),
     enabled: !!studentId,
     staleTime: staleTimeUni,
@@ -77,7 +86,9 @@ export function useCreateAdvisorOfficeHour() {
   return useMutation({
     mutationFn: createAdvisorOfficeHour,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["advisor-office-hours"] });
+      queryClient.invalidateQueries({
+        queryKey: [advisorHoursqueryKeys.hours],
+      });
     },
     onError: (error) => {
       errorToastHandler(error, "Failed to save weekly office hour.");
@@ -93,7 +104,7 @@ export function useCreateAdvisorOfficeHoursOverride() {
     mutationFn: createAdvisorOfficeHoursOverride,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["advisor-office-hours-overrides"],
+        queryKey: [advisorHoursqueryKeys.override],
       });
     },
     onError: (error) => {
@@ -109,7 +120,9 @@ export function useCreateAdvisorVisitIntent() {
   return useMutation({
     mutationFn: createAdvisorVisitIntent,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["student-visit-intents"] });
+      queryClient.invalidateQueries({
+        queryKey: [advisorHoursqueryKeys.studentsIntents],
+      });
     },
     onError: (error) => {
       errorToastHandler(error, "Failed to submit visit request.");
@@ -135,7 +148,9 @@ export function useUpdateAdvisorVisitIntentStatus() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["advisor-visit-intents"] });
-      queryClient.invalidateQueries({ queryKey: ["student-visit-intents"] });
+      queryClient.invalidateQueries({
+        queryKey: [advisorHoursqueryKeys.studentsIntents],
+      });
     },
     onError: (error) => {
       errorToastHandler(error, "Failed to update visit status.");
@@ -151,15 +166,17 @@ export function useToggleAdvisorOfficeHourActive() {
     mutationFn: async ({
       hourId,
       isActive,
+      advisorId,
     }: {
       hourId: string;
       isActive: boolean;
+      advisorId: string;
     }) => {
       return updateAdvisorOfficeHourActive(hourId, isActive);
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["advisor-office-hours", variables[0]],
+        queryKey: [advisorHoursqueryKeys.hours, variables.advisorId],
       });
     },
     onError: (error) => {
@@ -184,7 +201,7 @@ export function useToggleAdvisorOfficeHoursOverrideCancel() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["advisor-office-hours-overrides", variables[0]],
+        queryKey: [advisorHoursqueryKeys.override, variables[0]],
       });
     },
     onError: (error) => {
@@ -193,3 +210,76 @@ export function useToggleAdvisorOfficeHoursOverrideCancel() {
     },
   });
 }
+
+export function useDeleteAdvisorOfficeHour() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      hourId,
+      advisorId,
+    }: {
+      hourId: string;
+      advisorId: string;
+    }) => {
+      return deleteAdvisorOfficeHour(hourId);
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [advisorHoursqueryKeys.hours, variables.advisorId],
+      });
+    },
+    onError: (error) => {
+      errorToastHandler(error, "Failed to delete office hour");
+    },
+  });
+}
+
+export function useDeleteAdvisorOfficeHourOverride() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      overrideId,
+      advisorId,
+    }: {
+      overrideId: string;
+      advisorId: string;
+    }) => {
+      return deleteAdvisorOfficeHoursOverride(overrideId);
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [advisorHoursqueryKeys.hours, variables.advisorId],
+      });
+    },
+    onError: (error) => {
+      errorToastHandler(error, "Failed to delete office hour override.");
+    },
+  });
+}
+
+export function useDeleteAdvisorIntent() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      intentId,
+      studentId,
+    }: {
+      intentId: string;
+      studentId: string;
+    }) => {
+      return deleteAdvisorOfficeHoursOverride(intentId);
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [advisorHoursqueryKeys.hours, variables.studentId],
+      });
+    },
+    onError: (error) => {
+      errorToastHandler(error, "Failed to delete visit intent.");
+    },
+  });
+}
+

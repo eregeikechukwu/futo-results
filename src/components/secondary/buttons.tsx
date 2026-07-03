@@ -1,6 +1,7 @@
 import React from "react";
 import { LoaderSpinner3 } from "./loaders/loaders";
 import { RefreshCcw } from "lucide-react";
+import { colorMap } from "@/utils/colorMaps";
 
 export function AuthCTABtn({
   children,
@@ -60,6 +61,32 @@ export function CustomBtn({
       className={`py-8 px-24 lh-24 text-center rounded-lg border-solid cursor-pointer hover:opacity-80 active:opacity-90 transition-all ${className}`}
     >
       {children}
+    </button>
+  );
+}
+
+export function VariantBtn({
+  variant,
+  children,
+  onClick,
+  isLoading,
+}: {
+  variant: "green" | "blue" | "red";
+  children: React.ReactNode;
+  onClick?: () => void;
+  isLoading?: boolean;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={isLoading}
+      className="button-primary flex gap-8 items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-80 active:opacity-90 transition-all"
+      style={{
+        backgroundColor: colorMap[variant].colour,
+      }}
+    >
+      {children}
+      {isLoading && <LoaderSpinner3 size={10} />}
     </button>
   );
 }

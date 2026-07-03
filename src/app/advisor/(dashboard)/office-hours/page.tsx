@@ -27,10 +27,14 @@ import {
 import { AdvisorOverrideScheduleForm } from "@/components/forms/advisorOverrideScheduleForm";
 import { AdvisorWeekelySlotForm } from "@/components/forms/advisorWeeklySlotForm";
 import { formatDate, formatTime, weekdayLabels } from "@/utils/systemUtils";
+import { VariantBtn } from "@/components/secondary/buttons";
 
 export default function AdvisorOfficeHoursPage() {
-  const { advisorData, loading } = useAuth();
+  const { advisorData } = useAuth();
   const advisorId = advisorData?.id || "";
+
+  const [intentNotes, setIntentNotes] = useState<Record<string, string>>({});
+  const [isGeneralMutating, setIsGeneralMutating] = useState(true);
 
   const {
     data: weeklyHours,
@@ -48,25 +52,16 @@ export default function AdvisorOfficeHoursPage() {
     error: intentsError,
   } = useAdvisorVisitIntents(advisorId);
 
+  console.log(visitIntents, "Visit intwnts");
+
   const updateIntentMutation = useUpdateAdvisorVisitIntentStatus();
   const toggleHourMutation = useToggleAdvisorOfficeHourActive();
   const toggleOverrideMutation = useToggleAdvisorOfficeHoursOverrideCancel();
 
   const { toggleModal: toggleWeeklyModal, ModalTemplate: WeeklyModal } =
-    useModalTemplate();
+    useModalTemplate(isGeneralMutating);
   const { toggleModal: toggleOverrideModal, ModalTemplate: OverrideModal } =
-    useModalTemplate();
-
-  const [overrideForm, setOverrideForm] = useState({
-    date: "",
-    start_time: "09:00",
-    end_time: "10:00",
-    location: "",
-    note: "",
-    is_cancelled: false,
-  });
-
-  const [intentNotes, setIntentNotes] = useState<Record<string, string>>({});
+    useModalTemplate(isGeneralMutating);
 
   useEffect(() => {
     if (weeklyError || overrideError || intentsError) {
@@ -77,9 +72,9 @@ export default function AdvisorOfficeHoursPage() {
     }
   }, [weeklyError, overrideError, intentsError]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  // if (loading) {
+  return <div>Loading...</div>;
+  // }
 
   if (!advisorData) {
     return (
@@ -87,7 +82,11 @@ export default function AdvisorOfficeHoursPage() {
     );
   }
 
-  const pending = weeklyPending || overridePending || intentsPending;
+  useEffect(() => {
+    if (!weeklyPending && !overridePending && !intentsPending) {
+      setIsGeneralMutating(false);
+    }
+  }, [weeklyPending, overridePending, intentsPending]);
 
   const handleIntentNoteChange = (intentId: string, value: string) => {
     setIntentNotes((current) => ({ ...current, [intentId]: value }));
@@ -118,6 +117,7 @@ export default function AdvisorOfficeHoursPage() {
       {
         hourId: hour.id,
         isActive: !hour.is_active,
+        advisorId: advisorId,
       },
       {
         onSuccess: () => {
@@ -181,7 +181,7 @@ export default function AdvisorOfficeHoursPage() {
 
       <div className="dashboard-container">
         <h3 className="text-medium mb-16">Weekly Availability</h3>
-        {pending && !weeklySchedule.length ? (
+        {isGeneralMutating && !weeklySchedule.length ? (
           <p>Loading weekly office hours...</p>
         ) : weeklySchedule.length === 0 ? (
           <EmptyState
@@ -212,14 +212,13 @@ export default function AdvisorOfficeHoursPage() {
                       Status: {slot.is_active ? "Active" : "Inactive"}
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    className="button-secondary"
+                  <VariantBtn
+                    variant={slot.is_active ? "red" : "green"}
                     onClick={() => handleToggleHour(slot)}
-                    disabled={toggleHourMutation.isPending}
+                    isLoading={toggleHourMutation.isPending}
                   >
                     {slot.is_active ? "Deactivate" : "Activate"}
-                  </button>
+                  </VariantBtn>
                 </div>
               </div>
             ))}
@@ -229,7 +228,7 @@ export default function AdvisorOfficeHoursPage() {
 
       <div className="dashboard-container">
         <h3 className="text-medium mb-16">Special Date Overrides</h3>
-        {pending && !specialOverrides.length ? (
+        {isGeneralMutating && !specialOverrides.length ? (
           <p>Loading date overrides...</p>
         ) : specialOverrides.length === 0 ? (
           <EmptyState
@@ -263,14 +262,14 @@ export default function AdvisorOfficeHoursPage() {
                       {overrideItem.is_cancelled ? "Cancelled" : "Available"}
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    className="button-secondary"
+
+                  <VariantBtn
+                    variant="blue"
                     onClick={() => handleToggleOverride(overrideItem)}
-                    disabled={toggleOverrideMutation.isPending}
+                    isLoading={toggleOverrideMutation.isPending}
                   >
                     {overrideItem.is_cancelled ? "Restore" : "Cancel"}
-                  </button>
+                  </VariantBtn>
                 </div>
               </div>
             ))}
@@ -280,7 +279,7 @@ export default function AdvisorOfficeHoursPage() {
 
       <div className="dashboard-container">
         <h3 className="text-medium mb-16">Incoming Visit Requests</h3>
-        {pending && !incomingIntents.length ? (
+        {isGeneralMutating && !incomingIntents.length ? (
           <p>Loading visit requests...</p>
         ) : incomingIntents.length === 0 ? (
           <EmptyState
@@ -333,28 +332,27 @@ export default function AdvisorOfficeHoursPage() {
                   />
                 </div>
                 <div className="mt-16 flex flex-wrap gap-12">
-                  <button
-                    type="button"
-                    className="button-primary"
+                  <VariantBtn
+                    variant="blue"
                     onClick={() => handleIntentStatus(intent, "acknowledged")}
-                    disabled={
+                    isLoading={
                       intent.status !== "pending" ||
                       updateIntentMutation.isPending
                     }
                   >
                     Acknowledge
-                  </button>
-                  <button
-                    type="button"
-                    className="button-secondary"
+                  </VariantBtn>
+
+                  <VariantBtn
+                    variant="blue"
                     onClick={() => handleIntentStatus(intent, "resolved")}
-                    disabled={
+                    isLoading={
                       intent.status === "resolved" ||
                       updateIntentMutation.isPending
                     }
                   >
                     Resolve
-                  </button>
+                  </VariantBtn>
                 </div>
               </div>
             ))}
