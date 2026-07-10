@@ -10,11 +10,12 @@ import {
   useAdvisorOfficeHours,
   useAdvisorOfficeHoursOverrides,
   useAdvisorVisitIntents,
-  useCreateAdvisorOfficeHour,
-  useCreateAdvisorOfficeHoursOverride,
-  useUpdateAdvisorVisitIntentStatus,
+  useResolveAdvisorVisitIntent,
+  useAcknowledgeAdvisorVisitIntent,
   useToggleAdvisorOfficeHourActive,
   useToggleAdvisorOfficeHoursOverrideCancel,
+  useDeleteAdvisorOfficeHour,
+  useDeleteAdvisorOfficeHourOverride,
 } from "@/lib/hooks/useOfficeHours";
 import { errorToastHandler } from "@/helpers/errorHandler";
 import toast from "react-hot-toast";
@@ -27,14 +28,17 @@ import {
 import { AdvisorOverrideScheduleForm } from "@/components/forms/advisorOverrideScheduleForm";
 import { AdvisorWeekelySlotForm } from "@/components/forms/advisorWeeklySlotForm";
 import { formatDate, formatTime, weekdayLabels } from "@/utils/systemUtils";
-import { VariantBtn } from "@/components/secondary/buttons";
+import { DeleteButton, VariantBtn } from "@/components/secondary/buttons";
+import { TextLink } from "@/components/secondary/typography";
+import { CoverLoader } from "@/components/secondary/loaders/coverLoader";
 
 export default function AdvisorOfficeHoursPage() {
   const { advisorData } = useAuth();
   const advisorId = advisorData?.id || "";
 
   const [intentNotes, setIntentNotes] = useState<Record<string, string>>({});
-  const [isGeneralMutating, setIsGeneralMutating] = useState(true);
+  const [isGeneralMutating, setIsGeneralMutating] = useState(false);
+  const [hourToBeToggled, setHourToBeToggled] = useState<string | null>(null);
 
   const {
     data: weeklyHours,
@@ -54,9 +58,12 @@ export default function AdvisorOfficeHoursPage() {
 
   console.log(visitIntents, "Visit intwnts");
 
-  const updateIntentMutation = useUpdateAdvisorVisitIntentStatus();
+  const resolveIntentMutation = useResolveAdvisorVisitIntent();
+  const acknowledgeIntentMutation = useAcknowledgeAdvisorVisitIntent();
   const toggleHourMutation = useToggleAdvisorOfficeHourActive();
   const toggleOverrideMutation = useToggleAdvisorOfficeHoursOverrideCancel();
+  const deleteHourMutation = useDeleteAdvisorOfficeHour();
+  const deleteOverrideMutation = useDeleteAdvisorOfficeHourOverride();
 
   const { toggleModal: toggleWeeklyModal, ModalTemplate: WeeklyModal } =
     useModalTemplate(isGeneralMutating);
@@ -72,10 +79,6 @@ export default function AdvisorOfficeHoursPage() {
     }
   }, [weeklyError, overrideError, intentsError]);
 
-  // if (loading) {
-  return <div>Loading...</div>;
-  // }
-
   if (!advisorData) {
     return (
       <SomethingWentWrong message="Unable to load your advisor account." />
@@ -83,36 +86,47 @@ export default function AdvisorOfficeHoursPage() {
   }
 
   useEffect(() => {
-    if (!weeklyPending && !overridePending && !intentsPending) {
+    if (
+      deleteHourMutation.isPending ||
+      deleteOverrideMutation.isPending ||
+      resolveIntentMutation.isPending ||
+      acknowledgeIntentMutation.isPending ||
+      toggleHourMutation.isPending ||
+      toggleOverrideMutation.isPending
+    ) {
+      setIsGeneralMutating(true);
+    } else {
       setIsGeneralMutating(false);
     }
-  }, [weeklyPending, overridePending, intentsPending]);
+  }, [
+    deleteHourMutation.isPending,
+    deleteOverrideMutation.isPending,
+    resolveIntentMutation.isPending,
+    acknowledgeIntentMutation.isPending,
+    toggleHourMutation.isPending,
+    toggleOverrideMutation.isPending,
+  ]);
 
   const handleIntentNoteChange = (intentId: string, value: string) => {
     setIntentNotes((current) => ({ ...current, [intentId]: value }));
   };
 
-  const handleIntentStatus = (
-    intent: AdvisorVisitIntent,
-    status: "acknowledged" | "resolved",
-  ) => {
-    updateIntentMutation.mutate(
+  const handleAcknowledgeIntent = (intent: AdvisorVisitIntent) => {
+    acknowledgeIntentMutation.mutate(
       {
         intentId: intent.id,
-        status,
         advisorNote: intentNotes[intent.id] || intent.advisor_note || null,
       },
       {
         onSuccess: () => {
-          toast.success(
-            `Visit request marked ${status === "acknowledged" ? "acknowledged" : "resolved"}.`,
-          );
+          toast.success(`Visit request acknowledged.`);
         },
       },
     );
   };
 
   const handleToggleHour = (hour: AdvisorOfficeHour) => {
+    setHourToBeToggled(hour.id);
     toggleHourMutation.mutate(
       {
         hourId: hour.id,
@@ -124,6 +138,23 @@ export default function AdvisorOfficeHoursPage() {
           toast.success(
             `Weekly office hour ${hour.is_active ? "deactivated" : "activated"}.`,
           );
+          setHourToBeToggled(null);
+        },
+        onError: () => {
+          setHourToBeToggled(null);
+        },
+      },
+    );
+  };
+
+  const handleResolveIntent = (intent: AdvisorVisitIntent) => {
+    resolveIntentMutation.mutate(
+      {
+        intentId: intent.id,
+      },
+      {
+        onSuccess: () => {
+          toast.success(`Visit request resolved.`);
         },
       },
     );
@@ -140,6 +171,37 @@ export default function AdvisorOfficeHoursPage() {
           toast.success(
             `Override ${overrideItem.is_cancelled ? "restored" : "cancelled"}.`,
           );
+        },
+      },
+    );
+  };
+
+  const handleDeleteHour = (hour: AdvisorOfficeHour, advisorId: string) => {
+    deleteHourMutation.mutate(
+      {
+        hourId: hour.id,
+        advisorId: advisorId,
+      },
+      {
+        onSuccess: () => {
+          toast.success(`Weekly office hour deleted.`);
+        },
+      },
+    );
+  };
+
+  const handleDeleteHourOverride = (
+    overrideItem: AdvisorOfficeHoursOverride,
+    advisorId: string,
+  ) => {
+    deleteOverrideMutation.mutate(
+      {
+        overrideId: overrideItem.id,
+        advisorId: advisorId,
+      },
+      {
+        onSuccess: () => {
+          toast.success(`Date override deleted.`);
         },
       },
     );
@@ -181,7 +243,7 @@ export default function AdvisorOfficeHoursPage() {
 
       <div className="dashboard-container">
         <h3 className="text-medium mb-16">Weekly Availability</h3>
-        {isGeneralMutating && !weeklySchedule.length ? (
+        {weeklyPending && !weeklySchedule.length ? (
           <p>Loading weekly office hours...</p>
         ) : weeklySchedule.length === 0 ? (
           <EmptyState
@@ -212,13 +274,27 @@ export default function AdvisorOfficeHoursPage() {
                       Status: {slot.is_active ? "Active" : "Inactive"}
                     </p>
                   </div>
-                  <VariantBtn
-                    variant={slot.is_active ? "red" : "green"}
-                    onClick={() => handleToggleHour(slot)}
-                    isLoading={toggleHourMutation.isPending}
-                  >
-                    {slot.is_active ? "Deactivate" : "Activate"}
-                  </VariantBtn>
+                  {/* Actions */}
+                  <div className="flex gap-8 align-center">
+                    <VariantBtn
+                      variant={slot.is_active ? "red" : "green"}
+                      onClick={() => handleToggleHour(slot)}
+                      isLoading={
+                        toggleHourMutation.isPending &&
+                        hourToBeToggled === slot.id
+                      }
+                      disabled={toggleHourMutation.isPending}
+                    >
+                      {slot.is_active ? "Deactivate" : "Activate"}
+                    </VariantBtn>
+                    <DeleteButton
+                      disabled={
+                        deleteHourMutation.isPending ||
+                        toggleHourMutation.isPending
+                      }
+                      onClick={() => handleDeleteHour(slot, advisorId)}
+                    />
+                  </div>
                 </div>
               </div>
             ))}
@@ -226,9 +302,10 @@ export default function AdvisorOfficeHoursPage() {
         )}
       </div>
 
+      {/* Date Overrides */}
       <div className="dashboard-container">
         <h3 className="text-medium mb-16">Special Date Overrides</h3>
-        {isGeneralMutating && !specialOverrides.length ? (
+        {overridePending ? (
           <p>Loading date overrides...</p>
         ) : specialOverrides.length === 0 ? (
           <EmptyState
@@ -263,13 +340,28 @@ export default function AdvisorOfficeHoursPage() {
                     </p>
                   </div>
 
-                  <VariantBtn
-                    variant="blue"
-                    onClick={() => handleToggleOverride(overrideItem)}
-                    isLoading={toggleOverrideMutation.isPending}
-                  >
-                    {overrideItem.is_cancelled ? "Restore" : "Cancel"}
-                  </VariantBtn>
+                  <div className="flex gap-8 align-center">
+                    <VariantBtn
+                      variant="blue"
+                      onClick={() => handleToggleOverride(overrideItem)}
+                      isLoading={toggleOverrideMutation.isPending}
+                      disabled={
+                        toggleOverrideMutation.isPending ||
+                        deleteOverrideMutation.isPending
+                      }
+                    >
+                      {overrideItem.is_cancelled ? "Restore" : "Cancel"}
+                    </VariantBtn>
+                    <DeleteButton
+                      onClick={() =>
+                        handleDeleteHourOverride(overrideItem, advisorId)
+                      }
+                      disabled={
+                        deleteOverrideMutation.isPending ||
+                        toggleOverrideMutation.isPending
+                      }
+                    />
+                  </div>
                 </div>
               </div>
             ))}
@@ -278,8 +370,16 @@ export default function AdvisorOfficeHoursPage() {
       </div>
 
       <div className="dashboard-container">
-        <h3 className="text-medium mb-16">Incoming Visit Requests</h3>
-        {isGeneralMutating && !incomingIntents.length ? (
+        <div className="flex justify-between text-center">
+          <h3 className="text-medium mb-16  w-max">Incoming Visit Requests</h3>
+          {incomingIntents.length > 0 && (
+            <TextLink>
+              {incomingIntents.length} intent
+              {incomingIntents.length > 1 ? "'s" : ""} yet to be resolved
+            </TextLink>
+          )}
+        </div>
+        {!incomingIntents.length ? (
           <p>Loading visit requests...</p>
         ) : incomingIntents.length === 0 ? (
           <EmptyState
@@ -287,75 +387,82 @@ export default function AdvisorOfficeHoursPage() {
             message="Students have not submitted any visit requests yet."
           />
         ) : (
-          <div className="grid gap-16">
-            {incomingIntents.map((intent) => (
-              <div
-                key={intent.id}
-                className="rounded-3xl border border-(--color-border-light) p-24"
-              >
-                <div className="flex justify-between gap-16 flex-wrap">
-                  <div>
-                    <p className="text-small-passive">
-                      {intent.students?.profiles.full_name ||
-                        intent.students?.reg_number}
-                    </p>
-                    <p className="text-medium">
-                      {formatDate(intent.preferred_date)}
-                    </p>
-                    <p>{intent.reason}</p>
+          <div>
+            <div className="grid gap-16">
+              {incomingIntents.map((intent) => (
+                <div
+                  key={intent.id}
+                  className="rounded-3xl border border-(--color-border-light) p-24"
+                >
+                  <div className="flex justify-between gap-16 flex-wrap">
+                    <div>
+                      <p className="text-small-passive">
+                        {intent.students?.profiles.full_name ||
+                          intent.students?.reg_number}
+                      </p>
+                      <p className="text-medium">
+                        {formatDate(intent.preferred_date)}
+                      </p>
+                      <p>{intent.reason}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-small-passive">
+                        Status: {intent.status}
+                      </p>
+                      <p className="text-small-passive">
+                        Requested:{" "}
+                        {new Date(intent.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-small-passive">
-                      Status: {intent.status}
-                    </p>
-                    <p className="text-small-passive">
-                      Requested:{" "}
-                      {new Date(intent.created_at).toLocaleDateString()}
-                    </p>
+                  <div className="mt-16">
+                    <label
+                      className="text-small-passive"
+                      htmlFor={`note-${intent.id}`}
+                    >
+                      Note to Student (optional - will be sent upon
+                      acknowledgement)
+                    </label>
+                    <textarea
+                      id={`note-${intent.id}`}
+                      className="input w-full mt-8 p-10 disabled:opacity-50 disabled:cursor-not-allowed"
+                      rows={2}
+                      disabled={
+                        acknowledgeIntentMutation.isPending ||
+                        resolveIntentMutation.isPending ||
+                        intent.status === "acknowledged" ||
+                        intent.status === "resolved"
+                      }
+                      value={
+                        intentNotes[intent.id] ?? intent.advisor_note ?? ""
+                      }
+                      onChange={(event) =>
+                        handleIntentNoteChange(intent.id, event.target.value)
+                      }
+                    />
                   </div>
-                </div>
-                <div className="mt-16">
-                  <label
-                    className="text-small-passive"
-                    htmlFor={`note-${intent.id}`}
-                  >
-                    Advisor note
-                  </label>
-                  <textarea
-                    id={`note-${intent.id}`}
-                    className="input w-full mt-8"
-                    rows={4}
-                    value={intentNotes[intent.id] ?? intent.advisor_note ?? ""}
-                    onChange={(event) =>
-                      handleIntentNoteChange(intent.id, event.target.value)
-                    }
-                  />
-                </div>
-                <div className="mt-16 flex flex-wrap gap-12">
-                  <VariantBtn
-                    variant="blue"
-                    onClick={() => handleIntentStatus(intent, "acknowledged")}
-                    isLoading={
-                      intent.status !== "pending" ||
-                      updateIntentMutation.isPending
-                    }
-                  >
-                    Acknowledge
-                  </VariantBtn>
+                  <div className="mt-16 flex flex-wrap gap-12">
+                    <VariantBtn
+                      variant="blue"
+                      onClick={() => handleAcknowledgeIntent(intent)}
+                      isLoading={acknowledgeIntentMutation.isPending}
+                      disabled={intent.status !== "pending"}
+                    >
+                      Acknowledge
+                    </VariantBtn>
 
-                  <VariantBtn
-                    variant="blue"
-                    onClick={() => handleIntentStatus(intent, "resolved")}
-                    isLoading={
-                      intent.status === "resolved" ||
-                      updateIntentMutation.isPending
-                    }
-                  >
-                    Resolve
-                  </VariantBtn>
+                    <VariantBtn
+                      variant="blue"
+                      onClick={() => handleResolveIntent(intent)}
+                      isLoading={resolveIntentMutation.isPending}
+                      disabled={intent.status === "resolved"}
+                    >
+                      Mark as Resolved
+                    </VariantBtn>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
       </div>
@@ -369,6 +476,9 @@ export default function AdvisorOfficeHoursPage() {
           toggleOverrideModal={toggleOverrideModal}
         />
       </OverrideModal>
+
+      {/* Cover Loader */}
+      {isGeneralMutating && <CoverLoader />}
     </DashboardContainer>
   );
 }

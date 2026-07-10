@@ -94,6 +94,13 @@ export async function fetchStudentAdvisor(
   if (assignmentError) throw assignmentError;
   if (!assignment) return null;
 
+  if (assignment?.advisor_id === null) {
+    alert("No advisor assigned for this department and admission year.");
+    return null;
+  } else {
+    console.log("assignment.advisor_id:", assignment.advisor_id);
+  }
+
   // Step 2: fetch the advisor with their profile
   const { data, error } = await supabase
     .from("advisors")
@@ -112,6 +119,13 @@ export async function fetchStudentAdvisor(
     )
     .eq("id", assignment.advisor_id)
     .maybeSingle();
+
+  if (data.title === null) {
+    alert("No advisor title found for this department and admission year.");
+    return null;
+  } else {
+    console.log("data:", data);
+  }
 
   if (error) throw error;
   return data as StudentAdvisor | null;
@@ -211,17 +225,26 @@ export async function createAdvisorVisitIntent(input: {
   return data as AdvisorVisitIntent;
 }
 
-// Advisor updates the status of a visit intent
-export async function updateAdvisorVisitIntentStatus(
+export async function resolveVisitIntent(intentId: string) {
+  const supabase = createSupabaseClient();
+
+  const { error } = await supabase
+    .from("advisor_visit_intents")
+    .delete()
+    .eq("id", intentId);
+
+  if (error) throw error;
+}
+
+export async function acknowledgeVisitIntent(
   intentId: string,
-  status: AdvisorVisitIntentStatus,
   advisorNote?: string | null,
 ) {
   const supabase = createSupabaseClient();
 
   const { data, error } = await supabase
     .from("advisor_visit_intents")
-    .update({ status, advisor_note: advisorNote ?? null })
+    .update({ status: "acknowledged", advisor_note: advisorNote ?? null })
     .eq("id", intentId)
     .select()
     .single();

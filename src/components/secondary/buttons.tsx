@@ -1,6 +1,6 @@
 import React from "react";
 import { LoaderSpinner3 } from "./loaders/loaders";
-import { RefreshCcw } from "lucide-react";
+import { RefreshCcw, Trash2 } from "lucide-react";
 import { colorMap } from "@/utils/colorMaps";
 
 export function AuthCTABtn({
@@ -16,7 +16,7 @@ export function AuthCTABtn({
     <button
       type="submit"
       disabled={isSubmitting}
-      className={`button-primary flex gap-10 items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"}`}
+      className={`button-primary gap-10 disabled:opacity-50 disabled:cursor-not-allowed py-4! px-8! w-full`}
       onClick={CTA as () => void}
     >
       <p className=" flex items-center">{children}</p>
@@ -70,17 +70,19 @@ export function VariantBtn({
   children,
   onClick,
   isLoading,
+  disabled = false,
 }: {
   variant: "green" | "blue" | "red";
   children: React.ReactNode;
   onClick?: () => void;
   isLoading?: boolean;
+  disabled?: boolean;
 }) {
   return (
     <button
       onClick={onClick}
-      disabled={isLoading}
-      className="button-primary flex gap-8 items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-80 active:opacity-90 transition-all"
+      disabled={isLoading || disabled}
+      className="button-primary flex gap-8 items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed! hover:opacity-80 active:opacity-90 transition-all"
       style={{
         backgroundColor: colorMap[variant].colour,
       }}
@@ -102,6 +104,26 @@ export function RefetchButton({ refetch }: { refetch: () => void }) {
         className="group-hover:rotate-50 transition-all duration-300"
         size={20}
       />
+    </button>
+  );
+}
+
+// Delete / trash button
+export function DeleteButton({
+  onClick,
+  disabled,
+}: {
+  onClick: () => void;
+  disabled?: boolean;
+}) {
+  const bgColor = `bg-[${colorMap.red.bg}]`;
+  return (
+    <button
+      onClick={() => onClick()}
+      disabled={disabled}
+      className={`flex items-center gap-8 p-10 rounded-[10px] border border-(--color-border-light) mb-8 cursor-pointer hover:opacity-80 active:opacity-90 transition-all ${bgColor}`}
+    >
+      <Trash2 size={20} stroke={colorMap.red.colour} />
     </button>
   );
 }

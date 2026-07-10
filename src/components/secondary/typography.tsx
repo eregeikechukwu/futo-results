@@ -9,7 +9,7 @@ export function TextLink({
 }) {
   return (
     <h3
-      className={`secondary-heading font-medium  text-[var(--color-text-link)] ${
+      className={`secondary-heading font-medium  text-(--color-text-link) ${
         className ?? ""
       }`}
     >

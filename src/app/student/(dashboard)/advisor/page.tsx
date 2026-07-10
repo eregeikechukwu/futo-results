@@ -15,38 +15,10 @@ import { errorToastHandler } from "@/helpers/errorHandler";
 import { EmptyState } from "@/components/secondary/EmptyState";
 import toast from "react-hot-toast";
 import SomethingWentWrong from "@/components/secondary/error/somethingWentWrong";
-
-const weekdayLabels = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
-
-const formatTime = (time: string) => {
-  const [hours, minutes] = time.split(":");
-  const date = new Date();
-  date.setHours(Number(hours), Number(minutes), 0, 0);
-  return date.toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-};
-
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-};
+import { weekdayLabels, formatTime, formatDate } from "@/utils/systemUtils";
 
 export default function StudentAdvisorPage() {
-  const { studentData, loading } = useAuth();
+  const { studentData } = useAuth();
   const [preferredDate, setPreferredDate] = useState("");
   const [reason, setReason] = useState("");
 
@@ -85,10 +57,6 @@ export default function StudentAdvisorPage() {
       );
     }
   }, [advisorError, weeklyError, overrideError, intentsError]);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
 
   if (!studentData) {
     return (

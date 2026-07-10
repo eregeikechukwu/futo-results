@@ -111,7 +111,7 @@ CREATE POLICY "advisors_view_incoming_intents"
     ON advisor_visit_intents FOR SELECT
     USING (
         advisor_id IN (
-            SELECT id FROM students WHERE profile_id = auth.uid() 
+            SELECT id FROM advisors WHERE profile_id = auth.uid() 
         )
     );
 

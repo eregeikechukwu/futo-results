@@ -5,7 +5,7 @@ today.setHours(0, 0, 0, 0);
 
 export const overrideScheduleSchema = z
   .object({
-    date: z.date().refine((date) => date >= today, {
+    date: z.coerce.date().refine((date) => date >= today, {
       message: "Date cannot be in the past",
     }),
     start_time: z

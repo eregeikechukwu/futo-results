@@ -2,16 +2,16 @@
 @use "../abstracts/mixins.scss" as *;
 @use "../main/animations.scss" as *;
 
-.button-primary {
-  font-size: toRem(18);
-  font-weight: 600;
-  line-height: toRem(28);
-  border-radius: toRem(16);
-  padding: toRem(16) toRem(32);
-  cursor: pointer;
-  transition: all 0.2s;
-  text-wrap: nowrap;
-}
+// .button-primary {
+//   font-size: toRem(18);
+//   font-weight: 600;
+//   line-height: toRem(28);
+//   border-radius: toRem(16);
+//   padding: toRem(16) toRem(32);
+//   cursor: pointer;
+//   transition: all 0.2s;
+//   text-wrap: nowrap;
+// }
 
 .center-child {
   display: flex;

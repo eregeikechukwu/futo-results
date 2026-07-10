@@ -94,12 +94,21 @@ export function AdvisorWeekelySlotForm({
             required={true}
           />
           <div className="modal-field">
-            <label>Notes</label>
-            <textarea name="note" className=" h-auto!" rows={4} />
+            <label>Notes (optional)</label>
+            <textarea
+              className=" h-auto!"
+              rows={4}
+              {...methods.register("note")}
+            />
           </div>
           <div className="flex items-center gap-12">
-            <input name="is_active" id="weekly-active" type="checkbox" />
-            <label htmlFor="weekly-active">Active slot</label>
+            <input
+              {...methods.register("is_active")}
+              name="is_active"
+              id="is_active"
+              type="checkbox"
+            />
+            <label htmlFor="is_active">Active slot</label>
           </div>
           <div className="justify-end flex gap-16">
             <button

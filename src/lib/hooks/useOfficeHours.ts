@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  acknowledgeVisitIntent,
   createAdvisorOfficeHour,
   createAdvisorOfficeHoursOverride,
   createAdvisorVisitIntent,
@@ -10,13 +11,19 @@ import {
   fetchAdvisorVisitIntents,
   fetchStudentAdvisor,
   fetchStudentVisitIntents,
+  resolveVisitIntent,
   updateAdvisorOfficeHourActive,
   updateAdvisorOfficeHoursOverrideCancel,
-  updateAdvisorVisitIntentStatus,
 } from "../queries/officeHours";
 import { gcTimeUni, staleTimeUni } from "./utils";
 import { errorToastHandler } from "@/helpers/errorHandler";
-import { AdvisorVisitIntentStatus } from "@/app/types/officeHours";
+import {
+  AdvisorOfficeHour,
+  AdvisorOfficeHoursOverride,
+  AdvisorVisitIntent,
+  AdvisorVisitIntentStatus,
+} from "@/app/types/officeHours";
+import { toast } from "react-hot-toast";
 
 const advisorHoursqueryKeys = {
   hours: "advisor-office-hours",
@@ -131,20 +138,12 @@ export function useCreateAdvisorVisitIntent() {
   });
 }
 
-export function useUpdateAdvisorVisitIntentStatus() {
+export function useResolveAdvisorVisitIntent() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      intentId,
-      status,
-      advisorNote,
-    }: {
-      intentId: string;
-      status: AdvisorVisitIntentStatus;
-      advisorNote: string | null;
-    }) => {
-      return updateAdvisorVisitIntentStatus(intentId, status, advisorNote);
+    mutationFn: async ({ intentId }: { intentId: string }) => {
+      return resolveVisitIntent(intentId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["advisor-visit-intents"] });
@@ -153,7 +152,33 @@ export function useUpdateAdvisorVisitIntentStatus() {
       });
     },
     onError: (error) => {
-      errorToastHandler(error, "Failed to update visit status.");
+      errorToastHandler(error, "Failed to resolve visit intent.");
+      throw error;
+    },
+  });
+}
+
+export function useAcknowledgeAdvisorVisitIntent() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      intentId,
+      advisorNote,
+    }: {
+      intentId: string;
+      advisorNote: string | null;
+    }) => {
+      return acknowledgeVisitIntent(intentId, advisorNote);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["advisor-visit-intents"] });
+      queryClient.invalidateQueries({
+        queryKey: [advisorHoursqueryKeys.studentsIntents],
+      });
+    },
+    onError: (error) => {
+      errorToastHandler(error, "Failed to acknowledge student visit intent.");
       throw error;
     },
   });
@@ -201,7 +226,7 @@ export function useToggleAdvisorOfficeHoursOverrideCancel() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: [advisorHoursqueryKeys.override, variables[0]],
+        queryKey: [advisorHoursqueryKeys.override],
       });
     },
     onError: (error) => {
@@ -250,7 +275,7 @@ export function useDeleteAdvisorOfficeHourOverride() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: [advisorHoursqueryKeys.hours, variables.advisorId],
+        queryKey: [advisorHoursqueryKeys.override, variables.advisorId],
       });
     },
     onError: (error) => {
@@ -274,7 +299,7 @@ export function useDeleteAdvisorIntent() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: [advisorHoursqueryKeys.hours, variables.studentId],
+        queryKey: [advisorHoursqueryKeys.studentsIntents, variables.studentId],
       });
     },
     onError: (error) => {
@@ -282,4 +307,3 @@ export function useDeleteAdvisorIntent() {
     },
   });
 }
-
