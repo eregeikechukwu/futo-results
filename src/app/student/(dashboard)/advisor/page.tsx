@@ -49,6 +49,16 @@ export default function StudentAdvisorPage() {
 
   const createIntentMutation = useCreateAdvisorVisitIntent();
 
+   const scheduleContent = useMemo(() => {
+    if (!weeklyHours) return [];
+    return weeklyHours;
+  }, [weeklyHours]);
+
+  const overrideContent = useMemo(() => {
+    if (!overrides) return [];
+    return overrides;
+  }, [overrides]);
+
   useEffect(() => {
     if (advisorError || weeklyError || overrideError || intentsError) {
       errorToastHandler(
@@ -100,15 +110,7 @@ export default function StudentAdvisorPage() {
     );
   };
 
-  const scheduleContent = useMemo(() => {
-    if (!weeklyHours) return [];
-    return weeklyHours;
-  }, [weeklyHours]);
-
-  const overrideContent = useMemo(() => {
-    if (!overrides) return [];
-    return overrides;
-  }, [overrides]);
+ 
 
   return (
     <DashboardContainer>

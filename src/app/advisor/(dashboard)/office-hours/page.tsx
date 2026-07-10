@@ -79,12 +79,6 @@ export default function AdvisorOfficeHoursPage() {
     }
   }, [weeklyError, overrideError, intentsError]);
 
-  if (!advisorData) {
-    return (
-      <SomethingWentWrong message="Unable to load your advisor account." />
-    );
-  }
-
   useEffect(() => {
     if (
       deleteHourMutation.isPending ||
@@ -106,6 +100,27 @@ export default function AdvisorOfficeHoursPage() {
     toggleHourMutation.isPending,
     toggleOverrideMutation.isPending,
   ]);
+
+  const weeklySchedule = useMemo(() => {
+    if (!weeklyHours) return [];
+    return weeklyHours;
+  }, [weeklyHours]);
+
+  const specialOverrides = useMemo(() => {
+    if (!overrides) return [];
+    return overrides;
+  }, [overrides]);
+
+  const incomingIntents = useMemo(() => {
+    if (!visitIntents) return [];
+    return visitIntents;
+  }, [visitIntents]);
+
+  if (!advisorData) {
+    return (
+      <SomethingWentWrong message="Unable to load your advisor account." />
+    );
+  }
 
   const handleIntentNoteChange = (intentId: string, value: string) => {
     setIntentNotes((current) => ({ ...current, [intentId]: value }));
@@ -206,21 +221,6 @@ export default function AdvisorOfficeHoursPage() {
       },
     );
   };
-
-  const weeklySchedule = useMemo(() => {
-    if (!weeklyHours) return [];
-    return weeklyHours;
-  }, [weeklyHours]);
-
-  const specialOverrides = useMemo(() => {
-    if (!overrides) return [];
-    return overrides;
-  }, [overrides]);
-
-  const incomingIntents = useMemo(() => {
-    if (!visitIntents) return [];
-    return visitIntents;
-  }, [visitIntents]);
 
   return (
     <DashboardContainer>
