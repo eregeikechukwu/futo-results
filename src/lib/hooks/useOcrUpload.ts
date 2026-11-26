@@ -50,7 +50,7 @@ export function useOcrUpload(
 
         if (fnError) {
           // The function puts its real error message in the response body
-          const body = await (fnError as any).context?.json?.().catch(() => null);
+          const body = await fnError.context?.json?.().catch(() => null);
           throw new Error(body?.error ?? fnError.message ?? "Unknown error during upload.");
         }
 
