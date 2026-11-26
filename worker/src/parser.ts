@@ -5,7 +5,7 @@
  * Worker-ready TypeScript port of the FUTO spatial parser engine.
  *
  * Fixes applied vs. the original server.js:
- *  1. regNo cleaning now preserves FUTO format  e.g. "2019/1/12345ME"
+ *  1.regNo strips to digits only — FUTO format is all-numeric e.g. "20231453773"
  *  2. groupWordsIntoRows uses a rolling average Y so drifting rows don't split
  *  3. detectColumns merges adjacent single-char tokens (handles "REG. NO." split)
  */

@@ -8,7 +8,7 @@ import { InfoCard } from "../utilities";
 import { uploadImageForOCR } from "../../lib/api";
 import { Modal } from "../modals/overlay";
 import { ProgressBar } from "../secondary/ocrProgress";
-import { OcrJob } from "@/app/types/advisor";
+import { Progress } from "@/app/types/advisor";
 import { useExcelParser } from "../../lib/excelToJson";
 import { ParsedResult } from "@/app/types/resultsUpload";
 import toast from "react-hot-toast";
@@ -23,7 +23,7 @@ export function useAdvisorUploadFileSelect(
   const [dragging, setDragging] = useState(false);
   const [error, setError] = useState<boolean | null>(null);
   const [errorMessage, setErrorMessage] = useState<unknown | null>(false);
-  const [progress, setProgress] = useState({
+  const [progress, setProgress] = useState<Progress>({
     percent: 0,
     phase: "idle",
     message: "Ready to upload",
@@ -33,20 +33,7 @@ export function useAdvisorUploadFileSelect(
   const { profile } = useAuth();
 
   // OCR processing hook
-  const {
-    upload,
-    status: ocrStatus,
-    result: ocrResult,
-    error: ocrError,
-    loading: ocrLoading,
-  } = useOcrUpload(setProgress);
-
-  useEffect(() => {
-    if (ocrError) {
-      setError(true);
-      setErrorMessage(ocrError);
-    }
-  }, [ocrError]);
+  const { uploadImage, error: ocrError } = useOcrUpload(setProgress);
 
   //Excel Processing hook
   const { isLoading, error: excelError, parseFile } = useExcelParser();
@@ -101,7 +88,6 @@ export function useAdvisorUploadFileSelect(
 
         setTimeout(() => {
           //Make sure not to change ths order
-
           setModalState(false);
           console.log(results, "New loadss rf");
           setParsedJson((results.data as unknown as ParsedResult[]) || []);
@@ -113,32 +99,14 @@ export function useAdvisorUploadFileSelect(
           return;
         }
 
-        toast.error("OCR extraction is not available under free plan");
-        fileRef.current = null;
-        return;
-        // if (ocrError) {
-        //   alert("OCR ERRPR");
-        //   setErrorMessage(ocrError);
-        //   throw new Error("OCR processing error" + ocrError);
-        // }
-        await upload(file, course, profile?.id || "");
+        const rows = await uploadImage(file);
 
-        if (ocrStatus === "done") {
-          console.log("OCR Job completed successfully:", ocrResult);
-          setTimeout(() => {
-            //Make sure not to change ths order
-            console.log(
-              "Final results bbbbbbbbbbbooooooooooooooooooobbbbbbbbbbbbbbb:",
-              errorMessage,
-            );
-            setModalState(false);
-            // setParsedJson(
-            //   (job?.result?.parsedJson as ParsedResult[]) ||
-            //     (job?.result?.parsedJson as ParsedResult[]),
-            // );
-            if (ocrResult) setParsedJson(ocrResult);
-          }, 1000);
+        if (ocrError) {
+          toast.error("OCR processing failed: " + ocrError);
+          throw new Error(ocrError.toString());
         }
+
+        setParsedJson(rows);
       }
     } catch (error) {
       toast.error(
@@ -184,7 +152,7 @@ export function useAdvisorUploadFileSelect(
       acceptedFormats: "image/*",
       title2: "Upload Scanned Result sheet",
       instruction:
-        "AI will extract data from your scanned document (Not available under free plan)",
+        "AI will extract data from your scanned document. Drag and drop your file here, or click to browse",
       colors: {
         borderActive: "border-purple-400",
         borderHover: "hover:border-purple-400",
@@ -197,7 +165,7 @@ export function useAdvisorUploadFileSelect(
   const activeMode = modes.find((m) => m.name.toLowerCase() === mode);
 
   const buttonCommonClasses =
-    "cursor-pointer basis-1/2 rounded-[8px] lh-24 py-14 px-16 font-medium transition-colors center-child gap-8 ";
+    "cursor-pointer basis-1/2 rounded-lg lh-24 py-14 px-16 font-medium transition-colors center-child gap-8 ";
 
   //toggle modal
 
@@ -207,14 +175,14 @@ export function useAdvisorUploadFileSelect(
         <div className="animateFadeIn">
           <div className="dashboard-container">
             {/* switch between OCR and Excel upload */}
-            <div className="flex p-4 rounded-small bg-[var(--color-background-mild)]">
+            <div className="flex p-4 rounded-small bg-(--color-background-mild)">
               {modes.map((m) => (
                 <button
                   key={m.name}
                   className={`${buttonCommonClasses} ${
                     mode === m.name.toLowerCase()
-                      ? "bg-white shadow-sm text-[var(--color-primary)]"
-                      : "text-[var(--color-text-link)] hover:text-[var(--color-gray-800)]"
+                      ? "bg-white shadow-sm text-(--color-primary)"
+                      : "text-(--color-text-link) hover:text-(--color-gray-800)"
                   }`}
                   onClick={() =>
                     setMode(m.name.toLowerCase() as "excel" | "ocr")
@@ -278,7 +246,7 @@ export function useAdvisorUploadFileSelect(
                 </button>
                 <p
                   className={`${
-                    error ? "text-red-500" : "text-[var(--color-text-passive)]"
+                    error ? "text-red-500" : "text-(--color-text-passive)"
                   } text-14 mb-24`}
                 >
                   {error

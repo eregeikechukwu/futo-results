@@ -1,75 +1,88 @@
-import React, { useState, useCallback, useRef, useEffect } from "react";
-import {
-  createResultBatch,
-  deleteBatch,
-} from "../queries/advisorResultsDownload";
-import toast from "react-hot-toast";
+import { useState, useCallback } from "react";
 import { ParsedResult } from "@/app/types/resultsUpload";
+import { createSupabaseClient } from "../supabase/client";
+import { Progress } from "@/app/types/advisor";
 
-const POLL_INTERVAL = 2000;
-const MAX_POLLS = 20;
+// Shape the progress bar component expects
 
-interface Progress {
-  percent: number;
-  phase: string;
-  message: string;
-}
+
+type Status = "uploading" | "processing" | "complete" | "error" | null;
 
 export function useOcrUpload(
   setProgress: React.Dispatch<React.SetStateAction<Progress>>,
 ) {
-  const [status, setStatus] = useState<string | null>(null);
-  const [result, setResult] = useState<ParsedResult[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<Status>(null);
   const [loading, setLoading] = useState(false);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [error, setError] = useState<unknown | null>(null);
+  const [result, setResult] = useState<ParsedResult[] | null>(null);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, []);
+  // batchId is no longer sent anywhere (the function doesn't store anything).
+  // Kept in the signature so existing callers don't break.
+  const uploadImage = useCallback(
+    async ( file: File) => {
+      const supabase = createSupabaseClient();
 
-  // Silent cleanup — never throws, never shows toast
-  const deleteOrphanedBatch = useCallback(async (batchId: string) => {
-    try {
-      await deleteBatch(batchId);
-    } catch (err) {
-      console.error("Failed to clean up orphaned batch:", err);
-    }
-  }, []);
+      // Reset everything from any previous upload
+      setLoading(true);
+      setError(null);
+      setResult(null);
+      setStatus("uploading");
+      setProgress({ percent: 20, phase: "uploading", message: "Uploading image..." });
 
-  const createBatch = useCallback(
-    async (courseOffering: string, advisorProfileId: string) => {
-      const data = await createResultBatch(
-        courseOffering,
-        advisorProfileId,
-        "ocr",
-      );
-      if (!data?.id) throw new Error("No batch ID returned from server.");
-      return data.id;
+      // The function does upload + OCR in ONE request and we can't see inside it,
+      // so we fake a slowly-moving bar (capped at 95%) until it responds.
+      let percent = 20;
+      const fakeProgress = setInterval(() => {
+        percent = Math.floor(Math.min(percent + Math.random() * 10, 95));
+        setStatus("processing");
+        setProgress({ percent, phase: "processing", message: "Processing image..." });
+      }, 1000);
+
+      try {
+        // Pack the image into form data - the field name "image" must match the function
+        const form = new FormData();
+        form.append("image", file);
+
+
+        const { data, error: fnError } = await supabase.functions.invoke("ocr-worker", {
+          body: form,
+        });
+
+        if (fnError) {
+          // The function puts its real error message in the response body
+          const body = await (fnError as any).context?.json?.().catch(() => null);
+          throw new Error(body?.error ?? fnError.message ?? "Unknown error during upload.");
+        }
+
+
+        console.log(data, 'data from ocr-worker', data.data, 'data.data from ocr-worker');
+
+        // The function returns { headers, data: [...rows], metadata, ... }
+        // so the rows are in data.data
+        setResult(prev => [...(prev || []), ...(data.data  as ParsedResult[])]);
+        setStatus("complete");
+        setProgress({ percent: 100, phase: "done", message: "OCR processing complete!" });
+        return data.data as ParsedResult[];
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Unknown error during upload.";
+        setError(message);
+        setStatus("error");
+        setProgress({ percent: 0, phase: "error", message });
+        throw err; // lets the caller catch it too (remove if your callers don't use try/catch)
+      } finally {
+        // Runs on success AND failure, so the timer never leaks
+        clearInterval(fakeProgress);
+        setLoading(false);
+      }
     },
-    [],
+    [setProgress],
   );
 
-  const uploadImage = useCallback(async (batchId: string, file: File) => {
-    const fd = new FormData();
-    fd.append("image", file);
-    fd.append("batch_id", batchId);
+  return { uploadImage, status, loading, error, result };
+}
 
-    const res = await fetch("/api/ocr/upload", { method: "POST", body: fd });
 
-    if (!res.ok) {
-      throw new Error(`Upload failed: ${res.statusText}`);
-    }
-
-    const { jobId, error: uploadErr } = await res.json();
-    if (uploadErr) throw new Error(uploadErr);
-    if (!jobId) throw new Error("No job ID returned from upload.");
-
-    return jobId as string;
-  }, []);
+/*
 
   const upload = useCallback(
     async (file: File, courseOffering: string, advisorProfileId: string) => {
@@ -190,6 +203,4 @@ export function useOcrUpload(
     },
     [setProgress, createBatch, uploadImage, deleteOrphanedBatch],
   );
-
-  return { upload, status, result, error, loading };
-}
+  */

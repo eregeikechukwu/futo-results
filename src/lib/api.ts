@@ -5,15 +5,13 @@ import { OcrJob, UploadResponse } from "@/app/types/advisor";
 // Upload image and automatically poll until completion
 export async function uploadImageForOCR(
   file: File,
-  onProgress?: (progress: {
-    phase: string;
-    percent: number;
-    message: string;
-  }) => void
-): Promise<OcrJob> {
+batchId?: string, //optional - pass course string or UUID for batch identification
+): Promise<string> { //Return jobId only
   // Step 1: Submit the image
   const formData = new FormData();
   formData.append("image", file);
+ 
+  if (batchId) formData.append("batch_id", batchId);
 
   const res = await fetch("http://localhost:3030/api/ocr", {
     method: "POST",
@@ -29,7 +27,7 @@ export async function uploadImageForOCR(
   const jobId = data.jobs[0].jobId;
 
   // Step 2: Poll until job is complete
-  return pollUntilComplete(jobId, onProgress);
+  return data.jobs[0].jobId; //server returns { jobs: [{jobId, filename}] } for batch uploads, we return the first jobId for now
 }
 
 // Poll a specific job until it's done or failed

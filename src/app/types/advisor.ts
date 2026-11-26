@@ -86,11 +86,12 @@ export type SelectFieldProps = {
   numeric?: boolean;
 };
 
-export type Progress = {
-  phase: "queued" | "preprocessing" | "ocr" | "parsing" | "done" | string;
+export interface Progress {
   percent: number;
+  phase:"idle"| "uploading" | "processing" | "done" | "error";
   message: string;
-};
+}
+
 
 export interface OcrJob {
   id: string;
