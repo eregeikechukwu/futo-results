@@ -105,6 +105,11 @@ export function useAdvisorUploadFileSelect(
           toast.error("OCR processing failed: " + ocrError);
           throw new Error(ocrError.toString());
         }
+        if (rows.length === 0) {
+          toast.error("No data extracted from the scanned document.");
+          setModalState(false);
+          return;
+        }
 
         setTimeout(() => {
           //Make sure not to change ths order

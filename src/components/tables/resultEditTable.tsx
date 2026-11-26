@@ -204,19 +204,13 @@ export function ResultEditTable({
   }, [courseCode, parsedJson, setErrors]);
 
   // Filter parsed data based on search query
-  const filteredData = parsedJson
-    .filter((row) => {
-      const query = searchQuery.toLowerCase();
-      return (
-        row.name?.toLowerCase().includes(query) ||
-        String(row.regNo).includes(query)
-      );
-    })
-    .map((row, index) => {
-      return { ...row, "s/n": index };
-    });
-
-  console.log("Filtered Data:", filteredData, "from table component");
+  const filteredData = parsedJson.filter((row) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      row.name?.toLowerCase().includes(query) ||
+      String(row.regNo).includes(query)
+    );
+  });
 
   const handleDeleteRow = useCallback(
     (indexToDelete: number) => {
