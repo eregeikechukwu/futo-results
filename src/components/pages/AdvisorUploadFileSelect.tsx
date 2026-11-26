@@ -106,7 +106,11 @@ export function useAdvisorUploadFileSelect(
           throw new Error(ocrError.toString());
         }
 
-        setParsedJson(rows);
+        setTimeout(() => {
+          //Make sure not to change ths order
+          setModalState(false);
+          setParsedJson((rows as ParsedResult[]) || []);
+        }, 800);
       }
     } catch (error) {
       toast.error(

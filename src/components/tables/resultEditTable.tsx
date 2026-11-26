@@ -28,7 +28,6 @@ import { CoverLoader } from "../secondary/loaders/coverLoader";
 import ConfirmationModal from "../secondary/confirmationModal";
 
 const tableHeaders = [
-  "S/N",
   "Name",
   "RegNo",
   "Test",
@@ -70,7 +69,6 @@ export function ResultEditTable({
   // Column Visibility
   const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>(
     {
-      "S/N": true,
       Name: true,
       RegNo: true,
       Test: true,
@@ -206,13 +204,19 @@ export function ResultEditTable({
   }, [courseCode, parsedJson, setErrors]);
 
   // Filter parsed data based on search query
-  const filteredData = parsedJson.filter((row) => {
-    const query = searchQuery.toLowerCase();
-    return (
-      row.name?.toLowerCase().includes(query) ||
-      String(row.regNo).includes(query)
-    );
-  });
+  const filteredData = parsedJson
+    .filter((row) => {
+      const query = searchQuery.toLowerCase();
+      return (
+        row.name?.toLowerCase().includes(query) ||
+        String(row.regNo).includes(query)
+      );
+    })
+    .map((row, index) => {
+      return { ...row, "s/n": index };
+    });
+
+  console.log("Filtered Data:", filteredData, "from table component");
 
   const handleDeleteRow = useCallback(
     (indexToDelete: number) => {
@@ -411,6 +415,7 @@ export function ResultEditTable({
         <table className="table overflow-auto">
           <thead>
             <tr>
+              <th>S/N</th>
               {tableHeaders.map((header) =>
                 visibleColumns[header] ? <th key={header}>{header}</th> : null,
               )}
@@ -534,7 +539,7 @@ export function TableRow({
           : ""
       }
     >
-      <td className="text-center">{index + 1}</td>
+      <td className="text-center w-30">{index + 1}</td>
       {editCourseFields.map((field, field_index) => {
         const fieldError = errors[index]?.[field.name];
         const value =

@@ -138,6 +138,7 @@ export const formatDate = (dateString: string) => {
 export const requestTimeoutTime = 50000;
 
 export const editCourseFields = [
+    
   {
     name: "name",
     placeholder: "eg: John Doe (optional)",
