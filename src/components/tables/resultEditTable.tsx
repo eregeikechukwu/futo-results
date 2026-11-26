@@ -28,6 +28,7 @@ import { CoverLoader } from "../secondary/loaders/coverLoader";
 import ConfirmationModal from "../secondary/confirmationModal";
 
 const tableHeaders = [
+  "S/N",
   "Name",
   "RegNo",
   "Test",
@@ -69,6 +70,7 @@ export function ResultEditTable({
   // Column Visibility
   const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>(
     {
+      "S/N": true,
       Name: true,
       RegNo: true,
       Test: true,
@@ -532,6 +534,7 @@ export function TableRow({
           : ""
       }
     >
+      <td className="text-center">{index + 1}</td>
       {editCourseFields.map((field, field_index) => {
         const fieldError = errors[index]?.[field.name];
         const value =

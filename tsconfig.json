@@ -35,5 +35,12 @@
     ".next/types/**/*.ts",
     "src/components/tables/resultEditTable.tsx"
   ],
-  "exclude": ["node_modules", "worker/**/*"]
+  "exclude": [
+    "node_modules",
+    "worker/**/*",
+    "supabase/functions",
+    "dist",
+    "build",
+    ".next"
+  ]
 }
